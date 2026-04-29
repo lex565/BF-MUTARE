@@ -10,6 +10,7 @@ import {
   Shield,
 } from 'lucide-react'
 import features from '@/app/data/features.json'
+import { fadeInUp, staggerContainer, staggerItem } from '@/app/lib/animations'
 
 const iconMap: Record<string, React.ReactNode> = {
   CheckCircle2: <CheckCircle2 className="w-8 h-8" />,
@@ -26,9 +27,7 @@ export function Features() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
@@ -40,16 +39,17 @@ export function Features() {
         </motion.div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => {
+        <motion.div
+          {...staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {features.map((feature) => {
             const Icon = iconMap[feature.icon]
             return (
               <motion.div
                 key={feature.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                {...staggerItem}
+                whileHover={{ y: -8, transition: { duration: 0.3 } }}
                 className="group"
               >
                 <div className="relative p-8 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-lg hover:border-orange-200 transition-all duration-300 h-full">
@@ -79,13 +79,11 @@ export function Features() {
               </motion.div>
             )
           })}
-        </div>
+        </motion.div>
 
         {/* Trust Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
           className="mt-20 bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-12 text-white"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">

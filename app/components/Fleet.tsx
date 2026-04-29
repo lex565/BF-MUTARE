@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { MessageCircle } from 'lucide-react'
 import cars from '@/app/data/cars.json'
+import { fadeInUp, staggerContainer, staggerItem } from '@/app/lib/animations'
 
 export function Fleet() {
   return (
@@ -10,9 +11,7 @@ export function Fleet() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
@@ -24,14 +23,15 @@ export function Fleet() {
         </motion.div>
 
         {/* Cars Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {cars.map((car, index) => (
+        <motion.div
+          {...staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {cars.map((car) => (
             <motion.div
               key={car.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              {...staggerItem}
+              whileHover={{ y: -8, transition: { duration: 0.3 } }}
               className="group"
             >
               <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200">
@@ -85,13 +85,11 @@ export function Fleet() {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* View More CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
           className="text-center mt-16"
         >
           <button className="bg-gray-900 text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-600 transition-colors">

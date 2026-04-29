@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Search, Plane, FileCheck, Truck } from 'lucide-react'
+import { fadeInUp, staggerContainer, staggerItem } from '@/app/lib/animations'
 
 const steps = [
   {
@@ -36,9 +37,7 @@ export function HowItWorks() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
@@ -50,16 +49,16 @@ export function HowItWorks() {
         </motion.div>
 
         {/* Steps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <motion.div
+          {...staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+        >
           {steps.map((step, index) => {
             const Icon = step.icon
             return (
               <motion.div
                 key={step.number}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                {...staggerItem}
                 className="relative"
               >
                 {/* Card */}
@@ -86,13 +85,11 @@ export function HowItWorks() {
               </motion.div>
             )
           })}
-        </div>
+        </motion.div>
 
         {/* Why Choose Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
           className="mt-20 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-12 border border-orange-200"
         >
           <h3 className="text-2xl font-bold text-gray-900 mb-6">Why BF Mutare?</h3>

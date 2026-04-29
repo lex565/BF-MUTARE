@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import team from '@/app/data/team.json'
+import { fadeInUp, staggerContainer, staggerItem } from '@/app/lib/animations'
 
 export function Team() {
   return (
@@ -9,9 +10,7 @@ export function Team() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
@@ -23,14 +22,15 @@ export function Team() {
         </motion.div>
 
         {/* Team Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {team.map((member, index) => (
+        <motion.div
+          {...staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+        >
+          {team.map((member) => (
             <motion.div
               key={member.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              {...staggerItem}
+              whileHover={{ y: -12, transition: { duration: 0.3 } }}
               className="group"
             >
               <div className="text-center">
@@ -67,13 +67,11 @@ export function Team() {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Company Values */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
           className="mt-20 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-12 border border-orange-200"
         >
           <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">

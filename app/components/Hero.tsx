@@ -3,17 +3,21 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useCounter } from '@/app/lib/useCounter'
+import { fadeInUp, slideInLeft } from '@/app/lib/animations'
 
 export function Hero() {
+  const { count: customers, ref: customersRef } = useCounter(1200, 2.5)
+  const { count: hours, ref: hoursRef } = useCounter(48, 2.5)
+  const { count: rating, ref: ratingRef } = useCounter(5, 1.5)
+
   return (
     <section id="home" className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-white to-orange-50 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            {...slideInLeft}
             className="space-y-6"
           >
             <div className="space-y-4">
@@ -49,33 +53,39 @@ export function Hero() {
               </a>
             </div>
 
-            {/* Stats */}
+            {/* Stats with Counters */}
             <div className="flex flex-wrap gap-8 pt-8 border-t border-gray-200">
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
                 className="space-y-1"
+                ref={customersRef}
               >
-                <div className="text-3xl font-bold text-orange-600">1,200+</div>
+                <div className="text-3xl font-bold text-orange-600">{customers}+</div>
                 <p className="text-gray-600 text-sm">Happy Customers</p>
               </motion.div>
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
                 className="space-y-1"
+                ref={hoursRef}
               >
-                <div className="text-3xl font-bold text-orange-600">48h</div>
+                <div className="text-3xl font-bold text-orange-600">{hours}h</div>
                 <p className="text-gray-600 text-sm">Average Delivery Time</p>
               </motion.div>
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
                 className="space-y-1"
+                ref={ratingRef}
               >
-                <div className="text-3xl font-bold text-orange-600">5★</div>
+                <div className="text-3xl font-bold text-orange-600">{rating}★</div>
                 <p className="text-gray-600 text-sm">Customer Rating</p>
               </motion.div>
             </div>
@@ -83,9 +93,10 @@ export function Hero() {
 
           {/* Right Image */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+            whileHover={{ scale: 1.02 }}
             className="relative h-full min-h-96"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-200 via-orange-200 to-orange-300 rounded-2xl blur-2xl opacity-40" />

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
 import testimonials from '@/app/data/testimonials.json'
+import { fadeInUp, staggerContainer, staggerItem } from '@/app/lib/animations'
 
 export function Testimonials() {
   return (
@@ -10,9 +11,7 @@ export function Testimonials() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
@@ -24,14 +23,15 @@ export function Testimonials() {
         </motion.div>
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-12">
-          {testimonials.map((testimonial, index) => (
+        <motion.div
+          {...staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-12"
+        >
+          {testimonials.map((testimonial) => (
             <motion.div
               key={testimonial.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              {...staggerItem}
+              whileHover={{ scale: 1.02, transition: { duration: 0.3 } }}
               className="group"
             >
               <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-8 shadow-md hover:shadow-lg transition-all border border-gray-200 hover:border-orange-200 h-full">
@@ -65,13 +65,11 @@ export function Testimonials() {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Trust Indicators */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...fadeInUp}
           className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-12 border border-orange-200"
         >
           <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
