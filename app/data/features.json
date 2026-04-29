@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "title": "Verified Japanese Quality",
+    "description": "All vehicles inspected and certified. Direct imports from trusted Japanese suppliers.",
+    "icon": "CheckCircle2"
+  },
+  {
+    "id": 2,
+    "title": "Transparent Pricing",
+    "description": "No hidden costs. Know the exact price before you buy. Fair and competitive rates.",
+    "icon": "DollarSign"
+  },
+  {
+    "id": 3,
+    "title": "Nationwide Delivery",
+    "description": "Fast and reliable delivery to your doorstep across all of Zimbabwe.",
+    "icon": "Truck"
+  },
+  {
+    "id": 4,
+    "title": "Expert Support Team",
+    "description": "Dedicated customer service available 24/7. We're here to help you.",
+    "icon": "Headphones"
+  },
+  {
+    "id": 5,
+    "title": "Flexible Financing",
+    "description": "Easy payment plans available. We work with you to make car ownership possible.",
+    "icon": "CreditCard"
+  },
+  {
+    "id": 6,
+    "title": "Warranty & Support",
+    "description": "All vehicles come with warranty. After-sales support you can trust.",
+    "icon": "Shield"
+  }
+]
