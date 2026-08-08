@@ -1,0 +1,154 @@
+/* ---------------------------------------------------------------------------
+   Pineberry Holdings — shared design tokens
+   ---------------------------------------------------------------------------
+   One rhythm, two voices. Everything structural (spacing, type scale, easing,
+   radii) is shared so the family resemblance is real. Colour and typeface are
+   per-brand and get overridden in each app's globals.css.
+
+   Deliberate choices, so nobody has to re-litigate them later:
+   - No pure #fff or #000 anywhere. Paper is warm, ink is warm-black. Pure
+     white/black is the single loudest tell of a template.
+   - One accent per brand, used as a signal, never as a decorative gradient.
+   - Type scale is a fifth-based ratio (1.5) at display sizes and tightens to
+     1.2 at body sizes, so headlines carry and body text stays calm.
+   - Every easing is a custom cubic-bezier. Default `ease` is the tell.
+--------------------------------------------------------------------------- */
+
+/* `static` matters here. Tailwind drops theme variables it cannot see used in
+   a class name, and several of these are read from inline styles instead —
+   Reveal reaches for --duration-base and --ease-out-quint that way. Without
+   `static` those resolve to nothing and the animation silently stops easing. */
+@theme static {
+  /* -- Semantic colour slots. Overridden per brand. Defaults = Pineberry. -- */
+  --color-paper: #f6f3ec; /* warm page ground */
+  --color-paper-sunk: #ebe6db; /* recessed panels, table stripes */
+  --color-ink: #17150f; /* primary text, near-black warm */
+  --color-ink-soft: #5c574a; /* secondary text */
+  --color-ink-faint: #928c7c; /* captions, meta, disabled */
+  --color-rule: #d8d1c2; /* hairlines, borders */
+
+  --color-accent: #c4402c; /* pineberry seed red */
+  --color-accent-deep: #8f2c1e; /* pressed / hover */
+  --color-accent-wash: #f2ded8; /* tinted backgrounds */
+  --color-support: #2f5d46; /* calyx green — secondary signal */
+
+  /* -- Typefaces. Wired to next/font variables set in each app's layout. -- */
+  --font-display: var(--font-display-family), Georgia, serif;
+  --font-text: var(--font-text-family), system-ui, sans-serif;
+  --font-mono: var(--font-mono-family), ui-monospace, monospace;
+
+  /* -- Type scale. Fluid, clamped, no runaway headlines on ultrawide. -- */
+  --text-micro: 0.6875rem; /* 11px — eyebrow labels, plate codes */
+  --text-small: 0.8125rem; /* 13px — meta, captions */
+  --text-body: 1rem;
+  --text-lead: clamp(1.0625rem, 0.98rem + 0.42vw, 1.3125rem);
+  --text-h4: clamp(1.25rem, 1.14rem + 0.55vw, 1.5rem);
+  --text-h3: clamp(1.5rem, 1.28rem + 1.1vw, 2.25rem);
+  --text-h2: clamp(2rem, 1.55rem + 2.25vw, 3.375rem);
+  --text-h1: clamp(2.5rem, 1.65rem + 4.25vw, 5rem);
+  /* Mega is deliberately restrained. An 11rem headline looks decisive in a
+     mockup and wraps to four ragged lines on a real 1100px laptop, which is
+     what most people here will actually open the site on. */
+  --text-mega: clamp(2.75rem, 1.5rem + 5.5vw, 6.5rem);
+
+  /* -- Tracking. Big type needs negative tracking or it reads amateur. -- */
+  --tracking-mega: -0.045em;
+  --tracking-display: -0.03em;
+  --tracking-tight: -0.015em;
+  --tracking-label: 0.16em; /* uppercase eyebrows only */
+
+  /* -- Spacing rhythm: 4px base, but the useful steps get names. -- */
+  --spacing-gutter: clamp(1.25rem, 0.9rem + 1.75vw, 2.5rem);
+  --spacing-section: clamp(4.5rem, 3rem + 7.5vw, 10rem);
+  --spacing-measure: 68ch; /* max line length for readable prose */
+
+  /* -- Radii. Near-square. The 16px-rounded-everything look is the tell. -- */
+  --radius-sharp: 0px;
+  --radius-soft: 2px;
+  --radius-card: 4px;
+  --radius-pill: 999px;
+
+  /* -- Motion. Custom curves; nothing linear, nothing default-eased. -- */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-quick: 180ms;
+  --duration-base: 420ms;
+  --duration-slow: 900ms;
+}
+
+/* Panel entrance, used where content swaps in place (tab panels, filtered
+   grids) and a scroll reveal would be the wrong tool — nothing has scrolled. */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* -- Reduced motion is a correctness requirement, not a nicety. ----------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* -- Base element defaults shared by both sites. -------------------------- */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-text);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Headlines are display-face, tight, and never rely on font-weight alone. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: var(--tracking-display);
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-text);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.2;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Visible focus that matches the brand instead of the browser default. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-paper);
+  }
+}

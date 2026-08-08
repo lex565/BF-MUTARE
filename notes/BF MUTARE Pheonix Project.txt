@@ -1,0 +1,47 @@
+Here's the complete list from our conversation in a clean, copy-paste friendly format.You can copy everything below and save it as a text file (e.g., animation-resources-2026.txt) on your computer.Animation Libraries & Resources for Heavily Animated Responsive Websites (2026)1. Top Animation LibrariesMotion (Framer Motion)
+Best for: UI micro-interactions, gestures, scroll animations, page transitions
+Official site: https://motion.dev
+Install: npm install motionGSAP (GreenSock)
+Best for: Complex timelines, cinematic scroll effects, heavy animations
+Official site: https://gsap.com
+Install: npm install gsapReact Spring
+Best for: Physics-based natural animations
+Official site: https://react-spring.dev
+Install: npm install @react
+-spring/web@react
+-three/fiber + drei (for 3D)
+Best for: Interactive 3D models in Next.js
+Official: https://docs.pmnd.rs/react-three-fiber
+Install: npm install three @react
+-three/fiber @react
+-three/drei2. Component Libraries (Copy-Paste Animated UI)Aceternity UI – 200+ beautiful animated components (Tailwind + Motion)
+Website: https://ui.aceternity.com
+GitHub: https://github.com/aceternity
+Magic UI – 150+ free animated components and effects
+Website: https://magicui.design
+GitHub: https://github.com/magicuidesign/magicui
+
+3. Best GitHub Repositories (Ready to Clone)Strong Framer Motion / Motion Portfolioshttps://github.com/sanidhyy/modern-portfolio  
+https://github.com/mo-hassann/my-portfolio (code-editor style)  
+https://github.com/syedahmedullah14/modern-minimalist-portfolio (with Three.js)  
+https://github.com/adhirajcs/nextjs-portfolio (uses Aceternity + Magic UI)
+
+GSAP + Motion Portfolioshttps://github.com/oleksaYevtush/myPortfolio (Framer Motion + GSAP + Locomotive Scroll)
+
+3D + Next.js + React Three Fiber Startershttps://github.com/pmndrs/react-three-next → Best minimalist 3D starter  
+https://github.com/pmndrs/react-three-fiber → Main repo with examples  
+https://github.com/adrianhajdin/threejs-portfolio  
+https://github.com/Jayant-1/3D-Portfolio (GSAP + Framer Motion + 3D)  
+https://github.com/ankush-diwakar/my_threejs_portfolio
+
+Other Good Startershttps://github.com/codebucks27/Next.js-Creative-Portfolio-Website (creative 3D portfolio)  
+https://github.com/magicuidesign/portfolio (minimalist with Magic UI)
+
+Quick Start TipClone a repo you like (e.g. git clone https://github.com/sanidhyy/modern-portfolio.git)
+Open in VS Code
+Run npm install then npm run dev
+Use your Claude Code extension to customize: make it more responsive, add GSAP scroll animations, or integrate 3D models.
+
+Recommendation:
+Start with https://github.com/sanidhyy/modern-portfolio (pure Motion) or https://github.com/pmndrs/react-three-next (if you want 3D).Would you like me to add more specific prompts for Claude or installation steps to this list? Just say the word and I can update the text.Copy the whole block above (including the lines) and paste it into a new file in Notepad, VS Code, or any text editor, then save as .txt. Let me know if you need it in a different format!
+

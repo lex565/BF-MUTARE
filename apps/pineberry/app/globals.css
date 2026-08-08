@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+@import '@pineberry/ui/tokens.css';
+
+/* Tailwind only scans this app by default; the shared package authors classes
+   of its own, so it has to be pulled into the content scan explicitly. */
+@source '../../../packages/ui/src';
+
+/* ---------------------------------------------------------------------------
+   Pineberry Holdings — brand layer
+   ---------------------------------------------------------------------------
+   The parent company reads as an owner, not an operator: paper ground, an
+   editorial serif, generous whitespace, one red accent used sparingly. It
+   should look like an annual report, not a startup landing page. The operating
+   companies are where the energy lives.
+--------------------------------------------------------------------------- */
+
+:root {
+  --font-display-family: var(--font-fraunces);
+  --font-text-family: var(--font-schibsted);
+  --font-mono-family: var(--font-plex-mono);
+}
+
+@layer base {
+  /* Fraunces carries optical sizing and a "wonk" axis. Dialling both up at
+     display sizes is what stops the serif reading as stock Georgia. */
+  h1,
+  h2 {
+    font-variation-settings: 'SOFT' 0, 'WONK' 1, 'opsz' 144;
+    font-weight: 400;
+  }
+
+  h3 {
+    font-variation-settings: 'SOFT' 0, 'WONK' 1, 'opsz' 48;
+    font-weight: 500;
+  }
+}
+
+/* A hairline grid that runs the full page height, visible at the gutters.
+   Cheap, but it makes the layout feel measured rather than stacked. */
+.page-rules {
+  background-image: linear-gradient(
+    to right,
+    var(--color-rule) 0 1px,
+    transparent 1px 100%
+  );
+  background-size: 100% 100%;
+}

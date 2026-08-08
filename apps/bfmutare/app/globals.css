@@ -1,0 +1,74 @@
+@import 'tailwindcss';
+@import '@pineberry/ui/tokens.css';
+
+@source '../../../packages/ui/src';
+
+/* ---------------------------------------------------------------------------
+   BF Mutare — brand layer
+   ---------------------------------------------------------------------------
+   Same skeleton as Pineberry, opposite temperature.
+
+   Two decisions worth keeping:
+
+   1. Dark ground. Every photo we have is a real car shot outdoors in bright
+      Zimbabwean sun — bodywork, chrome, glass. On a white page those photos
+      look like classified ads. On near-black they look like a showroom, and
+      the paint colour becomes the page's colour.
+
+   2. The accent is Zimbabwean number-plate yellow, used flat and sparingly:
+      eyebrows, prices, the active nav marker. Not a gradient. It is the one
+      colour a Zimbabwean driver reads as "vehicle" before they read a word of
+      copy, and no template ships with it.
+--------------------------------------------------------------------------- */
+
+:root {
+  --color-paper: #131210; /* near-black, warm */
+  --color-paper-sunk: #1c1a17; /* cards, raised panels */
+  --color-ink: #f4f1e9;
+  --color-ink-soft: #a8a294;
+  --color-ink-faint: #6f6a5e;
+  --color-rule: #2e2b26;
+
+  --color-accent: #efc63b; /* plate yellow */
+  --color-accent-deep: #c9a223;
+  --color-accent-wash: #2a2415;
+  --color-support: #4a8f6d;
+
+  --font-display-family: var(--font-archivo);
+  --font-text-family: var(--font-archivo);
+  --font-mono-family: var(--font-plex-mono);
+}
+
+@layer base {
+  /* Archivo is variable on both weight and width. Headlines run expanded and
+     heavy; that width axis is doing the work a second typeface usually would. */
+  h1,
+  h2 {
+    font-variation-settings: 'wdth' 112;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    font-variation-settings: 'wdth' 105;
+    font-weight: 600;
+  }
+
+  /* Dark ground needs slightly lighter strokes or text looks bolder than set. */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Number-plate treatment for stock codes and registration numbers. Used on car
+   cards — it is the detail that says "this is a real dealer's actual stock". */
+.plate {
+  background-color: var(--color-accent);
+  color: #0d0c0a;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border-radius: var(--radius-soft);
+  padding: 0.15em 0.5em;
+}
