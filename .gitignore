@@ -12,6 +12,20 @@ next-env.d.ts
 # reference repos cloned for inspiration — not part of the build
 references/
 
+# Raw source photos and video straight off the phone (~130MB).
+#
+# ⚠ THESE ARE STILL TRACKED. This rule only stops NEW files being added here;
+#   it does not untrack what is already committed.
+#
+# BLOCKS PUSHING TO GITHUB: Images/video_2026-08-08_15-27-21.mp4 is 111MB and
+# GitHub hard-rejects any file over 100MB. Any push will be refused until that
+# blob is out of history — which needs either `git rm -r --cached Images` plus
+# a history rewrite, or Git LFS. Left alone deliberately, pending a decision.
+#
+# The site itself does not need this folder; the files it serves are committed
+# under apps/bfmutare/public/ (featured/, deliveries/, partnership/, video/).
+Images/
+
 # large local research dumps
 notes/composio.txt
 

@@ -1,0 +1,18 @@
+# Netlify build config.
+#
+# The build runs from the REPO ROOT, not from apps/bfmutare. That is deliberate:
+# the app imports @pineberry/ui through the npm workspace, so an install scoped
+# to the app folder would fail to resolve it. Setting `base` to the app
+# directory — the usual monorepo advice — breaks exactly that.
+
+[build]
+  command = "npm run build:bf"
+  publish = "apps/bfmutare/.next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Netlify normally auto-installs this for Next.js sites, but detection is less
+# reliable when the app is not at the repo root, so it is declared explicitly.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
