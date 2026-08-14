@@ -1,14 +1,35 @@
 # Pineberry Holdings — websites
 
-Two sites, one codebase.
+Five sites, one codebase.
 
 | App | What it is | Local | Intended domain |
 | --- | --- | --- | --- |
 | `apps/pineberry` | Pineberry Holdings, the parent | `localhost:3000` | pineberryholdings.com |
-| `apps/bfmutare` | BF Mutare, Japanese vehicle imports | `localhost:3001` | bfmutare.co.zw |
-| `packages/ui` | Shared tokens and components | — | — |
+| `apps/bfmutare` | BF Mutare, vehicle imports | `localhost:3001` | bfmutare.co.zw |
+| `apps/muroora` | Muroora Mart, retail and diaspora shopping | `localhost:3002` | TBC |
+| `apps/speedmotors` | Speed Motor Engineering, since 1996 | `localhost:3003` | TBC |
+| `apps/club420` | 420 Liquor Store | `localhost:3004` | TBC |
+| `packages/ui` | Shared tokens, components and the brand registry | — | — |
 
 Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · TypeScript · npm workspaces.
+
+## How the group hangs together
+
+`packages/ui/src/brands.ts` is the single source of truth. Every company's
+palette, activities, logo path and link live there once; the holdings site
+renders its register from it, and `GroupBar` renders from it on every company
+site. Add a fifth company there and it appears everywhere at once.
+
+**Linking is one-directional, on purpose.** Each company site links up to
+Pineberry (the group bar and the footer). Pineberry links out to all four.
+Company sites do *not* link sideways to each other — they share an owner, not
+an audience, and a header offering a garage on a liquor store's site makes each
+one read as a directory page rather than its own shopfront.
+
+`brandHref()` returns a company's production URL when it has one and its local
+dev port when it does not, so cross-links work throughout the build. After the
+first deploy, fill in the five `href` values in `brands.ts` and every link
+resolves at once.
 
 ---
 
@@ -94,10 +115,13 @@ not visible in an image was left out rather than invented.
 
 ```bash
 npm install            # once, at the ROOT — workspaces hoist everything
-npm run dev:bf         # BF Mutare  → localhost:3001
-npm run dev:pineberry  # Pineberry  → localhost:3000
-npm run build          # builds both
-npm run lint           # lints both
+npm run dev:pineberry  # Pineberry     → localhost:3000
+npm run dev:bf         # BF Mutare     → localhost:3001
+npm run dev:muroora    # Muroora Mart  → localhost:3002
+npm run dev:speed      # Speed Motors  → localhost:3003
+npm run dev:420        # 420           → localhost:3004
+npm run build          # builds all five
+npm run lint           # lints all five
 ```
 
 Run `npm install` from the **root**, never inside an app — the apps depend on
@@ -144,15 +168,35 @@ rather than three invented articles.
 
 ## Deploying
 
-### Vercel — two projects, one repo
+### Vercel — five projects, one repo
 
-| Setting | Pineberry | BF Mutare |
-| --- | --- | --- |
-| Root Directory | `apps/pineberry` | `apps/bfmutare` |
-| Install Command | `npm install --prefix ../..` | `npm install --prefix ../..` |
+Each app carries its own `vercel.json` with the right install command. Create
+one Vercel project per app and set:
 
-Tick **"Include files outside the root directory"** on both, or the build can't
-see `packages/ui` and fails on the `@pineberry/ui` import.
+| Setting | Value |
+| --- | --- |
+| Root Directory | `apps/<name>` |
+| Install Command | `npm install --prefix ../..` |
+| Include files outside the root directory | **ticked** |
+
+That last one is not optional: the apps import `@pineberry/ui` through the npm
+workspace, and without it the build cannot see `packages/` and fails on the
+import. The install command reaching up to the root is the same problem —
+installing inside the app folder alone leaves the dependency unresolved.
+
+There is deliberately no root `vercel.json` any more. The old one hardcoded
+`npm run build:bf`, which would have built BF Mutare for all five projects.
+
+### ⚠ This repo cannot be pushed to GitHub as it stands
+
+`Images/video_2026-08-08_15-27-21.mp4` is 110MB and is already committed in
+git history. GitHub hard-rejects any file over 100MB, so a push is refused
+regardless of `.gitignore` — that rule only stops *new* files being added.
+
+Fixing it needs either a history rewrite (`git filter-repo --path Images/
+--invert-paths`) or Git LFS. Deploying straight from the Vercel CLI avoids the
+problem entirely, because the CLI uploads the working tree and never touches
+git history.
 
 ### Namecheap — domains only
 
