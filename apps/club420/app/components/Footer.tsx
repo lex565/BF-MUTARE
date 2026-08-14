@@ -1,11 +1,9 @@
 import Link from 'next/link'
-import { BRANDS, PARENT, brandHref, parentHref } from '@pineberry/ui'
+import { PARENT, parentHref } from '@pineberry/ui'
 import { SITE, LEGAL } from '@/app/data/site'
 import { Wordmark } from '@/app/components/Nav'
 
 export function Footer() {
-  const siblings = BRANDS.filter((brand) => brand.slug !== 'club-420')
-
   return (
     <footer className="border-t border-rule">
       {/* The legal band. It runs above the ordinary footer on every page, not
@@ -55,24 +53,6 @@ export function Footer() {
           >
             {PARENT.name} ↗
           </a>
-
-          <ul className="mt-6 space-y-2">
-            {siblings.map((brand) => (
-              <li key={brand.slug}>
-                <a
-                  href={brandHref(brand)}
-                  className="inline-flex items-center gap-2 font-mono text-micro uppercase tracking-label text-ink-faint transition-colors hover:text-ink md:flex-row-reverse"
-                >
-                  <span
-                    aria-hidden
-                    className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: brand.palette.accent }}
-                  />
-                  {brand.name}
-                </a>
-              </li>
-            ))}
-          </ul>
 
           <p className="mt-8 font-mono text-micro text-ink-faint">
             © {new Date().getFullYear()} {SITE.fullName}

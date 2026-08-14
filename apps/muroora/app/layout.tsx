@@ -55,9 +55,10 @@ export default function RootLayout({
       className={`${figtree.variable} ${plexMono.variable}`}
     >
       <body className="flex min-h-dvh flex-col">
-        {/* The group bar sits above this site's own nav on every page — see
-            packages/ui/src/GroupBar.tsx. */}
-        <GroupBar current="muroora-mart" />
+        {/* One link back to the parent, above this site's own nav on every
+            page. It deliberately does not list the sister companies — see
+            packages/ui/src/GroupBar.tsx for why. */}
+        <GroupBar />
         <Nav />
         <div className="flex-1">{children}</div>
         <Footer />

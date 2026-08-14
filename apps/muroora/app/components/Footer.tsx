@@ -1,11 +1,9 @@
 import Link from 'next/link'
-import { BRANDS, PARENT, brandHref, parentHref } from '@pineberry/ui'
+import { PARENT, parentHref } from '@pineberry/ui'
 import { SITE } from '@/app/data/site'
 import { Logo } from '@/app/components/Logo'
 
 export function Footer() {
-  const siblings = BRANDS.filter((brand) => brand.slug !== 'muroora-mart')
-
   return (
     <footer className="border-t border-rule bg-paper-sunk">
       <div className="mx-auto grid max-w-[86rem] gap-12 px-gutter py-16 md:grid-cols-12">
@@ -30,8 +28,9 @@ export function Footer() {
           </p>
         </div>
 
-        {/* Every site in the group carries the full group list in its footer,
-            not just a link home — see also GroupBar at the top of the page. */}
+        {/* Links to the parent only. The sister companies are listed on
+            Pineberry's own site, which is the page whose job that is — see
+            packages/ui/src/GroupBar.tsx. */}
         <div className="md:col-span-4 md:text-right">
           <p className="font-mono text-micro uppercase tracking-label text-ink-faint">
             Part of {PARENT.name}
@@ -42,24 +41,6 @@ export function Footer() {
           >
             {PARENT.name} ↗
           </a>
-
-          <ul className="mt-6 space-y-2">
-            {siblings.map((brand) => (
-              <li key={brand.slug}>
-                <a
-                  href={brandHref(brand)}
-                  className="inline-flex items-center gap-2 font-mono text-micro uppercase tracking-label text-ink-faint transition-colors hover:text-ink md:flex-row-reverse"
-                >
-                  <span
-                    aria-hidden
-                    className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: brand.palette.accent }}
-                  />
-                  {brand.name}
-                </a>
-              </li>
-            ))}
-          </ul>
 
           <p className="mt-8 font-mono text-micro text-ink-faint">
             © {new Date().getFullYear()} {SITE.name}

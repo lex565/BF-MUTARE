@@ -51,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en-ZW" className={`${archivo.variable} ${plexMono.variable}`}>
       <body className="flex min-h-dvh flex-col">
-        <GroupBar current="speed-motors" />
+        <GroupBar />
         <Nav />
         <div className="flex-1">{children}</div>
         <Footer />

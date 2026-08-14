@@ -68,7 +68,7 @@ export default function RootLayout({
       className={`${bebas.variable} ${figtree.variable} ${plexMono.variable}`}
     >
       <body className="flex min-h-dvh flex-col">
-        <GroupBar current="club-420" />
+        <GroupBar />
         <Nav />
         <div className="flex-1">{children}</div>
         <Footer />
