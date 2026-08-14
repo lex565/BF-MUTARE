@@ -17,7 +17,7 @@ const STEPS = [
   },
   {
     title: 'Or we import to order',
-    body: 'Not on the lot? Tell us the model, the budget and the timeline, and we source it from Japan.',
+    body: 'Not on the lot? Tell us the model, the budget and the timeline, and we go and find it.',
   },
   {
     title: 'Drive it away',
@@ -43,15 +43,22 @@ export function Buying() {
               as="li"
               from="up"
               delay={index * 0.07}
-              className="bg-paper-sunk p-8"
+              className="group bg-paper-sunk p-8 transition-colors duration-300 hover:bg-paper"
             >
-              <span className="font-mono text-micro uppercase tracking-label text-accent">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              <h3 className="mt-6 text-h4 font-semibold">{step.title}</h3>
-              <p className="mt-3 text-small leading-relaxed text-ink-soft">
-                {step.body}
-              </p>
+              {/* Same numeral treatment as the services list — see `.numeral`
+                  in globals.css. The <ol> supplies the real numbering to a
+                  screen reader, so these are decorative and hidden from it. */}
+              <div className="flex items-center gap-4">
+                <span aria-hidden className="numeral text-h2">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span
+                  aria-hidden
+                  className="h-px flex-1 bg-rule transition-colors duration-300 group-hover:bg-accent"
+                />
+              </div>
+              <h3 className="mt-7 text-h4 font-semibold">{step.title}</h3>
+              <p className="mt-3 leading-relaxed text-ink-soft">{step.body}</p>
             </Reveal>
           ))}
         </ol>

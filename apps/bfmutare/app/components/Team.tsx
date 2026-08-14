@@ -79,7 +79,17 @@ export function Team() {
                     : 'border-rule text-ink-soft hover:border-ink-faint hover:text-ink'
                 }`}
               >
-                {department.department}
+                {/* The person's name leads, the department follows in the
+                    quieter weight. Six real names read as a team; six
+                    department nouns read as an org chart. */}
+                {department.name ?? department.department}
+                {department.name && (
+                  <span
+                    className={`ml-2 font-normal ${selected ? 'text-paper/60' : 'text-ink-faint'}`}
+                  >
+                    {department.department}
+                  </span>
+                )}
               </button>
             )
           })}
@@ -132,9 +142,30 @@ export function Team() {
               {head.title ?? `Head of ${head.department}`}
             </p>
 
-            <div className="mt-8 max-w-measure space-y-4 border-t border-rule pt-8">
-              <p className="text-lead text-ink-soft">{head.remit}</p>
-              {head.bio && <p className="text-ink-soft">{head.bio}</p>}
+            <div className="mt-8 max-w-measure space-y-6 border-t border-rule pt-8">
+              {/* The quote is what the 2.0 card led with and it is the line
+                  that gives each person a voice, so it sets larger than the
+                  remit and is marked up as a quotation rather than faked with
+                  typed-in quote marks. */}
+              {head.bio && (
+                <blockquote className="text-lead text-ink">
+                  <p>&ldquo;{head.bio}&rdquo;</p>
+                </blockquote>
+              )}
+              <p className="text-ink-soft">{head.remit}</p>
+
+              {head.tags.length > 0 && (
+                <ul className="flex flex-wrap gap-2 pt-2">
+                  {head.tags.map((tag) => (
+                    <li
+                      key={tag}
+                      className="border border-accent/30 bg-accent-wash px-4 py-1.5 font-mono text-micro uppercase tracking-label text-accent"
+                    >
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>

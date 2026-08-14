@@ -7,7 +7,7 @@ import { FINANCE } from '@/app/data/site'
 export const metadata: Metadata = {
   title: 'Contact',
   description:
-    'Talk to BF Mutare about importing a vehicle from Japan, and about spreading the cost over up to 24 months.',
+    'Talk to BF Mutare about importing a vehicle, and about spreading the cost over up to 24 months.',
 }
 
 export default function ContactPage() {

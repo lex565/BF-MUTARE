@@ -33,7 +33,11 @@ export function Partnership() {
       <div className="mx-auto max-w-[86rem] px-gutter py-section">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <Eyebrow index={2}>Japan</Eyebrow>
+            {/* "Japan" here is the specific event in these photographs, not a
+                claim about where stock comes from — BF Mutare sources from
+                more than one market. Kept as "one of our supplier teams" for
+                that reason. */}
+            <Eyebrow index={2}>The visit</Eyebrow>
             <h2 className="mt-5 text-h1">
               Our suppliers came to see us
             </h2>
@@ -41,9 +45,9 @@ export function Partnership() {
             <div className="mt-8 max-w-measure space-y-5 text-ink-soft">
               <p>
                 {/* TODO: replace with the real account of this visit. */}
-                Our Japanese supplier team travelled to Mutare to meet the
-                people they had been shipping to, walk the operation, and see
-                where the vehicles end up.
+                One of our supplier teams travelled from Japan to Mutare to meet
+                the people they had been shipping to, walk the operation, and
+                see where the vehicles end up.
               </p>
               <p>
                 Buying a car from overseas asks you to trust a chain you cannot

@@ -23,13 +23,14 @@ export function HomeSummary() {
               </h2>
               <div className="mt-8 max-w-measure space-y-5 text-lead text-ink-soft">
                 <p>
-                  You tell us the model, the budget and the timeline. We source
-                  it in Japan, ship it, clear it through the port, handle the
-                  duty, and hand you the keys and the file.
+                  You tell us the model, the budget and the timeline. We find
+                  it, ship it, clear it through the port, handle the duty, and
+                  hand you the keys and the file.
                 </p>
                 <p>
                   You are buying from people you can go and stand in front of in
-                  Mutare, not a listing on the internet.
+                  Mutare, not a listing on the internet — and we deliver right
+                  around Zimbabwe.
                 </p>
               </div>
               <Link

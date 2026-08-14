@@ -25,9 +25,14 @@
   --color-paper: #131210; /* near-black, warm */
   --color-paper-sunk: #1c1a17; /* cards, raised panels */
   --color-ink: #f4f1e9;
-  --color-ink-soft: #a8a294;
-  --color-ink-faint: #6f6a5e;
-  --color-rule: #2e2b26;
+  /* Both muted inks were lifted on 2026-08-14. The old values (#a8a294 and
+     #6f6a5e) looked right in a palette swatch and were genuinely hard to read
+     as running text on the near-black ground — #6f6a5e in particular sat close
+     to the 4.5:1 floor while being used for labels and captions. These clear
+     it with room to spare and still read as secondary. */
+  --color-ink-soft: #c5bfae;
+  --color-ink-faint: #948d7e;
+  --color-rule: #3a362f;
 
   --color-accent: #efc63b; /* plate yellow */
   --color-accent-deep: #c9a223;
@@ -58,6 +63,44 @@
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Outlined numerals for the services sequence.
+
+   Set hollow rather than solid so nine large numbers can carry the section
+   without nine blocks of yellow shouting over the headings they belong to. The
+   fill comes in on hover, which is what makes the row feel like a control
+   rather than decoration.
+
+   `-webkit-text-stroke` is the unprefixed-in-practice property here: every
+   current engine implements it under this name and there is no plain
+   `text-stroke`. The fallback if it is ever unsupported is transparent text,
+   so `color` is set to the accent first and only overridden inside the
+   @supports guard — a hollow number that fails to a visible solid one, never
+   to an invisible one. */
+.numeral {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 112;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: var(--color-accent);
+  transition:
+    color var(--duration-quick) var(--ease-out-quint),
+    opacity var(--duration-quick) var(--ease-out-quint);
+}
+
+@supports (-webkit-text-stroke: 1px red) {
+  .numeral {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--color-accent);
+    opacity: 0.75;
+  }
+
+  .group:hover .numeral {
+    color: var(--color-accent);
+    opacity: 1;
   }
 }
 

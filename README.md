@@ -17,31 +17,66 @@ Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · TypeScript · npm works
 Search the repo for `TODO` — every hit is a placeholder that will otherwise
 ship as-is.
 
-- [ ] **`apps/bfmutare/app/data/site.ts`** — WhatsApp number, phone, email,
-      street address, opening hours. WhatsApp must be full international with
-      no punctuation: `263771234567`, not `077 123 4567`.
-- [ ] **`FINANCE` in the same file** — **confirm the 24-month terms.** Deposit,
-      instalments and eligibility are `null` and the site says "ask us" instead.
-      Advertising credit terms is a claim you can be held to.
+- [x] **`apps/bfmutare/app/data/site.ts`** — done. Phone, WhatsApp, email,
+      address, hours and the three social links were recovered from the 2.0
+      build and are live.
+- [ ] **`FINANCE` in the same file** — **confirm the 24-month terms.** The
+      headline is confirmed (2.0 advertised it), but deposit and eligibility
+      are `null` and the site says "ask us" instead. Advertising credit terms
+      is a claim you can be held to.
 - [ ] **`STATS` in the same file** — `totalDelivered` and `operatingSince` are
-      `null`, so those figures are hidden rather than guessed. Fill them in and
-      they appear in the hero and on About.
-- [ ] **`apps/bfmutare/app/data/team.ts`** — all five department heads are
-      blank. Nothing was carried over from the old codebase; see below.
+      `null`, so those figures are hidden rather than guessed. 2.0 carried no
+      counts either, so there was nothing to recover. Fill them in and they
+      appear in the hero and on About.
+- [x] **`apps/bfmutare/app/data/team.ts`** — done. Six real people from 2.0,
+      confirmed correct by the client.
+- [ ] **Team photographs.** 2.0 pointed at a `/Company Images/` folder that is
+      not on this machine. Every `photo` is `null`, so the initials panel
+      renders. Drop the files into `public/team/` and set the paths.
 - [ ] **`apps/bfmutare/app/data/goals.ts`** — a draft for you to rewrite.
 - [ ] **`packages/ui/src/brands.ts`** — Muroora Mart and Speed Motors need real
       descriptions and towns.
-- [ ] **Logo.** The mark is a temporary `BF` in a plate-yellow box. Your staff
-      wear a real logo in the Japan photos — send the file and I'll swap it in.
-- [ ] Favicons. Both apps still use the Next.js default.
+- [x] **Logo** — done, and it is the real one. Traced from
+      `Images/bfmutarewhite_102403.png`. That file had its white background
+      baked in as opaque pixels rather than as alpha, so the white was knocked
+      out, the antialiased edges un-mixed back to solid colour, and the
+      silhouette traced to a single path. Lives in `app/icon.svg` (favicon),
+      `app/components/Logo.tsx` (header/footer, inlined) and
+      `public/logo-mark.svg` + `public/logo.svg` for off-site use. Brand orange
+      is `#d56422`, sampled from the artwork.
+- [x] Favicon. BF Mutare uses the mountain mark; Pineberry is still the Next.js
+      default.
 
-### Nothing was salvageable from the old code
+### What was and was not salvageable
 
-The previous site's "contact number" was `263123456789` — literally the digits
-1 to 9. Its team section had four names attached to Unsplash stock portraits,
-and its testimonials were invented. None of it was carried over. The only
-things worth confirming from it: it used `info@bfmutare.co.zw`, and claimed
-"serving Zimbabwe since 2020".
+**From the 2.0 build (`D:\DEV\Website\BF MUTARE 2.0\`) — recovered and now
+live:** phone `+263 774 850 107`, `bfmutare@gmail.com`, the Belmont Building
+address and map coordinates, opening hours, Facebook / Instagram / TikTok, all
+six staff with their real roles and quotes, and the nine services. Two files in
+that folder were written a week apart and agree on every contact value, which
+is why they were treated as confirmed.
+
+**Not recovered:** the six team photographs and the customer car photos — both
+lived in a `/Company Images/` folder that is not on this machine. The `.zip` in
+that folder is a scraped Astro template, not BF's own site. The logo WAS found,
+separately, at `Images/bfmutarewhite_102403.png`.
+
+### Sourcing is not Japan-only
+
+Every "we source from Japan" line was removed on 2026-08-14 — it is not true,
+and it understates the business. Copy is deliberately country-neutral
+("overseas", "the auction") until the client says which markets to name.
+Naming the actual countries would be stronger than "Overseas" on the About
+page, so that is worth asking them for.
+
+The Japan references that remain are all the *supplier visit* in
+`Partnership.tsx` — a real event with real photographs — plus one kei car
+correctly described as Japanese. Those are facts, not sourcing claims.
+
+**From the codebase before 2.0 — deliberately discarded:** its "contact number"
+was `263123456789`, literally the digits 1 to 9; its team section had four names
+on Unsplash stock portraits; its testimonials were invented. None of it was
+carried over, and the real values above supersede it.
 
 ### Why the deliveries have no prices or dates
 
@@ -75,9 +110,9 @@ Separate pages, not one long scroll. Home ends and hands off.
 | Route | Contents |
 | --- | --- |
 | `/` | Video hero, 24-month plan, short pitch, three recent deliveries |
-| `/deliveries` | Seven identified vehicles + a wall of 52 handover photos |
-| `/about` | Company description, goals, the Japan visit |
-| `/team` | Five departments as tabs — one panel at a time |
+| `/deliveries` | Muted handover video header, seven identified vehicles + a wall of 52 handover photos |
+| `/about` | Company description, the nine services, goals, the Japan visit |
+| `/team` | Six people as tabs — one panel at a time |
 | `/journal` | Blog listing (Sanity-ready) |
 | `/contact` | Payment plan detail, contact card, how buying works |
 

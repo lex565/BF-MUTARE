@@ -1,4 +1,4 @@
-import { BRANDS, Eyebrow } from '@pineberry/ui'
+import { BRANDS, Eyebrow, brandHref } from '@pineberry/ui'
 import { SITE } from '@/app/data/site'
 
 /** Contact plus footer, as one closing block. */
@@ -27,23 +27,26 @@ export function Colophon() {
             <p className="font-mono text-micro uppercase tracking-label text-ink-faint">
               Group companies
             </p>
+            {/* Every company has a site now, so this links them all rather
+                than reporting three of four as "in progress". brandHref falls
+                back to the local dev port until real domains are set on the
+                brand records, so these are clickable throughout the build. */}
             <ul className="mt-4 space-y-2">
               {BRANDS.map((brand) => (
                 <li key={brand.slug}>
-                  {brand.href ? (
-                    <a
-                      href={brand.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="transition-colors hover:text-accent"
-                    >
-                      {brand.name} ↗
-                    </a>
-                  ) : (
-                    <span className="text-ink-faint">
-                      {brand.name} — site in progress
-                    </span>
-                  )}
+                  <a
+                    href={brandHref(brand)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2.5 transition-colors hover:text-accent"
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: brand.palette.accent }}
+                    />
+                    {brand.fullName ?? brand.name} ↗
+                  </a>
                 </li>
               ))}
             </ul>

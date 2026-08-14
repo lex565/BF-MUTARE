@@ -1,4 +1,5 @@
-import { SITE, whatsappLink } from '@/app/data/site'
+import { SITE, mapLink, whatsappLink } from '@/app/data/site'
+import { Social } from '@/app/components/Social'
 
 /**
  * WhatsApp-first, deliberately. A contact form on a static site needs a third
@@ -23,6 +24,13 @@ export function Contact() {
             >
               WhatsApp {SITE.phoneDisplay}
             </a>
+
+            <div className="mt-12">
+              <p className="font-mono text-micro uppercase tracking-label text-ink-faint">
+                Follow us
+              </p>
+              <Social className="mt-4" />
+            </div>
           </div>
 
           <div className="lg:col-span-5">
@@ -58,9 +66,17 @@ export function Contact() {
                   Where
                 </dt>
                 <dd className="text-right">
-                  {SITE.address.street}
-                  <br />
-                  {SITE.address.city}, {SITE.address.country}
+                  <a
+                    href={mapLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition-colors hover:text-accent"
+                  >
+                    {SITE.address.street}
+                    <br />
+                    {SITE.address.city}, {SITE.address.country}
+                    <span className="ml-1 text-ink-faint">↗</span>
+                  </a>
                 </dd>
               </div>
               {SITE.hours.map((slot) => (

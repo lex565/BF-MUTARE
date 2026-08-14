@@ -21,7 +21,7 @@ export async function Journal() {
           </p>
           <p className="mx-auto mt-4 max-w-[44ch] text-lead text-ink-soft">
             We&rsquo;re writing the first few now. If there is something you
-            want explained — duty, shipping times, what a Japanese auction
+            want explained — duty, shipping times, what an auction
             grade actually means — ask and we&rsquo;ll write that one first.
           </p>
           <a

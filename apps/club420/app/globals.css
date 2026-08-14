@@ -1,0 +1,87 @@
+@import 'tailwindcss';
+@import '@pineberry/ui/tokens.css';
+
+@source '../../../packages/ui/src';
+
+/* ---------------------------------------------------------------------------
+   420 Liquor Store — brand layer
+   ---------------------------------------------------------------------------
+   The brand document specifies the palette outright: "Warm golds, deep greens,
+   matte blacks", with an "Afro-urban fusion" store aesthetic — wooden
+   finishes, cultural murals, ambient lighting. So this is the one site in the
+   group that is allowed to be warm and dim rather than crisp.
+
+   Matte black, not pure black. Gold as the accent because it is the colour of
+   the drink in the glass in the client's own photographs. Deep green as the
+   secondary because it is the colour of every beer bottle in them.
+
+   One thing deliberately NOT done: any visual nod to the other meaning of
+   420 — no leaf motifs, no green haze, nothing. The brand document is explicit
+   that this is not a cannabis outlet, and a licensed retailer winking at that
+   in its design would undercut its own legal position. The number is treated
+   strictly as a time on a clock throughout.
+--------------------------------------------------------------------------- */
+
+:root {
+  --color-paper: #0f100d; /* matte black, warm */
+  --color-paper-sunk: #17190f;
+  --color-ink: #f0ebdd;
+  --color-ink-soft: #c3bca6;
+  --color-ink-faint: #8f8874;
+  --color-rule: #302f24;
+
+  --color-accent: #c9a227; /* warm gold */
+  --color-accent-deep: #a5831b;
+  --color-accent-wash: #241f10;
+  --color-support: #2f7a4d; /* bottle green, lifted enough to read on black */
+
+  --font-display-family: var(--font-bebas);
+  --font-text-family: var(--font-figtree);
+  --font-mono-family: var(--font-plex-mono);
+}
+
+@layer base {
+  h1,
+  h2 {
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+  }
+
+  h3 {
+    font-family: var(--font-text);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* The clock. 4:20 set as a fixed monospaced stamp — used as the brand's
+   signature mark, since the logo the brand document describes (a clock frozen
+   at 4:20 stylised into a bottle) has not been drawn yet. */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  padding: 0.4em 0.9em;
+}
+
+/* Gold hairline used under section heads. */
+.gold-rule {
+  background: linear-gradient(
+    to right,
+    var(--color-accent) 0%,
+    var(--color-accent) 22%,
+    var(--color-rule) 22%,
+    var(--color-rule) 100%
+  );
+}

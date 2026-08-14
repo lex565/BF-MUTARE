@@ -12,7 +12,7 @@ export function About() {
 
           <div className="mt-8 max-w-measure space-y-5 text-ink-soft">
             <p>
-              BF Mutare imports vehicles from Japan to order, out of Mutare in
+              BF Mutare imports vehicles to order, based in Mutare in
               Manicaland. You tell us the model, the budget and the timeline;
               we source it, ship it, clear it and hand you the keys.
             </p>
@@ -38,9 +38,9 @@ export function About() {
             </div>
             <div>
               <dt className="font-mono text-micro uppercase tracking-label text-ink-faint">
-                Sourced from
+                Sourced
               </dt>
-              <dd className="mt-2 font-display text-h4 font-bold">Japan</dd>
+              <dd className="mt-2 font-display text-h4 font-bold">Overseas</dd>
             </div>
           </dl>
         </div>

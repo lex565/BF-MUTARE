@@ -24,26 +24,28 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'BF Mutare — Japanese vehicle imports, Zimbabwe',
+    default: 'BF Mutare — vehicle imports, Zimbabwe',
     template: '%s — BF Mutare',
   },
   description:
-    'BF Mutare imports vehicles from Japan to order and delivers them to owners across Zimbabwe. Spread the cost over up to 24 months.',
+    'BF Mutare imports vehicles to order and delivers them to owners across Zimbabwe. Based in Mutare, operating countrywide. Spread the cost over up to 24 months.',
   // TODO: confirm the domain. The old codebase used bfmutare.co.zw.
   metadataBase: new URL('https://bfmutare.co.zw'),
   keywords: [
     'car import Zimbabwe',
-    'Japanese cars Zimbabwe',
     'vehicle import Mutare',
-    'buy car Mutare',
+    'car dealer Mutare',
+    'buy car Zimbabwe',
   ],
   openGraph: {
     type: 'website',
     locale: 'en_ZW',
     siteName: 'BF Mutare',
-    title: 'BF Mutare — Japanese vehicle imports, Zimbabwe',
+    title: 'BF Mutare — vehicle imports, Zimbabwe',
     description:
-      'We import vehicles from Japan and deliver them to owners across Zimbabwe. Up to 24 months to pay.',
+      'We import vehicles to order and deliver them to owners across Zimbabwe. Based in Mutare, operating countrywide. Up to 24 months to pay.',
+    // TODO: an OG image. It must be a PNG or JPG at 1200x630 — Facebook,
+    // WhatsApp and X all ignore SVG, so the logo file cannot be used here.
   },
   twitter: {
     card: 'summary_large_image',

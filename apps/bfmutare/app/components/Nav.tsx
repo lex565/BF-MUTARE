@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { FINANCE, SITE, whatsappLink } from '@/app/data/site'
+import { Logo } from '@/app/components/Logo'
 
 /** Real routes, not hash anchors — each is its own page. */
 const LINKS = [
@@ -64,11 +65,8 @@ export function Nav() {
           aria-label="Primary"
           className="mx-auto flex max-w-[86rem] items-center justify-between px-gutter py-4"
         >
-          <Link href="/" className="flex items-baseline gap-2">
-            <span className="plate text-small leading-none">BF</span>
-            <span className="font-display text-lead font-bold uppercase tracking-tight">
-              Mutare
-            </span>
+          <Link href="/" aria-label="BF Mutare — home">
+            <Logo />
           </Link>
 
           <ul className="hidden items-center gap-8 md:flex">

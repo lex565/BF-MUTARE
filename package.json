@@ -12,6 +12,9 @@
     "build": "npm run build --workspaces --if-present",
     "build:bf": "npm run build --workspace @pineberry/bfmutare",
     "build:pineberry": "npm run build --workspace @pineberry/pineberry",
-    "lint": "npm run lint --workspaces --if-present"
+    "lint": "npm run lint --workspaces --if-present",
+    "dev:muroora": "npm run dev --workspace @pineberry/muroora",
+    "dev:speed": "npm run dev --workspace @pineberry/speedmotors",
+    "dev:420": "npm run dev --workspace @pineberry/club420"
   }
 }

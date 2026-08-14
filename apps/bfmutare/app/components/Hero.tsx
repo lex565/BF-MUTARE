@@ -84,25 +84,36 @@ export function Hero() {
         className="absolute inset-x-0 bottom-0 -z-10 h-3/4 bg-[linear-gradient(to_top,var(--color-paper)_2%,rgba(19,18,16,0.94)_30%,rgba(19,18,16,0.6)_62%,transparent_100%)]"
       />
 
-      <div className="mx-auto flex min-h-dvh max-w-[86rem] flex-col justify-end px-gutter pb-20 pt-40">
-        <p className="mb-8 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-micro uppercase tracking-label text-ink-soft">
-          <span className="plate">Mutare</span>
-          <span>Zimbabwe</span>
-          <span aria-hidden className="h-px w-10 bg-rule" />
-          <span>Japanese vehicle imports</span>
-        </p>
+      {/* Hard against the left gutter, deliberately. An earlier pass indented
+          this block inboard; the client wanted it back on the edge, which is
+          also the stronger composition — the headline starts on the same
+          vertical line as the nav logo above it and the sections below it. */}
+      <div className="mx-auto flex min-h-dvh max-w-[86rem] flex-col justify-end px-gutter pb-24 pt-40">
+        <div className="w-full">
+          <p className="mb-8 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-small uppercase tracking-label text-ink-soft">
+            <span className="plate">Mutare</span>
+            <span>Zimbabwe</span>
+            <span aria-hidden className="h-px w-10 bg-rule" />
+            <span>Vehicle imports</span>
+          </p>
 
-        {/* The line carries the brand colour rather than sitting in flat white
-            — plate yellow on the verb that matters. */}
-        <h1 className="max-w-[15ch] text-mega leading-[0.88] tracking-mega">
-          We bring them{' '}
-          <span className="text-accent">home</span>
-        </h1>
+          {/* The line carries the brand colour rather than sitting in flat
+              white — plate yellow on the verb that matters.
 
-        <p className="mt-8 max-w-[48ch] text-lead text-ink-soft">
-          {SITE.name} imports vehicles from Japan and delivers them to owners
-          across Zimbabwe.
-        </p>
+              Sized here rather than by raising --text-mega, because that token
+              is shared with the team page's initials panel and with Pineberry's
+              statement block; the client asked for a bigger HOME headline, not
+              a bigger everything. Tops out at 9rem — beyond that "We bring them
+              home" stops fitting two lines on a 1280px laptop, which is what
+              most of this audience opens the site on. */}
+          <h1 className="max-w-[12ch] text-[clamp(3.25rem,1.4rem+7.4vw,9rem)] leading-[0.86] tracking-mega">
+            We bring them <span className="text-accent">home</span>
+          </h1>
+
+          <p className="mt-10 max-w-[42ch] text-h3 font-normal leading-snug text-ink">
+            Based in Mutare, operating right around Zimbabwe. {SITE.name}{' '}
+            imports vehicles to order and delivers them to their owners.
+          </p>
 
         {/* The payment plan, given real estate. This is the thing that stops
             someone scrolling past, so it gets a panel of its own rather than a
@@ -111,13 +122,21 @@ export function Hero() {
           href="/contact"
           className="group mt-10 flex max-w-3xl flex-col gap-4 border-l-4 border-accent bg-paper-sunk/80 p-7 backdrop-blur-sm transition-colors duration-300 hover:bg-paper-sunk sm:flex-row sm:items-center sm:gap-8"
         >
-          {/* Held to one line from sm up — wrapped, "TO PAY" drops onto its own
-              line and throws the supporting copy beside it out of alignment.
-              On phones the panel stacks, so wrapping there is fine. */}
-          <span className="font-display text-h2 font-bold uppercase leading-none text-accent sm:whitespace-nowrap">
-            {FINANCE.headline}
+          {/* Headline and support stack in their own column rather than sitting
+              as two siblings in the row. As siblings the nowrap headline took
+              its full width and the support copy was squeezed to a one-word
+              column — "Spread / the / cost / of / your" down the page. */}
+          <span className="min-w-0 flex-1">
+            {/* Held to one line from sm up — wrapped, "TO PAY" drops onto its
+                own line and throws the panel out of alignment. On phones the
+                panel stacks, so wrapping there is fine. */}
+            <span className="block font-display text-h2 font-bold uppercase leading-none text-accent sm:whitespace-nowrap">
+              {FINANCE.headline}
+            </span>
+            <span className="mt-2 block max-w-[38ch] text-ink-soft">
+              {FINANCE.support}
+            </span>
           </span>
-          <span className="max-w-[30ch] text-ink-soft">{FINANCE.support}</span>
           <span
             aria-hidden
             className="font-mono text-micro uppercase tracking-label text-ink transition-transform duration-300 ease-[var(--ease-out-quint)] group-hover:translate-x-1 sm:ml-auto sm:shrink-0"
@@ -173,8 +192,9 @@ export function Hero() {
                 </dd>
               </div>
             )}
-          </dl>
-        )}
+            </dl>
+          )}
+        </div>
       </div>
     </section>
   )

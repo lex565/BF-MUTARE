@@ -5,27 +5,26 @@ const operating = operatingBrands().length
 const sectors = new Set(BRANDS.map((brand) => brand.sector)).size
 
 /**
- * The opening statement. No hero image, on purpose.
+ * The statement, and the group by the numbers.
  *
- * A holding company has no product to photograph — the honest picture of
- * Pineberry is its list of companies, and that is the next section. Putting a
- * stock boardroom or a skyline here would be the exact tell we are avoiding.
- * So the first screen is type, set large, on paper.
+ * This used to carry the page's <h1>. The masthead does now, so the heading
+ * here is demoted to <h2> — two <h1>s on one document is a real accessibility
+ * fault, not a style preference, and the video hero is unambiguously the
+ * primary heading.
  */
 export function Statement() {
   return (
     <section id="top" className="border-b border-rule">
       <div className="mx-auto max-w-[80rem] px-gutter py-section">
-        <p className="font-mono text-micro uppercase tracking-label text-ink-faint">
+        <p className="flex items-center gap-3 font-mono text-micro uppercase tracking-label text-ink-faint">
+          <span aria-hidden className="h-px w-8 bg-support" />
           {SITE.address.city}, {SITE.address.country}
           {SITE.founded ? ` — since ${SITE.founded}` : ''}
         </p>
 
-        <h1 className="mt-10 max-w-[16ch] text-mega leading-[0.94]">
-          A small group of
-          <span className="text-accent">&nbsp;real&nbsp;</span>
-          businesses
-        </h1>
+        <h2 className="mt-8 max-w-[20ch] text-h1 leading-[1.02]">
+          We own them, and we run them
+        </h2>
 
         <div className="mt-14 grid grid-cols-1 gap-12 border-t border-rule pt-10 md:grid-cols-12">
           <p className="max-w-measure text-lead text-ink-soft md:col-span-7">

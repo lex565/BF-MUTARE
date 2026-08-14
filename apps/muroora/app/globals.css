@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+@import '@pineberry/ui/tokens.css';
+
+@source '../../../packages/ui/src';
+
+/* ---------------------------------------------------------------------------
+   Muroora Mart — brand layer
+   ---------------------------------------------------------------------------
+   Light ground, deliberately. The other two retail-adjacent sites in the group
+   run dark, and dark is right for them — BF Mutare is showing car paint in
+   sunlight, 420 is a bar at night. A grocer is neither. This one has to read
+   as open, cheap and easy to walk into at eight in the morning, and a black
+   page reads as expensive.
+
+   The two colours are sampled from the company's own logo artwork, not chosen:
+   deep green #005029 and orange #f25c13. Green carries structure and headings,
+   orange is the action colour — buttons, prices, the diaspora programme. Using
+   both at equal weight would fight, so green sets the temperature and orange
+   is used sparingly enough to still mean "do this".
+--------------------------------------------------------------------------- */
+
+:root {
+  --color-paper: #f7f5ef; /* warm off-white, not a clinical supermarket white */
+  --color-paper-sunk: #eceade;
+  --color-ink: #12271b; /* near-black with green in it */
+  --color-ink-soft: #46584c;
+  --color-ink-faint: #6d7c72;
+  --color-rule: #d5d3c5;
+
+  --color-accent: #f25c13; /* logo orange — the action colour */
+  --color-accent-deep: #c9430a;
+  --color-accent-wash: #fbe6da;
+  --color-support: #005029; /* logo green — structure and trust */
+
+  --font-display-family: var(--font-figtree);
+  --font-text-family: var(--font-figtree);
+  --font-mono-family: var(--font-plex-mono);
+}
+
+@layer base {
+  h1,
+  h2 {
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  h3 {
+    font-weight: 700;
+  }
+}
+
+/* Price/label chip, used on category cards and the payment rails. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  padding: 0.3em 0.85em;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.chip-live {
+  border-color: var(--color-support);
+  color: var(--color-support);
+}

@@ -1,83 +1,98 @@
 /**
  * Business details for BF Mutare.
  *
- * ⚠ EVERY VALUE MARKED `TODO` IS A PLACEHOLDER AND MUST BE REPLACED BEFORE
- *   THIS SITE POINTS AT A DOMAIN. They are wrong on purpose — a plausible but
- *   fake phone number is worse than an obviously empty one, because it ships
- *   silently.
+ * SOURCE: recovered from the 2.0 build in
+ * `D:\DEV\Website\BF MUTARE 2.0\` — specifically
+ * `BF MUTARE CURRENTLY WORKING SITE.txt` and `BF MUTARE BASE 2.0.txt`.
+ * Those two files were written a week apart and agree on every value below,
+ * which is why these are treated as confirmed rather than as placeholders.
  *
- * Nothing usable was recoverable from the previous codebase: its "contact
- * number" was 263123456789, which is literally the digits 1 to 9.
+ * This replaces the earlier placeholder set, where the contact number was
+ * 263123456789 — literally the digits 1 to 9.
  *
- * The WhatsApp number must be full international form with no punctuation:
- * Zimbabwe 077 123 4567 becomes 263771234567.
+ * The WhatsApp number is full international form with no punctuation:
+ * 077 485 0107 becomes 263774850107.
  */
 
 export const SITE = {
   name: 'BF Mutare',
-  legalName: 'BF Mutare', // TODO: registered company name
+  legalName: 'BF Mutare', // TODO: registered company name, if it differs
   parent: 'Pineberry Holdings',
-  tagline: 'Japanese vehicle imports, delivered across Zimbabwe.',
+  /* Not "Japanese vehicle imports" — the client sources from more than Japan,
+     so naming one country understates the business and is a claim that is not
+     true. Kept country-neutral until they say which markets to name. */
+  tagline: 'Vehicle imports, delivered across Zimbabwe.',
 
-  whatsapp: '263000000000', // TODO
-  phoneDisplay: '+263 00 000 0000', // TODO
-  // The old code used bfmutare.co.zw — confirm which domain you actually hold.
-  email: 'info@bfmutare.co.zw', // TODO
+  whatsapp: '263774850107',
+  /**
+   * WhatsApp's own short link for the business account. Kept because it is
+   * what is printed on the Facebook and Instagram profiles, so it is the link
+   * customers may already have saved. `whatsappLink()` below uses the number
+   * instead, because a number accepts a pre-filled message reliably.
+   */
+  whatsappShortLink: 'https://wa.me/message/KOBL2NSXHUMAL1',
+  phoneDisplay: '+263 774 850 107',
+  email: 'bfmutare@gmail.com',
 
   address: {
-    street: 'TODO — street address',
+    street: 'Suite 6C, Belmont Building, 2nd Avenue & Second Street',
     city: 'Mutare',
     country: 'Zimbabwe',
   },
 
+  /** Office coordinates, carried over from the 2.0 map marker. */
+  coords: { lat: -18.973351, lng: 32.670067 },
+
   hours: [
-    { days: 'Monday – Friday', time: '08:00 – 17:00' }, // TODO: confirm
-    { days: 'Saturday', time: '08:00 – 13:00' }, // TODO: confirm
-    { days: 'Sunday', time: 'By appointment' }, // TODO: confirm
+    { days: 'Monday – Friday', time: '09:00 – 17:00' },
+    { days: 'Saturday', time: '09:00 – 13:00' },
+    { days: 'Sunday', time: 'Closed' },
   ],
 
   social: {
-    facebook: null as string | null, // TODO
-    instagram: null as string | null, // TODO
+    facebook: 'https://www.facebook.com/share/1Ai3JN7Lrd/',
+    instagram: 'https://www.instagram.com/beforward_mutare',
+    tiktok: 'https://www.tiktok.com/@beforward_mutare',
   },
+
+  /**
+   * The Be Forward stock list the 2.0 hero pointed at, which is where the name
+   * and the @beforward_mutare handles come from. It is ONE of the sources, not
+   * the only one — the site copy is deliberately country-neutral. Left as a
+   * live link rather than rebuilt locally: their stock changes daily and no
+   * copy of it here could keep up.
+   */
+  inventoryUrl: 'https://www.beforward.jp/stocklist/',
 } as const
 
 /**
  * The payment plan — the single strongest hook on the site.
  *
- * ⚠ CONFIRM THE TERMS BEFORE LAUNCH. Advertising credit terms is a claim you
- *   can be held to. `headline` is what appears in the ribbon and hero; the
- *   fields under it are the small print that has to be true. Anything left
- *   null simply does not render, so an unconfirmed detail is omitted rather
- *   than guessed.
+ * The headline is confirmed: "up to 24 months to pay" ran on the 2.0 hero.
+ * The small print under it is NOT confirmed, and advertising credit terms is a
+ * claim you can be held to, so anything still null simply does not render.
  */
 export const FINANCE = {
   headline: '24 months to pay',
-  /** Short supporting line used next to the headline. */
   support: 'Spread the cost of your import over up to two years.',
   depositFrom: null as string | null, // TODO e.g. '30% deposit'
-  /** Keep vague only if it genuinely is; buyers will ask immediately. */
   eligibility: null as string | null, // TODO e.g. 'Subject to approval'
-  /** Set true once the terms above are confirmed and signed off. */
+  /** Set true once deposit and eligibility above are confirmed. */
   confirmed: false, // TODO
 } as const
 
 /**
  * Headline figures.
  *
- * `totalDelivered` is the number that carries the most weight on the whole
- * site, and it is the one thing I must not guess. The company has been running
- * for years without a website, so a made-up figure would almost certainly
- * undersell it — and an invented one that undersells is worse than no figure.
- *
- * Set `totalDelivered` to null and the stat is hidden entirely rather than
- * showing a placeholder. Fill it in and it appears.
+ * Still null, still hidden rather than guessed. The 2.0 build carried no
+ * counts either, so there was nothing to recover. The company has traded for
+ * years without a website, so an invented figure would almost certainly
+ * undersell it.
  */
 export const STATS = {
   totalDelivered: null as number | null, // TODO — vehicles delivered to date
   deliveredThisMonth: null as number | null, // TODO — refreshed monthly
-  /** Set once you want a "trading since" line. */
-  operatingSince: null as number | null, // TODO — the old site said 2020, unconfirmed
+  operatingSince: null as number | null, // TODO — 2.0 footer said 2023, earlier draft said 2025
 } as const
 
 /** Pre-fills the WhatsApp message so enquiries arrive with context attached. */
@@ -87,3 +102,6 @@ export const whatsappLink = (about?: string) => {
     : "Hi BF Mutare, I'd like to ask about importing a vehicle."
   return `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(message)}`
 }
+
+/** Google Maps link for the office. Cheaper than shipping a map library. */
+export const mapLink = `https://www.google.com/maps/search/?api=1&query=${SITE.coords.lat},${SITE.coords.lng}`

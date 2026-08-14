@@ -5,7 +5,7 @@ import { Team } from '@/app/components/Team'
 export const metadata: Metadata = {
   title: 'Team',
   description:
-    'The departments behind BF Mutare — sales, marketing, logistics, IT and drivers.',
+    'The people behind BF Mutare — sales, marketing, logistics, information systems, accounts and transport.',
 }
 
 export default function TeamPage() {
@@ -14,7 +14,7 @@ export default function TeamPage() {
       <PageHeader
         eyebrow="The team"
         title="Who runs what"
-        intro="Five departments. Pick one to see who heads it and what they are responsible for."
+        intro="Six people, six departments. Pick a name to see what they are responsible for."
       />
       <Team />
     </main>

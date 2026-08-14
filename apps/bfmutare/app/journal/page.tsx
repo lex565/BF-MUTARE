@@ -5,7 +5,7 @@ import { Journal } from '@/app/components/Journal'
 export const metadata: Metadata = {
   title: 'Journal',
   description:
-    'Import duty, shipping times, Japanese auction grades, and what is worth bringing in this month.',
+    'Import duty, shipping times, auction grades, and what is worth bringing in this month.',
 }
 
 export default function JournalPage() {

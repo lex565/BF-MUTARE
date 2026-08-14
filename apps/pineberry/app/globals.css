@@ -15,6 +15,30 @@
 --------------------------------------------------------------------------- */
 
 :root {
+  /* ---- Palette ----------------------------------------------------------
+     The accent moved off the pineberry seed red on 2026-08-14. Red is the
+     brand's namesake colour, but on a holding company's site it reads as
+     alert, sale or error — the three things a parent company least wants to
+     suggest. A deep petrol navy is the colour finance, insurance and law have
+     used for the same reason for a century: it reads as solvent and unexcited.
+
+     The red is not discarded, just demoted to a secondary mark. It still
+     appears as the dot beside the wordmark, which is where the name earns it.
+
+     The inks are also lifted from the old values: the previous ink-faint was
+     too light against warm paper for the label text it was being used for. */
+  --color-paper: #f7f5f0;
+  --color-paper-sunk: #ece8de;
+  --color-ink: #14181c;
+  --color-ink-soft: #46505a; /* was #5c574a */
+  --color-ink-faint: #6d7883; /* was #928c7c, which failed on labels */
+  --color-rule: #d3cec2;
+
+  --color-accent: #17384f; /* petrol navy */
+  --color-accent-deep: #0d2536;
+  --color-accent-wash: #dfe6ec;
+  --color-support: #b3402c; /* the pineberry red, now secondary */
+
   --font-display-family: var(--font-fraunces);
   --font-text-family: var(--font-schibsted);
   --font-mono-family: var(--font-plex-mono);

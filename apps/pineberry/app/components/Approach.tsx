@@ -20,18 +20,22 @@ const POSITIONS = [
   },
   {
     title: 'Slow on purpose',
-    body: 'Two companies now, a third when the second is standing on its own. We add a business when it is ready, not when the page looks empty.',
+    body: 'The oldest company here has been trading since 1996; the youngest opened last year. We add a business when it is ready, not when the page looks empty.',
   },
 ]
 
-export function Approach() {
+export function Approach({ heading = true }: { heading?: boolean }) {
   return (
     <section id="approach" className="border-b border-rule bg-paper-sunk">
       <div className="mx-auto max-w-[80rem] px-gutter py-section">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <Eyebrow index={2}>Approach</Eyebrow>
-            <h2 className="mt-6 text-h1">How we work</h2>
+            {heading && (
+              <>
+                <Eyebrow index={2}>Approach</Eyebrow>
+                <h2 className="mt-6 text-h1">How we work</h2>
+              </>
+            )}
           </div>
 
           <ol className="lg:col-span-8">

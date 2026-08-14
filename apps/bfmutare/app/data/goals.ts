@@ -27,7 +27,7 @@ export const GOALS: Goal[] = [
   },
   {
     title: 'Keep the whole chain visible',
-    body: 'From the auction sheet in Japan to the plate on the bumper, a customer should be able to see where their car is and what stage it is at.',
+    body: 'From the auction sheet to the plate on the bumper, a customer should be able to see where their car is and what stage it is at.',
   },
   {
     title: 'Grow without dropping the standard',

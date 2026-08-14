@@ -1,0 +1,72 @@
+@import 'tailwindcss';
+@import '@pineberry/ui/tokens.css';
+
+@source '../../../packages/ui/src';
+
+/* ---------------------------------------------------------------------------
+   Speed Motor Engineering — brand layer
+   ---------------------------------------------------------------------------
+   Light ground, and this one is forced rather than chosen: the company's logo
+   is pure black with no second colour in it. On a dark page it would have to
+   be inverted, and an inverted logo is a different logo. So the page comes to
+   the mark instead.
+
+   That turns out to be right anyway. This is a workshop, not a showroom — the
+   reference is a service sheet and a parts diagram, not a night-time hero
+   shot. Off-white paper, black ink, hairline rules, mono for anything
+   resembling a spec.
+
+   Blue rather than the automotive red every garage site uses, and kept clear
+   of BF Mutare's yellow so the two automotive businesses in the group do not
+   collapse into each other.
+--------------------------------------------------------------------------- */
+
+:root {
+  --color-paper: #f1f0ee; /* concrete, not white */
+  --color-paper-sunk: #e4e2de;
+  --color-ink: #141414;
+  --color-ink-soft: #4a4a48;
+  --color-ink-faint: #6f6e6a;
+  --color-rule: #cfcdc8;
+
+  --color-accent: #1f4e79; /* workshop blue */
+  --color-accent-deep: #163757;
+  --color-accent-wash: #dde6f0;
+  --color-support: #c2410c; /* warning orange, used only for emphasis */
+
+  --font-display-family: var(--font-archivo);
+  --font-text-family: var(--font-archivo);
+  --font-mono-family: var(--font-plex-mono);
+}
+
+@layer base {
+  h1,
+  h2 {
+    font-variation-settings: 'wdth' 110;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    font-weight: 600;
+  }
+}
+
+/* Spec row: label left, value right, hairline between. Reads like the back
+   page of a service manual, which is the whole idea. */
+.spec {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--color-rule);
+  padding: 0.85rem 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+}
+
+.spec dt {
+  color: var(--color-ink-faint);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  font-size: var(--text-micro);
+}
