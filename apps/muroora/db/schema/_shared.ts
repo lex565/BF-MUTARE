@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm'
 import {
   bigint,
   index,
+  jsonb,
   pgEnum,
   text,
   timestamp,
@@ -67,9 +68,23 @@ export const softDelete = () => ({
  */
 export const storeId = () => uuid('store_id').notNull()
 
-/** Free-form structured detail on ledger and event rows. */
+/**
+ * Free-form structured detail on ledger and event rows.
+ *
+ * MUST BE `jsonb`, NOT `text`.
+ *
+ * This was `text().$type<Record<string, unknown>>()` — which type-checks
+ * perfectly and is silently wrong. Drizzle passes the object straight to the
+ * driver for a text column, Postgres stringifies it, and every row stored the
+ * literal `"[object Object]"`. Every audit entry, order event and stock
+ * movement lost its detail; the log still said who did what, and threw away
+ * what they actually did.
+ *
+ * `$type` describes what TypeScript should believe. It does not make the
+ * database store it that way. The column type has to agree.
+ */
 export const metadata = () =>
-  text('metadata').$type<Record<string, unknown> | null>()
+  jsonb('metadata').$type<Record<string, unknown> | null>()
 
 /** Index helper for the store scope, which nearly every query filters on. */
 export const storeIndex = (table: string) => (t: { storeId: unknown }) =>

@@ -29,6 +29,13 @@
       "when": 1786781674250,
       "tag": "0003_staff_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786790080604,
+      "tag": "0004_metadata_jsonb",
+      "breakpoints": true
     }
   ]
 }

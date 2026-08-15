@@ -139,10 +139,35 @@ try {
     .select()
     .from(auditLog)
     .where(eq(auditLog.entityId, alice))
-  if (audits.some((a) => a.action === 'STAFF_PROMOTED')) {
+  const promotion = audits.find((a) => a.action === 'STAFF_PROMOTED')
+  if (promotion) {
     ok('it is written to the audit log')
   } else {
     bad('it is written to the audit log')
+  }
+
+  /**
+   * Check the CONTENTS, not just that a row exists.
+   *
+   * The original version of this check stopped at "a row is there", and passed
+   * for weeks while every row stored the literal string "[object Object]" —
+   * the metadata column was `text` carrying a `$type` annotation, so the audit
+   * trail recorded who did what and silently threw away what they did. An
+   * existence check cannot catch that. This one can.
+   */
+  if (
+    promotion &&
+    typeof promotion.changes === 'object' &&
+    promotion.changes !== null &&
+    promotion.changes.role === 'SHOP_STAFF' &&
+    promotion.changes.jobTitle === 'Shop assistant'
+  ) {
+    ok('and the entry actually CONTAINS the role and job title')
+  } else {
+    bad(
+      'the audit entry contains the detail',
+      `stored: ${JSON.stringify(promotion?.changes)}`,
+    )
   }
 
   const second = await promoteToStaff(

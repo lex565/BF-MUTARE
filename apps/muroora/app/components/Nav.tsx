@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Logo } from '@/app/components/Logo'
+import { CartLink } from '@/app/components/shop/CartLink'
 
 const LINKS = [
-  { href: '/shop', label: 'What we stock' },
+  { href: '/shop', label: 'Shop' },
   { href: '/diaspora', label: 'Diaspora shopping' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
@@ -47,26 +48,29 @@ export function Nav() {
           })}
         </ul>
 
-        <button
-          type="button"
-          onClick={() => setOpen((value) => !value)}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          className="md:hidden"
-        >
-          <span className="sr-only">{open ? 'Close menu' : 'Open menu'}</span>
-          <span aria-hidden className="flex h-5 w-6 flex-col justify-between">
-            <span
-              className={`h-0.5 w-full bg-ink transition-transform duration-300 ${open ? 'translate-y-[9px] rotate-45' : ''}`}
-            />
-            <span
-              className={`h-0.5 w-full bg-ink transition-opacity duration-200 ${open ? 'opacity-0' : ''}`}
-            />
-            <span
-              className={`h-0.5 w-full bg-ink transition-transform duration-300 ${open ? '-translate-y-[9px] -rotate-45' : ''}`}
-            />
-          </span>
-        </button>
+        <div className="flex items-center gap-1">
+          <CartLink />
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            className="min-h-11 min-w-11 p-2 md:hidden"
+          >
+            <span className="sr-only">{open ? 'Close menu' : 'Open menu'}</span>
+            <span aria-hidden className="flex h-5 w-6 flex-col justify-between">
+              <span
+                className={`h-0.5 w-full bg-ink transition-transform duration-300 ${open ? 'translate-y-[9px] rotate-45' : ''}`}
+              />
+              <span
+                className={`h-0.5 w-full bg-ink transition-opacity duration-200 ${open ? 'opacity-0' : ''}`}
+              />
+              <span
+                className={`h-0.5 w-full bg-ink transition-transform duration-300 ${open ? '-translate-y-[9px] -rotate-45' : ''}`}
+              />
+            </span>
+          </button>
+        </div>
       </nav>
 
       <div

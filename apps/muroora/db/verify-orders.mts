@@ -444,10 +444,43 @@ try {
     bad('stock released on cancel', `reserved=${inv5.reserved}, expected 1`)
   }
 
-  if (cancelled.events.some((e) => e.eventType === 'ORDER_CANCELLED')) {
-    ok('with an event saying who cancelled it and why')
+  const cancelEvent = cancelled.events.find(
+    (e) => e.eventType === 'ORDER_CANCELLED',
+  )
+  if (cancelEvent) {
+    ok('with an event saying who cancelled it')
   } else {
     bad('cancellation event')
+  }
+
+  // The contents, not just the row. An existence check passed for weeks while
+  // every event stored "[object Object]" and the reason was thrown away.
+  if (
+    cancelEvent &&
+    typeof cancelEvent.metadata === 'object' &&
+    cancelEvent.metadata !== null &&
+    cancelEvent.metadata.reason === 'Verification run'
+  ) {
+    ok('and the event actually CONTAINS the reason given')
+  } else {
+    bad(
+      'the cancellation event contains the reason',
+      `stored: ${JSON.stringify(cancelEvent?.metadata)}`,
+    )
+  }
+
+  const placedEvent = cancelled.events.find(
+    (e) => e.eventType === 'ORDER_PLACED',
+  )
+  if (
+    placedEvent &&
+    typeof placedEvent.metadata === 'object' &&
+    placedEvent.metadata !== null &&
+    placedEvent.metadata.zone === TAG
+  ) {
+    ok('and the placement event kept which area it was for')
+  } else {
+    bad('placement event detail', JSON.stringify(placedEvent?.metadata))
   }
 
   /* --------------------------------------------------- who may look */

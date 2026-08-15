@@ -1,82 +1,104 @@
 import type { Metadata } from 'next'
-import { Reveal } from '@pineberry/ui'
-import { PageHeader } from '@/app/components/PageHeader'
-import { CATEGORIES, SEGMENTS } from '@/app/data/site'
+
+import { ShopCatalogue } from '@/app/components/shop/ShopCatalogue'
+import type {
+  CatalogueCategory,
+  CatalogueProduct,
+  WireMoney,
+} from '@/app/components/shop/types'
+import { listCategories, listPublicProducts } from '@/lib/services/products'
+import type { Money } from '@/lib/money'
 
 export const metadata: Metadata = {
-  title: 'What we stock',
+  title: 'Shop groceries and household essentials',
   description:
-    'Groceries, packaged food, cleaning supplies, personal hygiene, kitchen supplies and daily-use household items, in Mutare.',
+    'Browse Muroora Mart products currently available in Mutare. Shop as a guest and send the order to yourself or someone else.',
 }
 
-export default function ShopPage() {
+export const dynamic = 'force-dynamic'
+
+const wireMoney = (value: Money): WireMoney => ({
+  amount: value.amount.toString(),
+  currency: value.currency,
+  decimal: (Number(value.amount) / 100).toFixed(2),
+})
+
+const categoryShape = (
+  category: Awaited<ReturnType<typeof listCategories>>[number],
+): CatalogueCategory => ({
+  id: category.id,
+  name: category.name,
+  slug: category.slug,
+  description: category.description,
+})
+
+export default async function ShopPage() {
+  const [sourceProducts, sourceCategories] = await Promise.all([
+    listPublicProducts(),
+    listCategories(),
+  ])
+
+  const categories = sourceCategories.map(categoryShape)
+  const products: CatalogueProduct[] = sourceProducts.map((product) => ({
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    sku: product.sku,
+    brand: product.brand,
+    description: product.description,
+    unitSize: product.unitSize,
+    price: wireMoney(product.price),
+    promoPrice: product.promoPrice ? wireMoney(product.promoPrice) : null,
+    category: product.categoryId
+      ? {
+          id: product.categoryId,
+          name: product.categoryName!,
+          slug: product.categorySlug!,
+          description:
+            categories.find((item) => item.id === product.categoryId)?.description ??
+            null,
+        }
+      : null,
+    images: product.images,
+    availability: product.availability,
+  }))
+
   return (
     <main>
-      <PageHeader
-        eyebrow="What we stock"
-        title="Everything a household actually runs out of"
-        intro="Six categories covering the weekly shop. Stock comes from verified local and regional suppliers, and the live catalogue online reflects what is actually on the shelf."
-      />
-
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-[86rem] px-gutter py-section">
-          <ul className="grid grid-cols-1 gap-px bg-rule md:grid-cols-2 xl:grid-cols-3">
-            {CATEGORIES.map((category, index) => (
-              <Reveal
-                key={category.title}
-                as="li"
-                from="up"
-                delay={(index % 3) * 0.07}
-                className="group bg-paper p-8 transition-colors duration-300 hover:bg-paper-sunk lg:p-10"
-              >
-                <span
-                  aria-hidden
-                  className="block h-1 w-10 transition-all duration-300 group-hover:w-16"
-                  style={{
-                    backgroundColor:
-                      index % 2 === 0
-                        ? 'var(--color-support)'
-                        : 'var(--color-accent)',
-                  }}
-                />
-                <h2 className="mt-6 text-h4 font-bold">{category.title}</h2>
-                <p className="mt-3 text-ink-soft">{category.body}</p>
-              </Reveal>
-            ))}
-          </ul>
-
-          {/* An honest note. There is no live catalogue on this site yet — the
-              ordering platform is a separate system — so the page does not
-              pretend to be a shop front with a basket. */}
-          <p className="mt-14 max-w-measure text-ink-faint">
-            Prices move week to week, so they are not listed here. Message us
-            for what you need and we will quote the current price.
+      <header className="border-b border-rule bg-support text-white">
+        <div className="mx-auto max-w-[86rem] px-gutter py-14 md:py-20">
+          <p className="font-mono text-micro font-bold uppercase tracking-label text-orange-200">
+            Muroora Mart · Mutare
           </p>
+          <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-end">
+            <h1 className="max-w-[14ch] text-mega leading-[0.95]">
+              The household shop, without the runaround.
+            </h1>
+            <p className="max-w-measure text-lead text-white/80">
+              Browse what is actually available, build your basket without an
+              account, and send it to an address in Mutare—for yourself or
+              somebody you care about.
+            </p>
+          </div>
         </div>
-      </section>
+      </header>
 
-      <section className="bg-paper-sunk">
-        <div className="mx-auto max-w-[86rem] px-gutter py-section">
-          <h2 className="max-w-[18ch] text-h1">Who shops with us</h2>
-
-          <ul className="mt-16 grid grid-cols-1 gap-10 md:grid-cols-2">
-            {SEGMENTS.map((segment, index) => (
-              <Reveal
-                key={segment.title}
-                as="li"
-                from="up"
-                delay={(index % 2) * 0.07}
-                className="border-t border-ink pt-6"
-              >
-                <h3 className="text-h4 font-bold">{segment.title}</h3>
-                <p className="mt-3 max-w-measure text-ink-soft">
-                  {segment.body}
-                </p>
-              </Reveal>
-            ))}
-          </ul>
-        </div>
-      </section>
+      {products.length > 0 ? (
+        <ShopCatalogue products={products} categories={categories} />
+      ) : (
+        <section className="mx-auto max-w-[86rem] px-gutter py-section">
+          <div className="border border-rule bg-paper-sunk px-6 py-16 text-center">
+            <p className="font-mono text-micro uppercase tracking-label text-accent">
+              Catalogue setup
+            </p>
+            <h2 className="mt-3 text-h2">The shelves are being added online</h2>
+            <p className="mx-auto mt-4 max-w-xl text-ink-soft">
+              No products have been published yet. Muroora only lists confirmed
+              shop stock, so you will never see invented items or prices here.
+            </p>
+          </div>
+        </section>
+      )}
     </main>
   )
 }

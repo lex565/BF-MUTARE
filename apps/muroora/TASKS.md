@@ -64,9 +64,6 @@ That is the whole reason the boundary exists — section 56.
 
 | ID | Description | Owner | Depends on | Files | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| API-03 | Checkout + order creation | Claude | API-02 | `lib/services/orders.ts`, `app/api/orders/**` | Buyer/recipient split; idempotent; reserves stock; writes `order_events` |
-| API-04 | Delivery fee by zone | Claude | API-03 | `lib/services/delivery.ts` | Suburb → zone → fee; refuses inactive zones |
-| UI-04 | Checkout, buyer/recipient | Codex | API-03 | `app/(shop)/checkout` | "I am the recipient" checkbox; mobile-first |
 | STAFF-02 | Staff photographs on the profile | Claude | — | `lib/services/staff.ts` | Supabase Storage, signed URL at render. Column exists, unused. |
 | STAFF-03 | Printable staff ID cards | Claude | STAFF-02 | — | Addendum §8 says make it possible later, do not prioritise now. |
 | SEC-01 | Row-level security on Supabase tables | Claude | — | migration | Anon can read active products only |
@@ -80,12 +77,14 @@ That is the whole reason the boundary exists — section 56.
 | UI-01 | Shop + category pages | Codex | Consuming the ready API-01 contract; customer frontend only. |
 | UI-02 | Product detail page | Codex | Consuming the ready API-01 contract; customer frontend only. |
 | UI-03 | Guest cart page | Codex | Consuming the ready API-02 contract; customer frontend only. |
+| UI-04 | Checkout, buyer/recipient | Codex | Consuming the ready API-03/API-04 contracts; customer frontend only. |
 
 ## BLOCKED
 
 | ID | Description | Owner | Blocked on |
 | --- | --- | --- | --- |
 | DATA-01 | Load the real product catalogue | Owner | The shop's actual stock list — names, sizes, prices, categories. Nothing invented. |
+| DATA-02 | Set the real delivery areas | Owner | **The screen is built and waiting at `/admin/delivery`.** Until at least one area exists, checkout refuses every order — a fee only comes from an area, and none were invented. Needs the suburbs actually covered and what each costs. |
 | AUTH-02 | Google / Facebook sign-in | Owner | Client ID + secret from Google Cloud Console and Meta for Developers. Free, but only the owner can open those. |
 | WA-01 | WhatsApp CTAs | Owner | No business number yet. `WHATSAPP_BUSINESS_NUMBER` blank keeps every CTA hidden. |
 | PAY-01 | Payment provider | Owner | No provider chosen. `payments` table records without one. |
@@ -108,7 +107,9 @@ That is the whole reason the boundary exists — section 56.
 | API-01 | Product/catalogue service + read endpoints | Claude | `db/verify-api.mjs` — 13 checks, incl. a $999.99 cost price greppped for in the raw response |
 | API-02 | Cart service + endpoints | Claude | `db/verify-cart.mjs` — 22 checks, guest-only journey |
 | AUTH-01 | Email sign-in, role gating, admin bootstrap | Claude | Verified end to end with a real signed-in admin session on 2026-08-15. `tanakambendanata@gmail.com` holds ADMIN. |
-| STAFF-01 | Staff profiles, `MM-STF-0001` numbers, promote-to-staff, admin People screen, `/staff` shell, `/account` | Claude | `db/verify-staff.mjs` — 15 DB checks; `db/verify-staff-service.mts` — 22 service checks. Promote flow also driven through the real UI with a signed-in admin. |
+| STAFF-01 | Staff profiles, `MM-STF-0001` numbers, promote-to-staff, admin People screen, `/staff` shell, `/account` | Claude | `db/verify-staff.mjs` — 15 DB checks; `db/verify-staff-service.mts` — 23 service checks. Promote flow also driven through the real UI with a signed-in admin. |
+| API-03 | Checkout + order creation | Claude | `db/verify-orders.mts` — 30 checks incl. frozen prices, one order from a double-tap, and a failed line leaving no stock held |
+| API-04 | Delivery fee by zone + `/admin/delivery` | Claude | Same script. A suburb belongs to one zone only; an uncovered suburb is refused rather than given a default fee. |
 | DOC-00 | Phase 0 audit + decision log | Claude | — |
 
 ---
@@ -122,3 +123,9 @@ That is the whole reason the boundary exists — section 56.
   in git history and GitHub rejects anything over 100MB. Two agents working the
   same tree without a shared remote is a real coordination risk.
 - **Supabase free tier pauses after 7 days idle.** One click to wake.
+- **The dev database holds test data that cannot be deleted.** `order_events`
+  is append-only and `audit_log` has a foreign key to `users`, so verification
+  runs leave cancelled test orders and soft-deleted test accounts behind. That
+  is the audit guarantee working, not a fault: you must not be able to erase
+  history by deleting a row. **Reset the database before real trading begins**
+  rather than trying to clean it in place.
