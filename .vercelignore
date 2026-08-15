@@ -1,0 +1,34 @@
+# What NOT to upload to Vercel.
+#
+# Deploys run from the repo ROOT (each project sets its own Root Directory to
+# apps/<name>), so without this file every deploy would upload the whole
+# working tree — including ~130MB of raw phone footage that no site serves.
+#
+# Anything a site actually serves lives under apps/*/public and is NOT listed
+# here.
+
+node_modules
+.next
+out
+
+# Raw source photos and video straight off the phone. The files the sites
+# serve were copied into apps/*/public; these originals are the archive.
+Images/
+
+# Reference repos cloned for inspiration.
+references/
+
+# Research dumps and the old 2.0 source text.
+notes/
+
+# Credentials. Belt and braces — these are in .gitignore too, but .vercelignore
+# is what governs what leaves this machine on a deploy.
+vercell.txt
+vercel.txt
+*token*.txt
+*.token
+.env
+.env*.local
+
+# Local build artefacts
+*.tsbuildinfo

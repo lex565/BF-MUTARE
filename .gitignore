@@ -33,6 +33,14 @@ notes/composio.txt
 .env
 .env*.local
 
+# Credentials dropped into the repo root. vercell.txt held a Vercel access
+# token during the 2026-08-15 deploy; it was untracked but NOT ignored, so a
+# `git add -A` would have committed a live credential. Keep these patterns.
+vercell.txt
+vercel.txt
+*token*.txt
+*.token
+
 # vercel
 .vercel
 

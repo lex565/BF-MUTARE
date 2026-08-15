@@ -75,7 +75,7 @@ export const BRANDS: Brand[] = [
     base: 'Mutare',
     status: 'operating',
     founded: null, // TODO: confirm. 2.0 footers said 2023 in one file, 2025 in another.
-    href: null, // TODO: set to https://bfmutare.co.zw once the domain points at Vercel
+    href: 'https://bf-mutare.vercel.app',
     devPort: 3001,
     activities: ['Vehicle sourcing', 'Import & clearing', 'Nationwide delivery'],
     logo: '/logos/bf-mutare.svg',
@@ -96,7 +96,7 @@ export const BRANDS: Brand[] = [
     base: 'Mutare',
     status: 'operating',
     founded: 2025,
-    href: null,
+    href: 'https://muroora-mart.vercel.app',
     devPort: 3002,
     activities: ['Grocery & household', 'Local delivery', 'Diaspora shopping'],
     logo: '/logos/muroora-mart.png',
@@ -118,7 +118,7 @@ export const BRANDS: Brand[] = [
     base: 'Zimbabwe', // TODO: confirm the town
     status: 'operating',
     founded: 1996,
-    href: null,
+    href: 'https://speed-motors-tan.vercel.app',
     devPort: 3003,
     activities: ['Engine & gearbox', 'Suspension & brakes', 'Hybrid systems'],
     logo: '/logos/speed-motors.png',
@@ -140,7 +140,7 @@ export const BRANDS: Brand[] = [
     base: 'Mutare',
     status: 'operating',
     founded: 2025,
-    href: null,
+    href: 'https://club-420.vercel.app',
     devPort: 3004,
     activities: ['Liquor retail', 'Tasting nights', 'Loyalty club'],
     /* No artwork exists. The brand document describes a clock frozen at 4:20
@@ -174,7 +174,7 @@ export const brandHref = (brand: Brand): string =>
 /** The parent. Kept here so every site links back to the same place. */
 export const PARENT = {
   name: 'Pineberry Holdings',
-  href: null as string | null, // TODO: https://pineberryholdings.com once deployed
+  href: 'https://pineberry.vercel.app' as string | null, // TODO: swap for pineberryholdings.com once DNS points here
   devPort: 3000,
   line: 'A small group of real businesses in Zimbabwe.',
 } as const

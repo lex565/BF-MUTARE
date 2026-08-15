@@ -1,0 +1,22 @@
+{
+  "pineberry": {
+    "ok": true,
+    "url": "https://pineberry.vercel.app"
+  },
+  "bf-mutare": {
+    "ok": true,
+    "url": "https://bf-mutare.vercel.app"
+  },
+  "muroora-mart": {
+    "ok": true,
+    "url": "https://muroora-mart.vercel.app"
+  },
+  "speed-motors": {
+    "ok": true,
+    "url": "https://speed-motors-tan.vercel.app"
+  },
+  "club-420": {
+    "ok": true,
+    "url": "https://club-420.vercel.app"
+  }
+}
