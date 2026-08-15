@@ -2,11 +2,14 @@
 
 import { and, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
+import { CART_COOKIE_NAME } from '@/app/api/_lib/cart-owner'
 import { db } from '@/db/client'
 import { userRoles, users } from '@/db/schema'
+import { mergeGuestCart } from '@/lib/services/cart'
 import { supabaseServer } from '@/lib/supabase/server'
 
 /**
@@ -37,6 +40,36 @@ function safeNext(next: string | undefined): string {
   return next
 }
 
+/**
+ * Carry a guest cart into the account being signed into.
+ *
+ * Without this, somebody who fills a basket and then signs in to check out
+ * watches it empty — which is the most effective way there is to lose a sale
+ * at the last step.
+ *
+ * Never allowed to break the sign-in. A cart is recoverable; being unable to
+ * log in is not, so a failure here is logged and swallowed.
+ */
+async function carryCartOver(authId: string): Promise<void> {
+  try {
+    const jar = await cookies()
+    const token = jar.get(CART_COOKIE_NAME)?.value
+    if (!token) return
+
+    const [row] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.authId, authId))
+
+    if (!row) return
+
+    await mergeGuestCart(token, row.id)
+    jar.delete(CART_COOKIE_NAME)
+  } catch (error) {
+    console.error('[carryCartOver]', error)
+  }
+}
+
 export async function signIn(
   _prev: AuthState,
   formData: FormData,
@@ -52,7 +85,7 @@ export async function signIn(
   }
 
   const supabase = await supabaseServer()
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: parsed.data.email,
     password: parsed.data.password,
   })
@@ -62,6 +95,8 @@ export async function signIn(
     // which addresses are registered.
     return { error: 'That email and password do not match.' }
   }
+
+  if (data.user) await carryCartOver(data.user.id)
 
   revalidatePath('/', 'layout')
   redirect(safeNext(parsed.data.next))
@@ -128,6 +163,8 @@ export async function signUp(
       })
     }
   }
+
+  await carryCartOver(data.user.id)
 
   revalidatePath('/', 'layout')
   redirect(safeNext(parsed.data.next))

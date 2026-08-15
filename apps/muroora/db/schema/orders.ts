@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import {
   bigint,
   index,
@@ -101,10 +101,10 @@ export const orders = pgTable(
     subtotalAmount: bigint('subtotal_amount', { mode: 'bigint' }).notNull(),
     deliveryFeeAmount: bigint('delivery_fee_amount', { mode: 'bigint' })
       .notNull()
-      .default(0n),
+      .default(sql`0`),
     discountAmount: bigint('discount_amount', { mode: 'bigint' })
       .notNull()
-      .default(0n),
+      .default(sql`0`),
     totalAmount: bigint('total_amount', { mode: 'bigint' }).notNull(),
 
     /**

@@ -64,12 +64,11 @@ That is the whole reason the boundary exists — section 56.
 
 | ID | Description | Owner | Depends on | Files | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| API-02 | Cart service + endpoints | Claude | API-01 | `lib/services/cart.ts`, `app/api/cart/**` | Add/update/remove; guest carts work with no account |
 | API-03 | Checkout + order creation | Claude | API-02 | `lib/services/orders.ts`, `app/api/orders/**` | Buyer/recipient split; idempotent; reserves stock; writes `order_events` |
 | API-04 | Delivery fee by zone | Claude | API-03 | `lib/services/delivery.ts` | Suburb → zone → fee; refuses inactive zones |
-| UI-01 | Shop + category pages from the API | Codex | API-01 | `app/(shop)/shop/**` | Renders live products; no cost price in the payload |
-| UI-02 | Product detail page | Codex | API-01 | `app/(shop)/product/[slug]` | Shows stock state; add-to-cart |
-| UI-03 | Cart page | Codex | API-02 | `app/(shop)/cart` | Works signed out |
+| UI-01 | Shop + category pages — **API-01 is READY** | Codex | API-01 | `app/(shop)/shop/**` | Renders live products; no cost price in the payload |
+| UI-02 | Product detail page — **API-01 is READY** | Codex | API-01 | `app/(shop)/product/[slug]` | Shows stock state; add-to-cart |
+| UI-03 | Cart page — **API-02 is READY** | Codex | API-02 | `app/(shop)/cart` | Works signed out |
 | UI-04 | Checkout, buyer/recipient | Codex | API-03 | `app/(shop)/checkout` | "I am the recipient" checkbox; mobile-first |
 | OPS-01 | Staff order queue | Claude | API-03 | `app/staff/orders/**` | Filter by status; pick/pack |
 | SEC-01 | Row-level security on Supabase tables | Claude | — | migration | Anon can read active products only |
@@ -79,7 +78,7 @@ That is the whole reason the boundary exists — section 56.
 
 | ID | Description | Owner | Notes |
 | --- | --- | --- | --- |
-| API-01 | Product/catalogue service + read endpoints | Claude | Extracting logic out of the server action into `lib/services/products.ts` |
+| — | Nothing claimed. **API-03 is next for Claude.** | | |
 
 ## BLOCKED
 
@@ -94,19 +93,21 @@ That is the whole reason the boundary exists — section 56.
 
 | ID | Description | Owner | Notes |
 | --- | --- | --- | --- |
-| AUTH-01 | Email sign-in, role gating, admin bootstrap | Claude | Built and building clean. End-to-end sign-in not yet verified — a test account exists in Supabase (`claude-verify@muroora.test`) and should be deleted once verified. |
-| ADM-01 | Admin product screen | Claude | Built. Gate verified: anonymous hits redirect to `/login`. Add-product path not yet exercised against a real session. |
+| AUTH-01 | Email sign-in, role gating, admin bootstrap | Claude | Gate verified — anonymous hits on `/admin/*` redirect to `/login`. **Not yet verified end to end with a real session**, because the first admin needs an account only the owner can create. The temporary test account has been deleted. |
+| ADM-01 | Admin product screen | Claude | Built and gated. Add-product path exercised through the service layer by `db/verify-api.mjs`, not yet through the form with a signed-in admin. |
 
 ## DONE
 
-| ID | Description | Owner |
-| --- | --- | --- |
-| DB-01 | Schema: 17 tables, store_id everywhere, money as minor units | Claude |
-| DB-02 | Migrations + DB-level guards (append-only triggers, stock CHECKs, order-number sequence) | Claude |
-| DB-03 | Supabase project provisioned (free tier), migrated, seeded | Claude |
-| LIB-01 | `lib/money.ts` — 28 checks passing | Claude |
-| LIB-02 | `lib/inventory.ts` — ledger + balance in one transaction | Claude |
-| DOC-00 | Phase 0 audit + decision log | Claude |
+| ID | Description | Owner | Verified by |
+| --- | --- | --- | --- |
+| DB-01 | Schema: 19 tables, store_id everywhere, money as minor units | Claude | `db/verify.mjs` |
+| DB-02 | Migrations + DB-level guards (append-only triggers, stock CHECKs, order-number sequence) | Claude | `db/verify.mjs` — each rule deliberately violated to prove it refuses |
+| DB-03 | Supabase project provisioned (free tier), migrated, seeded | Claude | `db/show.mjs` |
+| LIB-01 | `lib/money.ts` | Claude | `lib/money.check.ts` — 28 checks |
+| LIB-02 | `lib/inventory.ts` — ledger + balance in one transaction | Claude | `db/verify.mjs` |
+| API-01 | Product/catalogue service + read endpoints | Claude | `db/verify-api.mjs` — 13 checks, incl. a $999.99 cost price greppped for in the raw response |
+| API-02 | Cart service + endpoints | Claude | `db/verify-cart.mjs` — 22 checks, guest-only journey |
+| DOC-00 | Phase 0 audit + decision log | Claude | — |
 
 ---
 

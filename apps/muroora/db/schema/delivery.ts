@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import {
   bigint,
   boolean,
@@ -52,7 +52,7 @@ export const deliveryZones = pgTable(
     perKmFeeAmount: bigint('per_km_fee_amount', { mode: 'bigint' }),
     minimumOrderAmount: bigint('minimum_order_amount', { mode: 'bigint' })
       .notNull()
-      .default(0n),
+      .default(sql`0`),
 
     estimatedMinutesMin: integer('estimated_minutes_min'),
     estimatedMinutesMax: integer('estimated_minutes_max'),
