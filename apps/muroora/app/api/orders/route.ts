@@ -30,13 +30,33 @@ import {
  */
 export const dynamic = 'force-dynamic'
 
+/**
+ * Every message here is written for a customer, not a developer.
+ *
+ * Zod's defaults read "Too small: expected string to have >=1 characters",
+ * which is fine in a log and useless under a form field. The front end shows
+ * `details[].problem` next to the input it names, so these have to be the
+ * words a shopper should actually see.
+ */
 const recipientSchema = z.object({
-  name: z.string().trim().min(1).max(120),
-  phone: z.string().trim().min(6).max(20),
+  name: z.string().trim().min(1, 'Who is this order going to?').max(120),
+  phone: z
+    .string()
+    .trim()
+    .min(6, 'The rider needs a number to ring on the day.')
+    .max(20, 'That phone number is too long.'),
   relationship: z.string().trim().max(60).optional(),
-  line1: z.string().trim().min(1).max(200),
+  line1: z
+    .string()
+    .trim()
+    .min(1, 'A house number and street, so the rider can find it.')
+    .max(200),
   line2: z.string().trim().max(200).optional(),
-  suburb: z.string().trim().min(1).max(80),
+  suburb: z
+    .string()
+    .trim()
+    .min(1, 'Which suburb? This is what sets the delivery fee.')
+    .max(80),
   city: z.string().trim().max(80).optional(),
   directions: z.string().trim().max(500).optional(),
   alternativeContactName: z.string().trim().max(120).optional(),
@@ -44,8 +64,14 @@ const recipientSchema = z.object({
 })
 
 const buyerSchema = z.object({
-  name: z.string().trim().min(1).max(120),
-  email: z.string().trim().email().max(160).optional().or(z.literal('')),
+  name: z.string().trim().min(1, 'Please give us your name.').max(120),
+  email: z
+    .string()
+    .trim()
+    .email('That email address does not look right.')
+    .max(160)
+    .optional()
+    .or(z.literal('')),
   phone: z.string().trim().max(20).optional(),
   countryCode: z.string().trim().max(4).optional(),
 })
@@ -53,7 +79,13 @@ const buyerSchema = z.object({
 const placeSchema = z.object({
   buyer: buyerSchema,
   recipient: recipientSchema,
-  idempotencyKey: z.string().trim().min(8).max(200),
+  // Not customer-facing: a client that omits this has a bug, and the message
+  // is for whoever is reading the network tab.
+  idempotencyKey: z
+    .string()
+    .trim()
+    .min(8, 'Client error: send a unique idempotencyKey with each attempt.')
+    .max(200),
   substitutionPreference: z
     .enum(['NONE', 'SIMILAR', 'CONTACT_ME'])
     .optional(),

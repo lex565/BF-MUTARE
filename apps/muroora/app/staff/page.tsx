@@ -97,6 +97,22 @@ export default async function StaffHomePage() {
 
         {isAdmin(me) && (
           <article className="border border-rule p-6">
+            <h2 className="text-h3 font-bold">Delivery areas</h2>
+            <p className="mt-3 text-small text-ink-soft">
+              Where you deliver and what it costs. Nothing can be ordered until
+              at least one area is set up.
+            </p>
+            <Link
+              href="/admin/delivery"
+              className="mt-4 inline-block border border-ink px-4 py-2 font-mono text-micro uppercase tracking-label transition-colors hover:bg-ink hover:text-paper"
+            >
+              Open delivery areas
+            </Link>
+          </article>
+        )}
+
+        {isAdmin(me) && (
+          <article className="border border-rule p-6">
             <h2 className="text-h3 font-bold">People</h2>
             <p className="mt-3 text-small text-ink-soft">
               Add a colleague, change what someone is allowed to do, or record

@@ -66,9 +66,6 @@ That is the whole reason the boundary exists — section 56.
 | --- | --- | --- | --- | --- | --- |
 | API-03 | Checkout + order creation | Claude | API-02 | `lib/services/orders.ts`, `app/api/orders/**` | Buyer/recipient split; idempotent; reserves stock; writes `order_events` |
 | API-04 | Delivery fee by zone | Claude | API-03 | `lib/services/delivery.ts` | Suburb → zone → fee; refuses inactive zones |
-| UI-01 | Shop + category pages — **API-01 is READY** | Codex | API-01 | `app/(shop)/shop/**` | Renders live products; no cost price in the payload |
-| UI-02 | Product detail page — **API-01 is READY** | Codex | API-01 | `app/(shop)/product/[slug]` | Shows stock state; add-to-cart |
-| UI-03 | Cart page — **API-02 is READY** | Codex | API-02 | `app/(shop)/cart` | Works signed out |
 | UI-04 | Checkout, buyer/recipient | Codex | API-03 | `app/(shop)/checkout` | "I am the recipient" checkbox; mobile-first |
 | STAFF-02 | Staff photographs on the profile | Claude | — | `lib/services/staff.ts` | Supabase Storage, signed URL at render. Column exists, unused. |
 | STAFF-03 | Printable staff ID cards | Claude | STAFF-02 | — | Addendum §8 says make it possible later, do not prioritise now. |
@@ -80,6 +77,9 @@ That is the whole reason the boundary exists — section 56.
 | ID | Description | Owner | Notes |
 | --- | --- | --- | --- |
 | OPS-01 | Staff order queue | Claude | Blocked on API-03 for real orders, but the shell at `/staff` is in place. |
+| UI-01 | Shop + category pages | Codex | Consuming the ready API-01 contract; customer frontend only. |
+| UI-02 | Product detail page | Codex | Consuming the ready API-01 contract; customer frontend only. |
+| UI-03 | Guest cart page | Codex | Consuming the ready API-02 contract; customer frontend only. |
 
 ## BLOCKED
 
