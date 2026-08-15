@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    // ES2020 for BigInt literals (0n). Money is stored in minor units as
+    // bigint — see lib/money.ts and D-003 — and ES2017 cannot express them.
+    "target": "ES2020",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
