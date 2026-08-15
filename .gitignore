@@ -60,3 +60,5 @@ yarn-error.log*
 # Muroora local env (Supabase keys, database URLs)
 .env.local
 .env*.local
+
+.verify-credentials
