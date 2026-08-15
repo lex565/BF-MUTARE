@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Reveal } from '@pineberry/ui'
 import { SITE, PRINCIPLES, CATEGORIES } from '@/app/data/site'
@@ -7,44 +8,78 @@ export default function HomePage() {
     <main>
       {/* Hero. The diaspora line leads because it is the one thing no
           supermarket in Mutare offers, and because it is the reason someone in
-          Leeds or Johannesburg would ever land on this page. */}
-      <section className="relative overflow-hidden border-b border-rule">
-        {/* A soft green field behind the type rather than a photograph. There
-            are no shop photographs yet, and a stock supermarket aisle would be
-            the most obviously borrowed image on the site. */}
+          Leeds or Johannesburg would ever land on this page.
+
+          The photograph is the client's own. It earns its place rather than
+          being decoration: a woman with a suitcase in a Zimbabwean courtyard
+          reads as travelling and coming home, which is precisely the diaspora
+          relationship this business exists to serve. A supermarket aisle would
+          have said "shop"; this says "family". */}
+      {/* Full-bleed photograph with the type over it.
+
+          The source PNG is used uncompressed — next/image resizes it and
+          serves AVIF or WebP per request, so the original stays full quality
+          on disk without a 2.4MB download ever reaching a phone.
+
+          Legibility is handled by inverting the type rather than by bleaching
+          the photograph. An earlier attempt kept the dark-on-cream palette and
+          needed a scrim heavy enough to wash the image out to do it. Cream
+          type over a warm dark gradient reads cleanly and leaves the picture
+          intact — and the gradient is weighted to the bottom-left, where the
+          courtyard floor is the quietest part of the frame. */}
+      <section className="relative isolate border-b border-rule">
+        <div className="absolute inset-0 -z-20">
+          <Image
+            src="/hero/courtyard.png"
+            alt="A traveller arriving with a suitcase at a Zimbabwean courtyard under jacaranda blossom"
+            fill
+            priority
+            quality={90}
+            sizes="100vw"
+            className="object-cover object-[38%_46%]"
+          />
+        </div>
+
+        {/* Warm near-black, not the brand's dark green: green over a golden-
+            hour photograph turns the whole frame to mud. And kept light —
+            a first pass at 0.92/0.24 crushed the picture into a flat wash,
+            which defeats the point of having one. Just enough under the type,
+            almost nothing at the top. */}
         <div
           aria-hidden
-          className="absolute inset-0 -z-10 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 18% 22%, var(--color-support) 0, transparent 42%), radial-gradient(circle at 84% 68%, var(--color-accent) 0, transparent 46%)',
-          }}
+          className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(26,16,8,0.80)_0%,rgba(26,16,8,0.55)_28%,rgba(26,16,8,0.22)_58%,rgba(26,16,8,0.04)_100%)]"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(26,16,8,0.38)_0%,rgba(26,16,8,0.10)_46%,transparent_72%)]"
         />
 
-        <div className="mx-auto max-w-[86rem] px-gutter pb-20 pt-20 md:pb-28 md:pt-28">
-          <p className="chip chip-live">Mutare · since {SITE.founded}</p>
+        <div className="relative mx-auto flex min-h-[34rem] max-w-[86rem] flex-col justify-end px-gutter pb-20 pt-28 md:min-h-[42rem] md:pb-24">
+          <p className="chip w-fit border-white/40 text-white/85">
+            Mutare · since {SITE.founded}
+          </p>
 
-          <h1 className="mt-8 max-w-[16ch] text-mega leading-[0.94]">
+          <h1 className="mt-8 max-w-[15ch] text-mega leading-[0.94] text-white">
             The shopping gets{' '}
             <span className="text-accent">done</span>, wherever you are.
           </h1>
 
-          <p className="mt-9 max-w-[52ch] text-lead text-ink-soft">
+          <p className="mt-8 max-w-[50ch] text-lead text-white/90">
             Groceries and household goods in Mutare, with same-day local
             delivery. And if you are abroad, you can buy the actual goods for
             your family here — not send money and hope.
           </p>
 
-          <div className="mt-12 flex flex-wrap items-center gap-4">
+          <div className="mt-11 flex flex-wrap items-center gap-4">
             <Link
               href="/diaspora"
-              className="bg-accent px-8 py-4 font-mono text-small font-bold uppercase tracking-label text-paper transition-colors duration-200 hover:bg-accent-deep"
+              className="bg-accent px-8 py-4 font-mono text-small font-bold uppercase tracking-label text-white transition-colors duration-200 hover:bg-accent-deep"
             >
               Shopping from abroad
             </Link>
             <Link
               href="/shop"
-              className="group inline-flex items-center gap-3 border border-support px-8 py-4 font-mono text-small uppercase tracking-label text-support transition-colors duration-200 hover:bg-support hover:text-paper"
+              className="group inline-flex items-center gap-3 border border-white/60 px-8 py-4 font-mono text-small uppercase tracking-label text-white transition-colors duration-200 hover:bg-white hover:text-ink"
             >
               What we stock
               <span

@@ -20,13 +20,10 @@ export function Footer() {
 
       <div className="mx-auto grid max-w-[86rem] gap-12 px-gutter py-16 md:grid-cols-12">
         <div className="md:col-span-5">
-          <Link href="/" className="flex items-baseline gap-3">
-            <Wordmark />
-            <span className="font-mono text-micro uppercase tracking-label text-ink-faint">
-              Liquor Store
-            </span>
+          <Link href="/">
+            <Wordmark className="h-24" />
           </Link>
-          <p className="mt-5 max-w-[32ch] font-display text-h3 text-accent">
+          <p className="mt-6 max-w-[32ch] font-display text-h3 text-accent">
             {SITE.tagline}
           </p>
         </div>

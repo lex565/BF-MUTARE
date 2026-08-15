@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
@@ -12,21 +13,33 @@ const LINKS = [
 ]
 
 /**
- * Wordmark.
+ * The crest.
  *
- * The brand document describes a logo — a minimalist clock frozen at 4:20,
- * stylised into a bottle silhouette — but that artwork does not exist yet, and
- * no file was supplied. Rather than invent a mark, the number is set as type
- * with the clock colon carried in the accent, which is honest and will not
- * fight the real logo when it arrives.
+ * This replaces the type-set `4:20` stand-in that stood here while the logo
+ * described in the brand document had not been drawn. It now has been.
+ *
+ * The artwork already contains "LIQUOR STORE" and "MUTARE", so nothing is set
+ * beside it — repeating either in HTML next to the mark would say the same
+ * thing twice. The accessible name lives on the alt text instead.
+ *
+ * The file arrived with a correct alpha channel (45% of it transparent, 168
+ * stray white pixels), so nothing was knocked out — only trimmed to its
+ * bounding box and resized.
  */
-export function Wordmark({ className = '' }: { className?: string }) {
+/* Sized generously on purpose. This is a detailed crest — a mountain range,
+   a glass, two lines of lettering — and at the 32-40px a wordmark would take
+   it turns to mush. It carries the site's whole identity, so it gets the
+   room. */
+export function Wordmark({ className = 'h-16' }: { className?: string }) {
   return (
-    <span
-      className={`font-display text-h3 leading-none tracking-wide ${className}`}
-    >
-      4<span className="text-accent">:</span>20
-    </span>
+    <Image
+      src="/logo.png"
+      alt="420 Liquor Store, Mutare"
+      width={512}
+      height={489}
+      priority
+      className={`w-auto ${className}`}
+    />
   )
 }
 
@@ -40,15 +53,8 @@ export function Nav() {
         aria-label="Primary"
         className="mx-auto flex max-w-[86rem] items-center justify-between gap-6 px-gutter py-4"
       >
-        <Link
-          href="/"
-          aria-label="420 Liquor Store — home"
-          className="flex items-baseline gap-3"
-        >
+        <Link href="/" aria-label="420 Liquor Store — home">
           <Wordmark />
-          <span className="hidden font-mono text-micro uppercase tracking-label text-ink-faint sm:inline">
-            Liquor Store
-          </span>
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex">
