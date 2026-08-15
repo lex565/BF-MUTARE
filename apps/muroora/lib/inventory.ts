@@ -1,6 +1,6 @@
 import { and, eq, sql } from 'drizzle-orm'
 
-import { db, type Db } from '@/db/client'
+import { db, type DbOrTx } from '@/db/client'
 import { inventory, inventoryTransactions } from '@/db/schema'
 
 /**
@@ -75,9 +75,9 @@ const REASON_REQUIRED: ReadonlySet<StockMoveType> = new Set([
  */
 export async function applyStockMove(
   move: StockMove,
-  tx?: Db,
+  tx?: DbOrTx,
 ): Promise<{ quantityBefore: number; quantityAfter: number }> {
-  const run = async (conn: Db) => {
+  const run = async (conn: DbOrTx) => {
     if (REASON_REQUIRED.has(move.type) && !move.reason?.trim()) {
       throw new Error(
         `A ${move.type} needs a reason. Somebody has to be able to read this ` +
@@ -139,7 +139,7 @@ export async function applyStockMove(
     return { quantityBefore: before, quantityAfter: after }
   }
 
-  return tx ? run(tx) : db.transaction(run as never)
+  return tx ? run(tx) : db.transaction(run)
 }
 
 /**
@@ -158,9 +158,9 @@ export async function reserveStock(
     orderId: string
     performedBy?: string
   },
-  tx?: Db,
+  tx?: DbOrTx,
 ): Promise<void> {
-  const run = async (conn: Db) => {
+  const run = async (conn: DbOrTx) => {
     const [row] = await conn
       .select()
       .from(inventory)
@@ -210,7 +210,7 @@ export async function reserveStock(
     })
   }
 
-  return tx ? run(tx) : db.transaction(run as never)
+  return tx ? run(tx) : db.transaction(run)
 }
 
 /** Release a hold — cancelled order, or the goods have now actually left. */
@@ -224,9 +224,9 @@ export async function releaseReservation(
     fulfilled: boolean
     performedBy?: string
   },
-  tx?: Db,
+  tx?: DbOrTx,
 ): Promise<void> {
-  const run = async (conn: Db) => {
+  const run = async (conn: DbOrTx) => {
     const [row] = await conn
       .select()
       .from(inventory)
@@ -278,7 +278,7 @@ export async function releaseReservation(
     }
   }
 
-  return tx ? run(tx) : db.transaction(run as never)
+  return tx ? run(tx) : db.transaction(run)
 }
 
 /** What a customer can actually buy right now. */

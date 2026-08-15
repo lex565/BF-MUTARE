@@ -53,3 +53,22 @@ if (process.env.NODE_ENV !== 'production') {
 export const db = drizzle(client, { schema })
 export { schema }
 export type Db = typeof db
+
+/**
+ * A transaction handle, as Drizzle hands it to a `db.transaction` callback.
+ *
+ * Derived from the real signature rather than written out, so it cannot drift
+ * when Drizzle is upgraded.
+ */
+export type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0]
+
+/**
+ * Either one.
+ *
+ * Service functions that may be composed into a larger transaction take this,
+ * so order creation can reserve stock inside the same transaction that writes
+ * the order. Typing those parameters as `Db` was almost right and forced `as
+ * never` casts at each call site, which is exactly the sort of cast that hides
+ * a genuine mismatch later.
+ */
+export type DbOrTx = Db | Tx
