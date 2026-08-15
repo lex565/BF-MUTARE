@@ -13,6 +13,7 @@
 
 export * from './_shared'
 export * from './identity'
+export * from './staff'
 export * from './catalogue'
 export * from './inventory'
 export * from './cart'

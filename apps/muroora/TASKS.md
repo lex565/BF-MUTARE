@@ -70,7 +70,8 @@ That is the whole reason the boundary exists — section 56.
 | UI-02 | Product detail page — **API-01 is READY** | Codex | API-01 | `app/(shop)/product/[slug]` | Shows stock state; add-to-cart |
 | UI-03 | Cart page — **API-02 is READY** | Codex | API-02 | `app/(shop)/cart` | Works signed out |
 | UI-04 | Checkout, buyer/recipient | Codex | API-03 | `app/(shop)/checkout` | "I am the recipient" checkbox; mobile-first |
-| OPS-01 | Staff order queue | Claude | API-03 | `app/staff/orders/**` | Filter by status; pick/pack |
+| STAFF-02 | Staff photographs on the profile | Claude | — | `lib/services/staff.ts` | Supabase Storage, signed URL at render. Column exists, unused. |
+| STAFF-03 | Printable staff ID cards | Claude | STAFF-02 | — | Addendum §8 says make it possible later, do not prioritise now. |
 | SEC-01 | Row-level security on Supabase tables | Claude | — | migration | Anon can read active products only |
 | DOC-01 | Remaining `/docs` files from section 45 | Claude | — | `docs/**` | 01–19 present |
 
@@ -78,7 +79,7 @@ That is the whole reason the boundary exists — section 56.
 
 | ID | Description | Owner | Notes |
 | --- | --- | --- | --- |
-| — | Nothing claimed. **API-03 is next for Claude.** | | |
+| OPS-01 | Staff order queue | Claude | Blocked on API-03 for real orders, but the shell at `/staff` is in place. |
 
 ## BLOCKED
 
@@ -93,7 +94,6 @@ That is the whole reason the boundary exists — section 56.
 
 | ID | Description | Owner | Notes |
 | --- | --- | --- | --- |
-| AUTH-01 | Email sign-in, role gating, admin bootstrap | Claude | Gate verified — anonymous hits on `/admin/*` redirect to `/login`. **Not yet verified end to end with a real session**, because the first admin needs an account only the owner can create. The temporary test account has been deleted. |
 | ADM-01 | Admin product screen | Claude | Built and gated. Add-product path exercised through the service layer by `db/verify-api.mjs`, not yet through the form with a signed-in admin. |
 
 ## DONE
@@ -107,6 +107,8 @@ That is the whole reason the boundary exists — section 56.
 | LIB-02 | `lib/inventory.ts` — ledger + balance in one transaction | Claude | `db/verify.mjs` |
 | API-01 | Product/catalogue service + read endpoints | Claude | `db/verify-api.mjs` — 13 checks, incl. a $999.99 cost price greppped for in the raw response |
 | API-02 | Cart service + endpoints | Claude | `db/verify-cart.mjs` — 22 checks, guest-only journey |
+| AUTH-01 | Email sign-in, role gating, admin bootstrap | Claude | Verified end to end with a real signed-in admin session on 2026-08-15. `tanakambendanata@gmail.com` holds ADMIN. |
+| STAFF-01 | Staff profiles, `MM-STF-0001` numbers, promote-to-staff, admin People screen, `/staff` shell, `/account` | Claude | `db/verify-staff.mjs` — 15 DB checks; `db/verify-staff-service.mts` — 22 service checks. Promote flow also driven through the real UI with a signed-in admin. |
 | DOC-00 | Phase 0 audit + decision log | Claude | — |
 
 ---

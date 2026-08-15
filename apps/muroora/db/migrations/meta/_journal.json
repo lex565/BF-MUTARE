@@ -22,6 +22,13 @@
       "when": 1786779025283,
       "tag": "0002_carts",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786781674250,
+      "tag": "0003_staff_profiles",
+      "breakpoints": true
     }
   ]
 }
