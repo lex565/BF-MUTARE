@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Archivo, IBM_Plex_Mono } from 'next/font/google'
+import { siteUrl } from '@pineberry/ui'
 import { Nav } from '@/app/components/Nav'
 import { Footer } from '@/app/components/Footer'
 import './globals.css'
@@ -29,8 +30,11 @@ export const metadata: Metadata = {
   },
   description:
     'BF Mutare imports vehicles to order and delivers them to owners across Zimbabwe. Based in Mutare, operating countrywide. Spread the cost over up to 24 months.',
-  // TODO: confirm the domain. The old codebase used bfmutare.co.zw.
-  metadataBase: new URL('https://bfmutare.co.zw'),
+  /* Read from the shared brand record rather than hardcoded. This was
+     https://bfmutare.co.zw, a domain that does not resolve — which meant every
+     canonical URL and every Open Graph image path on the site pointed at
+     nothing. */
+  metadataBase: new URL(siteUrl('bf-mutare')),
   keywords: [
     'car import Zimbabwe',
     'vehicle import Mutare',

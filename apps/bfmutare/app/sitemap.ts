@@ -1,11 +1,16 @@
 import type { MetadataRoute } from 'next'
+import { siteUrl } from '@pineberry/ui'
 
 /**
  * Kept in step with the routes by hand — there are six of them and they change
  * rarely. If per-vehicle pages get added later, generate that part from
  * FEATURED rather than listing them here.
+ *
+ * The base was hardcoded to https://bfmutare.co.zw, which does not resolve, so
+ * every URL in this sitemap pointed at a domain that does not exist. Now read
+ * from the shared brand record.
  */
-const BASE = 'https://bfmutare.co.zw' // TODO: confirm domain
+const BASE = siteUrl('bf-mutare')
 
 const ROUTES: Array<{ path: string; priority: number }> = [
   { path: '', priority: 1 },

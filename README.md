@@ -2,14 +2,23 @@
 
 Five sites, one codebase.
 
-| App | What it is | Local | Intended domain |
+| App | What it is | Local | Live |
 | --- | --- | --- | --- |
-| `apps/pineberry` | Pineberry Holdings, the parent | `localhost:3000` | pineberryholdings.com |
-| `apps/bfmutare` | BF Mutare, vehicle imports | `localhost:3001` | bfmutare.co.zw |
-| `apps/muroora` | Muroora Mart, retail and diaspora shopping | `localhost:3002` | TBC |
-| `apps/speedmotors` | Speed Motor Engineering, since 1996 | `localhost:3003` | TBC |
-| `apps/club420` | 420 Liquor Store | `localhost:3004` | TBC |
+| `apps/pineberry` | Pineberry Holdings, the parent | `localhost:3000` | [pineberry.vercel.app](https://pineberry.vercel.app) |
+| `apps/bfmutare` | BF Mutare, vehicle imports | `localhost:3001` | [bf-mutare.vercel.app](https://bf-mutare.vercel.app) |
+| `apps/muroora` | Muroora Mart, retail and diaspora shopping | `localhost:3002` | [muroora-mart.vercel.app](https://muroora-mart.vercel.app) |
+| `apps/speedmotors` | Speed Motor Engineering, since 1996 | `localhost:3003` | [speed-motors-tan.vercel.app](https://speed-motors-tan.vercel.app) |
+| `apps/club420` | 420 Liquor Store | `localhost:3004` | [club-420.vercel.app](https://club-420.vercel.app) |
 | `packages/ui` | Shared tokens, components and the brand registry | — | — |
+
+**The group owns no working domains.** `pineberryholdings.com` and
+`bfmutare.co.zw` do not resolve — not "point somewhere wrong", they do not
+exist. Every canonical URL, sitemap, robots.txt and cross-link therefore uses
+the Vercel address, read from `href` in `packages/ui/src/brands.ts`. Change it
+there when a domain is bought and every one of those follows.
+
+Do not write an aspirational domain into a canonical URL or a sitemap: it aims
+search engines and link previews at nothing, silently.
 
 Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · TypeScript · npm workspaces.
 

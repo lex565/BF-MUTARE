@@ -1,8 +1,9 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { BRANDS } from '@pineberry/ui'
+import { BRANDS, brandHref } from '@pineberry/ui'
 
 /**
  * The holdings masthead.
@@ -113,19 +114,46 @@ export function Masthead() {
             and someone whose name is on it.
           </p>
 
-          {/* The four accents, as a legend. It tells you at a glance that this
-              is a group of four before you have scrolled anywhere. */}
-          <ul className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3">
+          {/* The four companies, by their own marks. A holding company's job on
+              its own front page is to show what it owns, and four real logos do
+              that faster than four names in a row.
+
+              Each sits on a light plate rather than straight on the video.
+              That is not decoration: the four marks were drawn for four
+              different grounds — Speed Motors' is pure black and would vanish
+              entirely on this dark hero — and recolouring somebody's logo to
+              suit a background is not ours to do. A common plate lets all four
+              keep their own artwork and stay legible. */}
+          <ul className="mt-12 flex flex-wrap items-center gap-3">
             {BRANDS.map((brand) => (
-              <li key={brand.slug} className="flex items-center gap-2.5">
-                <span
-                  aria-hidden
-                  className="inline-block h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: brand.palette.accent }}
-                />
-                <span className="font-mono text-micro uppercase tracking-label text-paper/75">
-                  {brand.name}
-                </span>
+              <li key={brand.slug}>
+                <a
+                  href={brandHref(brand)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex h-16 w-32 items-center justify-center rounded-sm bg-paper/92 px-4 transition duration-300 hover:bg-paper sm:h-[4.5rem] sm:w-40"
+                >
+                  <span className="sr-only">
+                    Visit {brand.fullName ?? brand.name}
+                  </span>
+                  {brand.logo ? (
+                    <Image
+                      src={brand.logo}
+                      alt=""
+                      width={320}
+                      height={160}
+                      className="h-auto max-h-11 w-auto max-w-full object-contain transition-transform duration-300 group-hover:scale-[1.04] sm:max-h-12"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden
+                      className="font-display text-h4"
+                      style={{ color: brand.palette.accent }}
+                    >
+                      {brand.name}
+                    </span>
+                  )}
+                </a>
               </li>
             ))}
           </ul>

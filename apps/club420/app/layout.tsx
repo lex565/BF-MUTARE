@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Bebas_Neue, Figtree, IBM_Plex_Mono } from 'next/font/google'
-import { GroupBar } from '@pineberry/ui'
+import { GroupBar, siteUrl } from '@pineberry/ui'
 import { Nav } from '@/app/components/Nav'
 import { Footer } from '@/app/components/Footer'
 import './globals.css'
@@ -37,6 +37,9 @@ export const metadata: Metadata = {
   },
   description:
     'A licensed liquor store in Mutare built around the 4:20 pause. Premium spirits, wine and Zimbabwean craft, plus tasting nights and cultural evenings. Over 18s only.',
+  /* Without this, Next resolves Open Graph and canonical URLs against
+     localhost at build time. Read from the shared brand record. */
+  metadataBase: new URL(siteUrl('club-420')),
   keywords: [
     'liquor store Mutare',
     'bottle store Zimbabwe',

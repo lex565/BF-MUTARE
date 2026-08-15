@@ -13,8 +13,17 @@ export const SITE = {
   summary:
     'Pineberry Holdings owns and operates a small group of businesses in Zimbabwe.',
 
-  email: 'hello@pineberryholdings.com', // TODO
-  phoneDisplay: '+263 00 000 0000', // TODO
+  /**
+   * Null, not a placeholder string.
+   *
+   * This was 'hello@pineberryholdings.com' and it was rendered in the footer
+   * of every page as a large mailto link. That domain does not resolve, so any
+   * mail sent to it bounces — a visitor who tried to make contact got silence
+   * and assumed they had been ignored. A visible "not published yet" is a far
+   * better outcome than an address that quietly fails.
+   */
+  email: null as string | null, // TODO: a real address on a domain that exists
+  phoneDisplay: null as string | null, // TODO: was +263 00 000 0000
 
   address: {
     city: 'Mutare', // TODO: confirm — head office may be Harare

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { PARENT, parentHref } from '@pineberry/ui'
 import { SITE, mapLink } from '@/app/data/site'
 import { Logo } from '@/app/components/Logo'
 import { Social } from '@/app/components/Social'
@@ -54,10 +55,15 @@ export function Footer() {
             A {SITE.parent} company
           </p>
           <a
-            href="https://pineberryholdings.com"
+            /* Was a hardcoded https://pineberryholdings.com — a link on every
+               page of this site to a domain that does not resolve. Now reads
+               the parent's live URL from the shared record. */
+            href={parentHref()}
+            target="_blank"
+            rel="noopener noreferrer"
             className="font-mono text-micro uppercase tracking-label text-ink-soft transition-colors hover:text-accent"
           >
-            pineberryholdings.com ↗
+            Visit {PARENT.name} ↗
           </a>
           <p className="mt-2 font-mono text-micro text-ink-faint">
             © {new Date().getFullYear()} {SITE.legalName}

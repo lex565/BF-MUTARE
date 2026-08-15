@@ -7,6 +7,7 @@ export {
   PARENT,
   brandBySlug,
   brandHref,
+  siteUrl,
   parentHref,
   operatingBrands,
   type Brand,

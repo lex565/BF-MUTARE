@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Archivo, IBM_Plex_Mono } from 'next/font/google'
-import { GroupBar } from '@pineberry/ui'
+import { GroupBar, siteUrl } from '@pineberry/ui'
 import { Nav } from '@/app/components/Nav'
 import { Footer } from '@/app/components/Footer'
 import './globals.css'
@@ -28,6 +28,9 @@ export const metadata: Metadata = {
   },
   description:
     'Engine and gearbox overhauls, suspension, brakes, clutches and hybrid systems. A working repair shop in Zimbabwe, trading since 1996.',
+  /* Without this, Next resolves Open Graph and canonical URLs against
+     localhost at build time. Read from the shared brand record. */
+  metadataBase: new URL(siteUrl('speed-motors')),
   keywords: [
     'engine overhaul Zimbabwe',
     'gearbox repair Zimbabwe',

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Fraunces, Schibsted_Grotesk, IBM_Plex_Mono } from 'next/font/google'
+import { PARENT } from '@pineberry/ui'
 import './globals.css'
 
 /* Fraunces with its optical-size, softness and "wonk" axes exposed. The wonk
@@ -32,7 +33,9 @@ export const metadata: Metadata = {
   },
   description:
     'Pineberry Holdings is a Zimbabwean holding company. We own and operate a small group of businesses, including BF Mutare and Muroora Mart.',
-  metadataBase: new URL('https://pineberryholdings.com'),
+  /* Was https://pineberryholdings.com, which does not resolve. The group owns
+     no working domains yet, so the canonical URL is the live Vercel one. */
+  metadataBase: new URL(PARENT.href),
   openGraph: {
     type: 'website',
     locale: 'en_ZW',

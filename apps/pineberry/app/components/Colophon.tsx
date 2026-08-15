@@ -15,12 +15,25 @@ export function Colophon() {
               company — they answer faster. For anything about the group,
               partnerships or property, write to us here.
             </p>
-            <a
-              href={`mailto:${SITE.email}`}
-              className="mt-10 inline-block border-b-2 border-accent pb-1 font-display text-h3 transition-colors duration-200 hover:text-accent"
-            >
-              {SITE.email}
-            </a>
+
+            {/* Only rendered when there is a real address. This used to print
+                hello@pineberryholdings.com as a large mailto link on every
+                page; that domain does not resolve, so anyone who wrote to it
+                got silence and reasonably concluded they had been ignored. */}
+            {SITE.email ? (
+              <a
+                href={`mailto:${SITE.email}`}
+                className="mt-10 inline-block border-b-2 border-accent pb-1 font-display text-h3 transition-colors duration-200 hover:text-accent"
+              >
+                {SITE.email}
+              </a>
+            ) : (
+              <p className="mt-10 max-w-measure border-l-4 border-support pl-5 text-ink-soft">
+                A group address is not published yet. Until it is, the fastest
+                route to anyone here is through whichever company you need —
+                they are all listed to the right.
+              </p>
+            )}
           </div>
 
           <div className="lg:col-span-5 lg:pt-16">

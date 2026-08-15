@@ -4,7 +4,6 @@ import { siteUrl } from '@pineberry/ui'
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: '*', allow: '/' },
-    // Was hardcoded to bfmutare.co.zw, which does not resolve.
-    sitemap: `${siteUrl('bf-mutare')}/sitemap.xml`,
+    sitemap: `${siteUrl('muroora-mart')}/sitemap.xml`,
   }
 }

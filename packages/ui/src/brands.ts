@@ -34,11 +34,20 @@ export interface Brand {
   /** Year founded, when confirmed. Null rather than guessed. */
   founded: number | null
   /**
-   * Production URL. Null until the site is actually deployed and reachable —
-   * a link in a group bar that 404s is worse than no link, and these get sent
-   * to colleagues.
+   * The canonical, live URL. This is the ONLY place a site's public address is
+   * written down: metadataBase, sitemaps, robots.txt, the group bar and every
+   * cross-link all read it from here.
+   *
+   * These are Vercel URLs and that is the current reality, not a stopgap to be
+   * papered over. The group owns no working domains yet — pineberryholdings.com
+   * and bfmutare.co.zw do not resolve at all. Writing an aspirational domain
+   * into a canonical URL or a sitemap does real damage: it points search
+   * engines and link previews at nothing.
+   *
+   * When a domain is bought and pointed at Vercel, change it here and every
+   * one of those places follows.
    */
-  href: string | null
+  href: string
   /**
    * Local dev port, so the group bar cross-links work while the sites are
    * still being built. Production `href` wins when it exists.
@@ -143,9 +152,9 @@ export const BRANDS: Brand[] = [
     href: 'https://club-420.vercel.app',
     devPort: 3004,
     activities: ['Liquor retail', 'Tasting nights', 'Loyalty club'],
-    /* No artwork exists. The brand document describes a clock frozen at 4:20
-       stylised into a bottle silhouette, but it has never been drawn. */
-    logo: null,
+    /* The crest the brand document called for has now been drawn: mountains,
+       the 4:20 colon as two gold dots, a glass, and MUTARE on the ribbon. */
+    logo: '/logos/club-420.png',
     palette: {
       ground: '#0f100d', // matte black
       ink: '#f0ebdd',
@@ -161,23 +170,22 @@ export const brandBySlug = (slug: string): Brand | undefined =>
 export const operatingBrands = (): Brand[] =>
   BRANDS.filter((brand) => brand.status === 'operating')
 
-/**
- * Where to link a company right now.
- *
- * Production URL if it has one, otherwise its local dev server — so the group
- * bar is clickable while the sites are still being built, and needs no code
- * change once the real domains are set on the records above.
- */
-export const brandHref = (brand: Brand): string =>
-  brand.href ?? `http://localhost:${brand.devPort}`
+/** A company's live URL. */
+export const brandHref = (brand: Brand): string => brand.href
+
+/** The same thing by slug, for apps that only know their own name. */
+export const siteUrl = (slug: string): string => {
+  const brand = brandBySlug(slug)
+  if (!brand) throw new Error(`siteUrl: unknown brand slug "${slug}"`)
+  return brand.href
+}
 
 /** The parent. Kept here so every site links back to the same place. */
 export const PARENT = {
   name: 'Pineberry Holdings',
-  href: 'https://pineberry.vercel.app' as string | null, // TODO: swap for pineberryholdings.com once DNS points here
+  href: 'https://pineberry.vercel.app',
   devPort: 3000,
   line: 'A small group of real businesses in Zimbabwe.',
 } as const
 
-export const parentHref = (): string =>
-  PARENT.href ?? `http://localhost:${PARENT.devPort}`
+export const parentHref = (): string => PARENT.href
