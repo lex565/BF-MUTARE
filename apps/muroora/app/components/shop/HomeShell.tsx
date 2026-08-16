@@ -95,20 +95,62 @@ export function HomeShell() {
       </nav>
 
       <main>
-        <section className="grid min-h-[32rem] border-b border-rule bg-[#fbfaf6] lg:grid-cols-2">
-          <div className="flex items-center px-gutter py-16 lg:justify-end lg:py-20">
-            <div className="w-full max-w-[38rem] lg:pr-12">
-              <h1 className="max-w-[12ch] text-mega leading-[1.02] text-support">The shopping gets <span className="text-accent">done</span>, wherever you are.</h1>
-              <p className="mt-6 max-w-[48ch] text-lead text-ink-soft">Shop quality products from Muroora Mart in Mutare. We&rsquo;ll prepare and deliver to your door or to someone you care about.</p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Link href="/shop" className="bg-accent px-9 py-4 font-mono text-micro font-bold uppercase tracking-label text-white hover:bg-accent-deep">Shop now</Link>
-                <Link href="/login" className="border border-support px-9 py-4 font-mono text-micro font-bold uppercase tracking-label text-support hover:bg-support hover:text-white">Log in</Link>
+        {/*
+          Full-bleed header. The photograph is the background of the whole
+          band, not a panel beside a white one, and the words sit on top of it.
+
+          READABILITY. The picture is bright where the text goes: window light,
+          a steaming pot, pale walls. Two scrims do the work, and they are
+          separate on purpose:
+
+            1. a left-to-right gradient, so the words have something to sit on
+               while her face on the right stays as clear as it was.
+            2. a faint wash over everything, which lifts the whole frame just
+               enough that white type never lands on a light patch.
+
+          Both are warm near-black rather than the brand green. Green over a
+          warm kitchen turns the whole thing muddy; the same mistake was made
+          on this site once already.
+
+          The image is 1402x1122, closer to square than a header wants, so the
+          crop is done by object-position rather than baked in: on a phone it
+          shows nearly the whole frame, on a wide screen it keeps her and the
+          pot and loses the ceiling.
+        */}
+        <section className="relative isolate flex min-h-[36rem] items-center border-b border-rule lg:min-h-[42rem]">
+          <Image
+            src="/hero/kitchen.jpg"
+            alt="A woman cooking over a wood fire in a Zimbabwean kitchen, stirring a large pot"
+            fill
+            priority
+            quality={90}
+            sizes="100vw"
+            className="-z-20 object-cover object-[68%_12%] lg:object-[57%_15%]"
+          />
+          {/* Phone: the words run the full width, so the scrim has to come
+              from the bottom rather than the side. */}
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10 bg-gradient-to-t from-[#1a0f08]/94 via-[#1a0f08]/72 to-[#1a0f08]/30 lg:hidden"
+          />
+          {/* Wide: text on the left, her face on the right stays clear. */}
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10 hidden bg-gradient-to-r from-[#1a0f08]/86 from-5% via-[#1a0f08]/58 via-45% to-[#1a0f08]/6 lg:block"
+          />
+          <div aria-hidden className="absolute inset-0 -z-10 bg-[#1a0f08]/8" />
+
+          <div className="w-full px-gutter py-16 lg:py-20">
+            <div className="mx-auto w-full max-w-[86rem]">
+              <div className="max-w-[38rem]">
+                <h1 className="max-w-[12ch] text-mega leading-[1.02] text-white [text-shadow:0_2px_18px_rgb(0_0_0/0.45)]">The shopping gets <span className="text-[#ffb37a]">done</span>, wherever you are.</h1>
+                <p className="mt-6 max-w-[48ch] text-lead text-white/90 [text-shadow:0_1px_10px_rgb(0_0_0/0.5)]">Shop quality products from Muroora Mart in Mutare. We&rsquo;ll prepare and deliver to your door or to someone you care about.</p>
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <Link href="/shop" className="bg-accent px-9 py-4 font-mono text-micro font-bold uppercase tracking-label text-white hover:bg-accent-deep">Shop now</Link>
+                  <Link href="/login" className="border border-white/80 bg-white/10 px-9 py-4 font-mono text-micro font-bold uppercase tracking-label text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-support">Log in</Link>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="relative min-h-[24rem] lg:min-h-full">
-            <Image src="/hero/courtyard.png" alt="Traveller arriving at a Zimbabwean courtyard" fill priority className="object-cover object-[58%_50%]" />
-            <div aria-hidden className="absolute inset-y-0 left-0 hidden w-20 bg-gradient-to-r from-[#fbfaf6] to-transparent lg:block" />
           </div>
         </section>
 
