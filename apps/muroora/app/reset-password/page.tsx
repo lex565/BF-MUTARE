@@ -67,9 +67,12 @@ export default async function ResetPasswordPage({
       data: { user },
     } = await supabase.auth.getUser()
     ready = Boolean(user)
-    if (!ready && !problem) {
-      problem = 'Open this page from the link in your email.'
-    }
+    // Deliberately NOT an error. Supabase answers a recovery link with the
+    // tokens in a URL fragment, which never reaches the server, so "nothing
+    // here" is the normal case and the browser has to look. Saying "expired"
+    // at this point is what made every reset fail.
+    ready = false
+    problem = null
   }
 
   return <ResetPasswordForm ready={ready} problem={problem} />
