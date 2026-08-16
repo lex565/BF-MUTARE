@@ -4,6 +4,7 @@ import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 
 import {
+  changeMyPasswordAction,
   updateMyProfileAction,
   uploadMyPhotoAction,
   type ProfileState,
@@ -63,6 +64,58 @@ export function PhotoForm({ hasPhoto }: { hasPhoto: boolean }) {
 
       <div className="flex flex-wrap items-center gap-4">
         <Submit label={hasPhoto ? 'Replace photo' : 'Save photo'} />
+        {state.error && (
+          <p role="alert" className="text-small text-accent">
+            {state.error}
+          </p>
+        )}
+        {state.message && (
+          <p role="status" className="text-small text-support">
+            {state.message}
+          </p>
+        )}
+      </div>
+    </form>
+  )
+}
+
+export function PasswordForm() {
+  const [state, formAction] = useActionState<ProfileState, FormData>(
+    changeMyPasswordAction,
+    {},
+  )
+
+  return (
+    <form action={formAction} className="mt-4 max-w-md space-y-5">
+      <label className="block">
+        <span className={label}>New password</span>
+        <input
+          type="password"
+          name="password"
+          required
+          minLength={10}
+          autoComplete="new-password"
+          className={field}
+        />
+        <span className="mt-2 block text-small text-ink-faint">
+          At least 10 characters. Three ordinary words you will remember beat
+          one short word with symbols in it.
+        </span>
+      </label>
+
+      <label className="block">
+        <span className={label}>Type it again</span>
+        <input
+          type="password"
+          name="confirm"
+          required
+          autoComplete="new-password"
+          className={field}
+        />
+      </label>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <Submit label="Change password" />
         {state.error && (
           <p role="alert" className="text-small text-accent">
             {state.error}

@@ -3,6 +3,7 @@ import { Figtree, IBM_Plex_Mono } from 'next/font/google'
 import { GroupBar, siteUrl } from '@pineberry/ui'
 import { Nav } from '@/app/components/Nav'
 import { Footer } from '@/app/components/Footer'
+import { StaffBar } from '@/app/components/StaffBar'
 import './globals.css'
 
 /* Figtree rather than the group's Archivo: it is rounder and reads friendlier
@@ -61,6 +62,9 @@ export default function RootLayout({
         {/* One link back to the parent, above this site's own nav on every
             page. It deliberately does not list the sister companies — see
             packages/ui/src/GroupBar.tsx for why. */}
+        {/* Renders nothing at all unless a staff member is signed in, so the
+            customer-facing design is unaffected. */}
+        <StaffBar />
         <GroupBar />
         <Nav />
         <div className="flex-1">{children}</div>

@@ -7,6 +7,7 @@ import { db } from '@/db/client'
 import { users } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { requireRole } from '@/lib/auth'
+import { supabaseServer } from '@/lib/supabase/server'
 import { StaffError } from '@/lib/services/staff'
 import { updateStaffProfile } from '@/lib/services/staff'
 import { uploadStaffPhoto } from '@/lib/services/staff-photo'
@@ -68,6 +69,50 @@ export async function updateMyProfileAction(
     console.error('[updateMyProfileAction]', error)
     return { error: 'Could not save that.' }
   }
+}
+
+const passwordInput = z
+  .object({
+    password: z
+      .string()
+      .min(10, 'Use at least 10 characters — length beats punctuation.')
+      .max(200),
+    confirm: z.string(),
+  })
+  .refine((v) => v.password === v.confirm, {
+    message: 'Those two do not match.',
+    path: ['confirm'],
+  })
+
+/**
+ * Change your own password.
+ *
+ * Goes through the signed-in user's own Supabase session, NOT the service-role
+ * key — so it can only ever change the password of whoever is holding the
+ * session. There is no user id parameter to get wrong, and no path by which an
+ * admin could set somebody else's password from here.
+ */
+export async function changeMyPasswordAction(
+  _prev: ProfileState,
+  formData: FormData,
+): Promise<ProfileState> {
+  await requireRole('SHOP_STAFF', 'ADMIN', 'SUPER_ADMIN', 'VIEWER')
+
+  const parsed = passwordInput.safeParse(Object.fromEntries(formData))
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message }
+  }
+
+  const supabase = await supabaseServer()
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  return { message: 'Password changed. Use it next time you sign in.' }
 }
 
 export async function uploadMyPhotoAction(

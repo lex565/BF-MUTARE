@@ -9,7 +9,7 @@ import { supabaseServer } from '@/lib/supabase/server'
 import { format } from '@/lib/money'
 import { getStaffDashboard } from '@/lib/services/dashboard'
 import { staffSetupComplete } from '@/lib/services/staff-photo'
-import { PhotoForm, ProfileForm } from '@/app/staff/ProfileForms'
+import { PasswordForm, PhotoForm, ProfileForm } from '@/app/staff/ProfileForms'
 
 export const metadata: Metadata = {
   title: 'Staff',
@@ -374,6 +374,15 @@ export default async function StaffHomePage() {
             On file. Kept privately, never shown on the public site.
           </p>
           <PhotoForm hasPhoto />
+        </div>
+
+        <div className="mt-10 border-t border-rule pt-8">
+          <h3 className="font-bold">Change your password</h3>
+          <p className="mt-2 max-w-measure text-small text-ink-soft">
+            Do this now if somebody else set the one you are using. Nobody
+            else can see or change your password from anywhere in this system.
+          </p>
+          <PasswordForm />
         </div>
       </section>
     </main>
