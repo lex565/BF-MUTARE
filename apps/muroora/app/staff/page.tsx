@@ -3,13 +3,13 @@ import Link from 'next/link'
 import { eq } from 'drizzle-orm'
 
 import { db } from '@/db/client'
-import { staffProfiles, users } from '@/db/schema'
+import { staffProfiles } from '@/db/schema'
 import { canViewAdmin, isAdmin, isViewerOnly, requireRole } from '@/lib/auth'
 import { supabaseServer } from '@/lib/supabase/server'
 import { format } from '@/lib/money'
 import { getStaffDashboard } from '@/lib/services/dashboard'
 import { staffSetupComplete } from '@/lib/services/staff-photo'
-import { PasswordForm, PhotoForm, ProfileForm } from '@/app/staff/ProfileForms'
+import { PhotoForm } from '@/app/staff/ProfileForms'
 import { StaffPhoto } from '@/app/components/StaffPhoto'
 
 export const metadata: Metadata = {
@@ -18,6 +18,18 @@ export const metadata: Metadata = {
 }
 
 export const dynamic = 'force-dynamic'
+
+/**
+ * A whole tile is the tap target, not a small button inside it.
+ *
+ * On a phone the button was a 40px target inside a 200px card, and everyone
+ * taps the card. min-h-[7.5rem] keeps them comfortably above the 44px minimum
+ * even at the smallest text size.
+ */
+const tile =
+  'flex min-h-[7.5rem] flex-col border border-rule p-6 transition-colors hover:border-ink hover:bg-paper-sunk focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent'
+const tileGo =
+  'mt-auto pt-4 font-mono text-micro uppercase tracking-label text-support'
 
 const timeOfDay = (d: Date) => {
   const h = d.getHours()
@@ -45,7 +57,7 @@ const dayAndTime = (d: Date) =>
  * The staff welcome screen.
  *
  * Per the owner: a brief overview of what has been added, who the workers
- * are, when they signed in, and other statistics — plus somewhere to edit
+ * are, when they signed in, and other statistics - plus somewhere to edit
  * their own profile.
  *
  * THE PHOTO GATE. "Staff cannot finish creating the account without the
@@ -60,8 +72,6 @@ export default async function StaffHomePage() {
     .select()
     .from(staffProfiles)
     .where(eq(staffProfiles.userId, me.id))
-
-  const [userRow] = await db.select().from(users).where(eq(users.id, me.id))
 
   const setup = await staffSetupComplete(me.id)
 
@@ -115,7 +125,7 @@ export default async function StaffHomePage() {
           <section className="mt-10">
             <p className="max-w-measure text-ink-soft">
               You have signed in, but an admin has not added you to the staff
-              list yet. Ask them to find your account on the People screen —
+              list yet. Ask them to find your account on the People screen -
               they will need the email you signed up with:{' '}
               <span className="font-mono">{me.email}</span>
             </p>
@@ -146,7 +156,7 @@ export default async function StaffHomePage() {
           {readOnly && (
             <>
               {' '}
-              Your access is <strong>oversight only</strong> — you can see
+              Your access is <strong>oversight only</strong> - you can see
               everything and change nothing.
             </>
           )}
@@ -183,20 +193,36 @@ export default async function StaffHomePage() {
                   ? `${dash.stock.lowOrOut} low or out`
                   : 'none running low',
               warn: dash.stock.lowOrOut > 0,
+              href: canViewAdmin(me) ? '/admin/products' : undefined,
             },
-          ].map((s) => (
-            <div key={s.label} className="border border-rule p-6">
-              <p className="font-mono text-micro uppercase tracking-label text-ink-faint">
-                {s.label}
-              </p>
-              <p
-                className={`mt-2 text-mega leading-none ${s.warn ? 'text-accent' : ''}`}
+          ].map((stat) => {
+            const body = (
+              <>
+                <p className="font-mono text-micro uppercase tracking-label text-ink-faint">
+                  {stat.label}
+                </p>
+                <p
+                  className={`mt-2 text-mega leading-none ${stat.warn ? 'text-accent' : ''}`}
+                >
+                  {stat.value}
+                </p>
+                <p className="mt-2 text-small text-ink-faint">{stat.note}</p>
+              </>
+            )
+            return stat.href ? (
+              <Link
+                key={stat.label}
+                href={stat.href}
+                className="border border-rule p-6 transition-colors hover:border-ink hover:bg-paper-sunk"
               >
-                {s.value}
-              </p>
-              <p className="mt-2 text-small text-ink-faint">{s.note}</p>
-            </div>
-          ))}
+                {body}
+              </Link>
+            ) : (
+              <div key={stat.label} className="border border-rule p-6">
+                {body}
+              </div>
+            )
+          })}
         </div>
 
         <dl className="mt-8 flex flex-wrap gap-x-12 gap-y-4 text-small">
@@ -217,7 +243,7 @@ export default async function StaffHomePage() {
             <dd className="mt-1 font-mono tabular-nums">
               {dash.orders.takenThisWeek
                 ? format(dash.orders.takenThisWeek)
-                : '—'}
+                : '-'}
             </dd>
           </div>
           <div>
@@ -269,7 +295,14 @@ export default async function StaffHomePage() {
 
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {dash.team.map((c) => (
-            <li key={c.staffNumber} className="flex gap-4 border border-rule p-5">
+            <li key={c.staffNumber}>
+              <Link
+                href={
+                  canViewAdmin(me)
+                    ? `/staff/card?staff=${c.staffNumber}`
+                    : '/staff/card'
+                }
+                className="flex gap-4 border border-rule p-5 transition-colors hover:border-ink hover:bg-paper-sunk">
               <StaffPhoto
                 path={c.photoPath}
                 name={c.name}
@@ -295,6 +328,7 @@ export default async function StaffHomePage() {
                 {c.roles.length > 0 ? c.roles.join(', ') : 'no access yet'}
               </p>
               </div>
+              </Link>
             </li>
           ))}
         </ul>
@@ -305,59 +339,63 @@ export default async function StaffHomePage() {
       <section className="border-b border-rule py-10">
         <h2 className="text-h3 font-bold">Your work</h2>
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <article className="border border-rule p-6">
+          <div className={`${tile} opacity-60`}>
             <h3 className="font-bold">Orders</h3>
             <p className="mt-2 text-small text-ink-soft">
-              The queue to pick and pack. Coming next.
+              The queue to pick and pack. Opens once customers can order.
             </p>
-          </article>
+            <span className="mt-4 block font-mono text-micro uppercase tracking-label text-ink-faint">
+              Coming next
+            </span>
+          </div>
 
           {canViewAdmin(me) && (
             <>
-              <article className="border border-rule p-6">
+              <Link href="/admin/products" className={tile}>
                 <h3 className="font-bold">Products and stock</h3>
                 <p className="mt-2 text-small text-ink-soft">
                   {readOnly
                     ? 'Look at what is on sale and what is running low.'
-                    : 'Add products, adjust stock levels.'}
+                    : 'Add products, photos and stock levels.'}
                 </p>
-                <Link
-                  href="/admin/products"
-                  className="mt-4 inline-block border border-ink px-4 py-2 font-mono text-micro uppercase tracking-label transition-colors hover:bg-ink hover:text-paper"
-                >
-                  Open
-                </Link>
-              </article>
+                <span className={tileGo}>Open</span>
+              </Link>
 
-              <article className="border border-rule p-6">
+              <Link href="/admin/delivery" className={tile}>
                 <h3 className="font-bold">Delivery areas</h3>
                 <p className="mt-2 text-small text-ink-soft">
                   Where the shop delivers and what it costs.
                 </p>
-                <Link
-                  href="/admin/delivery"
-                  className="mt-4 inline-block border border-ink px-4 py-2 font-mono text-micro uppercase tracking-label transition-colors hover:bg-ink hover:text-paper"
-                >
-                  Open
-                </Link>
-              </article>
+                <span className={tileGo}>Open</span>
+              </Link>
 
-              <article className="border border-rule p-6">
+              <Link href="/admin/staff" className={tile}>
                 <h3 className="font-bold">People</h3>
                 <p className="mt-2 text-small text-ink-soft">
                   {readOnly
                     ? 'See who works here and what they may do.'
                     : 'Add a colleague or change what they may do.'}
                 </p>
-                <Link
-                  href="/admin/staff"
-                  className="mt-4 inline-block border border-ink px-4 py-2 font-mono text-micro uppercase tracking-label transition-colors hover:bg-ink hover:text-paper"
-                >
-                  Open
-                </Link>
-              </article>
+                <span className={tileGo}>Open</span>
+              </Link>
+
+              <Link href="/admin/reports" className={tile}>
+                <h3 className="font-bold">Reports</h3>
+                <p className="mt-2 text-small text-ink-soft">
+                  Sales, stock movement and what is selling, as charts.
+                </p>
+                <span className={tileGo}>Open</span>
+              </Link>
             </>
           )}
+
+          <Link href="/staff/profile" className={tile}>
+            <h3 className="font-bold">Your details</h3>
+            <p className="mt-2 text-small text-ink-soft">
+              Your name, phone, photo, staff card and password.
+            </p>
+            <span className={tileGo}>Edit</span>
+          </Link>
         </div>
 
         {isAdmin(me) && (
@@ -367,47 +405,6 @@ export default async function StaffHomePage() {
         )}
       </section>
 
-      {/* ----------------------------------------------------- your details */}
-
-      <section className="py-10">
-        <h2 className="text-h3 font-bold">Your details</h2>
-        <ProfileForm
-          fullName={userRow?.fullName ?? ''}
-          phone={userRow?.phone ?? ''}
-          jobTitle={profileRow?.jobTitle ?? ''}
-        />
-
-        <div className="mt-10 border-t border-rule pt-8">
-          <h3 className="font-bold">Your staff card</h3>
-          <p className="mt-2 max-w-measure text-small text-ink-soft">
-            Your photo, name, role and staff number on a card you can show or
-            print.
-          </p>
-          <Link
-            href="/staff/card"
-            className="mt-4 inline-block border border-ink px-4 py-2 font-mono text-micro uppercase tracking-label transition-colors hover:bg-ink hover:text-paper"
-          >
-            Open your card
-          </Link>
-        </div>
-
-        <div className="mt-10 border-t border-rule pt-8">
-          <h3 className="font-bold">Your photo</h3>
-          <p className="mt-2 max-w-measure text-small text-ink-soft">
-            On file. Kept privately, never shown on the public site.
-          </p>
-          <PhotoForm hasPhoto />
-        </div>
-
-        <div className="mt-10 border-t border-rule pt-8">
-          <h3 className="font-bold">Change your password</h3>
-          <p className="mt-2 max-w-measure text-small text-ink-soft">
-            Do this now if somebody else set the one you are using. Nobody
-            else can see or change your password from anywhere in this system.
-          </p>
-          <PasswordForm />
-        </div>
-      </section>
     </main>
   )
 }

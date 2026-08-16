@@ -15,7 +15,7 @@ import { categories, deliveryZones, stores } from './schema'
  *
  * That is deliberate. This is an operating shop, and invented products with
  * invented prices would be indistinguishable from real ones once they were in
- * the database — and a customer would eventually try to order one. The
+ * the database - and a customer would eventually try to order one. The
  * catalogue gets loaded from the shop's actual stock list, by an admin, once
  * that list exists. An empty catalogue that says so is honest; a full one of
  * fictional groceries is not.
@@ -67,12 +67,12 @@ const CATEGORIES = [
  *
  * The brief: "Do not hard-code the examples into production." The suburbs are
  * real Mutare ones so the shape is testable, but the fees are placeholders and
- * the rows are marked inactive — an admin sets the real ones. Nothing here
+ * the rows are marked inactive - an admin sets the real ones. Nothing here
  * quotes a customer a delivery price the business has not agreed to.
  */
 const ZONES = [
   {
-    name: 'Zone A — Central',
+    name: 'Zone A - Central',
     description: 'PLACEHOLDER. Fee not confirmed by the business.',
     suburbs: ['CBD', 'Yeovil', 'Murambi', 'Morningside'],
     // Minor units: 150 = $1.50. Placeholder, and the row is inactive.
@@ -81,7 +81,7 @@ const ZONES = [
     estimatedMinutesMax: 60,
   },
   {
-    name: 'Zone B — High density',
+    name: 'Zone B - High density',
     description: 'PLACEHOLDER. Fee not confirmed by the business.',
     suburbs: ['Dangamvura', 'Chikanga', 'Sakubva', 'Hobhouse'],
     baseFeeAmount: 200n,
@@ -155,14 +155,14 @@ async function seed() {
       currency: 'USD',
       estimatedMinutesMin: zone.estimatedMinutesMin,
       estimatedMinutesMax: zone.estimatedMinutesMax,
-      // INACTIVE on purpose — see the note above. An admin activates these
+      // INACTIVE on purpose - see the note above. An admin activates these
       // once the business has agreed real delivery fees.
       isActive: false,
       sortOrder: index,
     })
     zonesAdded += 1
   }
-  console.log(`zones       ${zonesAdded} created (inactive — fees are placeholders)`)
+  console.log(`zones       ${zonesAdded} created (inactive - fees are placeholders)`)
 
   console.log('\nNo products were seeded. This is an operating shop; the')
   console.log('catalogue is loaded from its real stock list, not invented.')

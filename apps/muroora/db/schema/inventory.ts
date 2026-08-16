@@ -22,7 +22,7 @@ import { users } from './identity'
  *
  * `inventory.quantity` is the balance. `inventory_transactions` is the history
  * of every movement that produced it. The two are written in the SAME database
- * transaction, never separately — see lib/inventory.ts, which is the only
+ * transaction, never separately - see lib/inventory.ts, which is the only
  * place in the codebase allowed to touch either.
  *
  * Why it matters for a grocer: when the till says 40 bags of mealie-meal and
@@ -81,7 +81,7 @@ export const inventory = pgTable(
 )
 
 /**
- * The ledger. APPEND-ONLY — see D-004.
+ * The ledger. APPEND-ONLY - see D-004.
  *
  * No update, no delete, ever. A mistake is corrected by writing a compensating
  * row, which is how a business explains a discrepancy rather than hiding it.

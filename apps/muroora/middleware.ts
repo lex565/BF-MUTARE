@@ -11,7 +11,7 @@ import { NextResponse, type NextRequest } from 'next/server'
  *    customer would be silently logged out.
  *
  * 2. Bounce anonymous visitors away from /admin and /staff before the page
- *    renders. This is a convenience, NOT the security boundary — middleware
+ *    renders. This is a convenience, NOT the security boundary - middleware
  *    checks the session but deliberately does not query the database for
  *    roles, because that would add a round trip to every request.
  *
@@ -68,7 +68,7 @@ export const config = {
     /**
      * Everything except static assets and images.
      *
-     * The shop, product pages and cart are deliberately NOT gated — the brief
+     * The shop, product pages and cart are deliberately NOT gated - the brief
      * is explicit that customers browse and build a cart without an account.
      */
     '/((?!_next/static|_next/image|favicon.ico|logo.png|hero|.*\\.(?:svg|png|jpg|jpeg|webp|mp4)$).*)',

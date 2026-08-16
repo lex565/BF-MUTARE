@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Muroora Mart">
+  <!--
+    The Muroora Mart basket, redrawn.
+
+    The mark could not be cropped out of the wordmark: in the logo the basket
+    sits behind the letters of MUROORA and shares pixels with them, so a crop
+    gives a basket with "ROO" stamped through it. This is the same basket,
+    drawn clean, in the two colours sampled from the artwork: #005029 green
+    and #f35d14 orange.
+
+    DRAWN FOR 16px, NOT FOR 64. The first version was proportioned like the
+    logo and turned to mud in a browser tab: the handles thinned to nothing
+    and the wheels disappeared. Everything here is heavier than looks right at
+    full size, because full size is not where a favicon lives.
+  -->
+  <rect width="64" height="64" rx="12" fill="#005029"/>
+
+  <!-- Handles: thick, and steep enough to stay separate at 16px. -->
+  <path d="M23 25 L28 11" stroke="#ffffff" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M41 25 L36 11" stroke="#ffffff" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <!-- Basket: one solid trapezoid. The rim of the first version merged with
+       the body at small sizes and only cost contrast, so it is gone. -->
+  <path d="M9 26 H55 L49 47 H15 Z" fill="#f35d14"/>
+
+  <!-- Wheels: oversized on purpose. At 16px these are barely two pixels, and
+       they are what makes the shape read as a basket rather than a bucket. -->
+  <circle cx="22" cy="54" r="5.5" fill="#ffffff"/>
+  <circle cx="42" cy="54" r="5.5" fill="#ffffff"/>
+</svg>

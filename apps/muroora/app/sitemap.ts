@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 import { siteUrl } from '@pineberry/ui'
 
 /**
- * Base URL comes from the shared brand record, never a literal — the two older
+ * Base URL comes from the shared brand record, never a literal - the two older
  * apps had theirs hardcoded to domains that do not resolve, which put every
  * sitemap URL on a host that does not exist.
  */

@@ -4,17 +4,17 @@
 @source '../../../packages/ui/src';
 
 /* ---------------------------------------------------------------------------
-   Muroora Mart — brand layer
+   Muroora Mart - brand layer
    ---------------------------------------------------------------------------
    Light ground, deliberately. The other two retail-adjacent sites in the group
-   run dark, and dark is right for them — BF Mutare is showing car paint in
+   run dark, and dark is right for them - BF Mutare is showing car paint in
    sunlight, 420 is a bar at night. A grocer is neither. This one has to read
    as open, cheap and easy to walk into at eight in the morning, and a black
    page reads as expensive.
 
    The two colours are sampled from the company's own logo artwork, not chosen:
    deep green #005029 and orange #f25c13. Green carries structure and headings,
-   orange is the action colour — buttons, prices, the diaspora programme. Using
+   orange is the action colour - buttons, prices, the diaspora programme. Using
    both at equal weight would fight, so green sets the temperature and orange
    is used sparingly enough to still mean "do this".
 --------------------------------------------------------------------------- */
@@ -27,10 +27,10 @@
   --color-ink-faint: #6d7c72;
   --color-rule: #d5d3c5;
 
-  --color-accent: #f25c13; /* logo orange — the action colour */
+  --color-accent: #f25c13; /* logo orange - the action colour */
   --color-accent-deep: #c9430a;
   --color-accent-wash: #fbe6da;
-  --color-support: #005029; /* logo green — structure and trust */
+  --color-support: #005029; /* logo green - structure and trust */
 
   --font-display-family: var(--font-figtree);
   --font-text-family: var(--font-figtree);

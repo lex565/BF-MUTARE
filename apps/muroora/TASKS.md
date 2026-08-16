@@ -1,4 +1,4 @@
-# Muroora Mart — Tasks
+# Muroora Mart - Tasks
 
 Coordination between **Claude** (backend, data, API) and **Codex** (Figma,
 front end). Required by section 59 of the master build prompt.
@@ -6,7 +6,7 @@ front end). Required by section 59 of the master build prompt.
 ## The deal, in one line
 
 **One backend, two consumers.** Claude owns the database, the service layer and
-the HTTP API. Codex owns the front end. The API is the contract between them —
+the HTTP API. Codex owns the front end. The API is the contract between them -
 neither agent edits the other's layer.
 
 ## Rules
@@ -20,7 +20,7 @@ neither agent edits the other's layer.
 5. **Update the docs** when architecture changes.
 6. No TODO placeholders in security, money or stock logic.
 
-## Ownership — who edits what
+## Ownership - who edits what
 
 | Path | Owner | Notes |
 | --- | --- | --- |
@@ -47,7 +47,7 @@ UI  ──►  app/api/*  ──►  lib/services/*  ──►  db/*
 ```
 
 A future native app calls the same `app/api/*` routes the web front end does.
-That is the whole reason the boundary exists — section 56.
+That is the whole reason the boundary exists - section 56.
 
 **Rules that are enforced below the UI and cannot be worked around:**
 
@@ -64,10 +64,10 @@ That is the whole reason the boundary exists — section 56.
 
 | ID | Description | Owner | Depends on | Files | Acceptance |
 | --- | --- | --- | --- | --- | --- |
-| STAFF-02 | Staff photographs on the profile | Claude | — | `lib/services/staff.ts` | Supabase Storage, signed URL at render. Column exists, unused. |
-| STAFF-03 | Printable staff ID cards | Claude | STAFF-02 | — | Addendum §8 says make it possible later, do not prioritise now. |
-| SEC-01 | Row-level security on Supabase tables | Claude | — | migration | Anon can read active products only |
-| DOC-01 | Remaining `/docs` files from section 45 | Claude | — | `docs/**` | 01–19 present |
+| STAFF-02 | Staff photographs on the profile | Claude | - | `lib/services/staff.ts` | Supabase Storage, signed URL at render. Column exists, unused. |
+| STAFF-03 | Printable staff ID cards | Claude | STAFF-02 | - | Addendum §8 says make it possible later, do not prioritise now. |
+| SEC-01 | Row-level security on Supabase tables | Claude | - | migration | Anon can read active products only |
+| DOC-01 | Remaining `/docs` files from section 45 | Claude | - | `docs/**` | 01-19 present |
 
 ## IN PROGRESS
 
@@ -83,8 +83,8 @@ That is the whole reason the boundary exists — section 56.
 
 | ID | Description | Owner | Blocked on |
 | --- | --- | --- | --- |
-| DATA-01 | Load the real product catalogue | Owner | The shop's actual stock list — names, sizes, prices, categories. Nothing invented. |
-| DATA-02 | Set the real delivery areas | Owner | **The screen is built and waiting at `/admin/delivery`.** Until at least one area exists, checkout refuses every order — a fee only comes from an area, and none were invented. Needs the suburbs actually covered and what each costs. |
+| DATA-01 | Load the real product catalogue | Owner | The shop's actual stock list - names, sizes, prices, categories. Nothing invented. |
+| DATA-02 | Set the real delivery areas | Owner | **The screen is built and waiting at `/admin/delivery`.** Until at least one area exists, checkout refuses every order - a fee only comes from an area, and none were invented. Needs the suburbs actually covered and what each costs. |
 | AUTH-02 | Google / Facebook sign-in | Owner | Client ID + secret from Google Cloud Console and Meta for Developers. Free, but only the owner can open those. |
 | WA-01 | WhatsApp CTAs | Owner | No business number yet. `WHATSAPP_BUSINESS_NUMBER` blank keeps every CTA hidden. |
 | PAY-01 | Payment provider | Owner | No provider chosen. `payments` table records without one. |
@@ -100,17 +100,17 @@ That is the whole reason the boundary exists — section 56.
 | ID | Description | Owner | Verified by |
 | --- | --- | --- | --- |
 | DB-01 | Schema: 19 tables, store_id everywhere, money as minor units | Claude | `db/verify.mjs` |
-| DB-02 | Migrations + DB-level guards (append-only triggers, stock CHECKs, order-number sequence) | Claude | `db/verify.mjs` — each rule deliberately violated to prove it refuses |
+| DB-02 | Migrations + DB-level guards (append-only triggers, stock CHECKs, order-number sequence) | Claude | `db/verify.mjs` - each rule deliberately violated to prove it refuses |
 | DB-03 | Supabase project provisioned (free tier), migrated, seeded | Claude | `db/show.mjs` |
-| LIB-01 | `lib/money.ts` | Claude | `lib/money.check.ts` — 28 checks |
-| LIB-02 | `lib/inventory.ts` — ledger + balance in one transaction | Claude | `db/verify.mjs` |
-| API-01 | Product/catalogue service + read endpoints | Claude | `db/verify-api.mjs` — 13 checks, incl. a $999.99 cost price greppped for in the raw response |
-| API-02 | Cart service + endpoints | Claude | `db/verify-cart.mjs` — 22 checks, guest-only journey |
+| LIB-01 | `lib/money.ts` | Claude | `lib/money.check.ts` - 28 checks |
+| LIB-02 | `lib/inventory.ts` - ledger + balance in one transaction | Claude | `db/verify.mjs` |
+| API-01 | Product/catalogue service + read endpoints | Claude | `db/verify-api.mjs` - 13 checks, incl. a $999.99 cost price greppped for in the raw response |
+| API-02 | Cart service + endpoints | Claude | `db/verify-cart.mjs` - 22 checks, guest-only journey |
 | AUTH-01 | Email sign-in, role gating, admin bootstrap | Claude | Verified end to end with a real signed-in admin session on 2026-08-15. `tanakambendanata@gmail.com` holds ADMIN. |
-| STAFF-01 | Staff profiles, `MM-STF-0001` numbers, promote-to-staff, admin People screen, `/staff` shell, `/account` | Claude | `db/verify-staff.mjs` — 15 DB checks; `db/verify-staff-service.mts` — 23 service checks. Promote flow also driven through the real UI with a signed-in admin. |
-| API-03 | Checkout + order creation | Claude | `db/verify-orders.mts` — 30 checks incl. frozen prices, one order from a double-tap, and a failed line leaving no stock held |
+| STAFF-01 | Staff profiles, `MM-STF-0001` numbers, promote-to-staff, admin People screen, `/staff` shell, `/account` | Claude | `db/verify-staff.mjs` - 15 DB checks; `db/verify-staff-service.mts` - 23 service checks. Promote flow also driven through the real UI with a signed-in admin. |
+| API-03 | Checkout + order creation | Claude | `db/verify-orders.mts` - 30 checks incl. frozen prices, one order from a double-tap, and a failed line leaving no stock held |
 | API-04 | Delivery fee by zone + `/admin/delivery` | Claude | Same script. A suburb belongs to one zone only; an uncovered suburb is refused rather than given a default fee. |
-| DOC-00 | Phase 0 audit + decision log | Claude | — |
+| DOC-00 | Phase 0 audit + decision log | Claude | - |
 
 ---
 

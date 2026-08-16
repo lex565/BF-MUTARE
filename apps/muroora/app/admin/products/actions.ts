@@ -3,7 +3,12 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-import { requireAdminWrite } from '@/lib/auth'
+import { requireAdminWrite, requireRole } from '@/lib/auth'
+import {
+  ProductPhotoError,
+  addProductPhoto,
+  removeProductPhoto,
+} from '@/lib/services/product-photo'
 import { applyStockMove } from '@/lib/inventory'
 import {
   ProductConflictError,
@@ -19,7 +24,7 @@ import {
  *   2. validate the form input,
  *   3. call the service in lib/services/*.
  *
- * No business logic lives here. That is section 56 of the brief — logic stays
+ * No business logic lives here. That is section 56 of the brief - logic stays
  * out of the UI layer so a future native app can reach the same behaviour
  * through app/api/* rather than a Next server action it cannot invoke.
  *
@@ -138,4 +143,62 @@ export async function toggleProductActiveAction(
   revalidatePath('/admin/products')
   revalidatePath('/shop')
   return { message: isActive ? 'Now in the shop.' : 'Hidden from the shop.' }
+}
+
+/* ------------------------------------------------------- product photos */
+
+/**
+ * Add a photo to a product.
+ *
+ * SHOP_STAFF may do this, not only admins. The shop manager fills the shelves,
+ * and making him ask an admin to attach every picture would mean the pictures
+ * never get attached. Prices and cost stay admin-only; a photograph is not a
+ * commercial decision.
+ */
+export async function addProductPhotoAction(
+  _prev: ProductFormState,
+  formData: FormData,
+): Promise<ProductFormState> {
+  const user = await requireRole('SHOP_STAFF', 'ADMIN', 'SUPER_ADMIN')
+
+  const productId = String(formData.get('productId') ?? '')
+  const file = formData.get('photo')
+  const alt = String(formData.get('alt') ?? '')
+
+  if (!productId) return { error: 'Which product?' }
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: 'Choose a photo first.' }
+  }
+
+  try {
+    await addProductPhoto({ productId, file, alt, actorId: user.id })
+    revalidatePath('/admin/products')
+    revalidatePath('/shop')
+    return { message: 'Photo added.' }
+  } catch (error) {
+    if (error instanceof ProductPhotoError) return { error: error.message }
+    console.error('[addProductPhotoAction]', error)
+    return { error: 'Could not add that photo.' }
+  }
+}
+
+export async function removeProductPhotoAction(
+  _prev: ProductFormState,
+  formData: FormData,
+): Promise<ProductFormState> {
+  const user = await requireRole('SHOP_STAFF', 'ADMIN', 'SUPER_ADMIN')
+
+  const imageId = String(formData.get('imageId') ?? '')
+  if (!imageId) return { error: 'Which photo?' }
+
+  try {
+    await removeProductPhoto({ imageId, actorId: user.id })
+    revalidatePath('/admin/products')
+    revalidatePath('/shop')
+    return { message: 'Photo removed.' }
+  } catch (error) {
+    if (error instanceof ProductPhotoError) return { error: error.message }
+    console.error('[removeProductPhotoAction]', error)
+    return { error: 'Could not remove that photo.' }
+  }
 }

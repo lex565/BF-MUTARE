@@ -13,7 +13,7 @@ import {
  *
  * Laid out in the order somebody holding the item would fill it in: what it
  * is, what it costs, how many are there. Opening stock is on the same form on
- * purpose — a product entered without its stock count is a product that has to
+ * purpose - a product entered without its stock count is a product that has to
  * be visited twice.
  */
 

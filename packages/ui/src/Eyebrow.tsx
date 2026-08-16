@@ -3,7 +3,7 @@ import { cn } from './cn'
 
 export interface EyebrowProps {
   children: ReactNode
-  /** Optional index, rendered as a rule-marker like `01 —`. */
+  /** Optional index, rendered as a rule-marker like `01 -`. */
   index?: number
   className?: string
 }

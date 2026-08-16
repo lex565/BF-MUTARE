@@ -13,7 +13,7 @@ import {
  * Find an existing account and give it staff access.
  *
  * Deliberately two steps: search, then choose. There is no "create a staff
- * account" form here, and that is the point of §7 — the employee signs up
+ * account" form here, and that is the point of §7 - the employee signs up
  * themselves with their own password, which nobody else ever knows, and an
  * admin only decides what that account is allowed to do.
  */
@@ -57,7 +57,7 @@ export function PromoteForm() {
    * Controlled, so the search term survives the round trip. An uncontrolled
    * input empties itself when the action returns, which then trips the
    * `required` rule and paints the box red immediately after a search that
-   * worked — the box looks like an error at the exact moment it succeeded.
+   * worked - the box looks like an error at the exact moment it succeeded.
    */
   const [query, setQuery] = useState('')
 
@@ -108,7 +108,7 @@ export function PromoteForm() {
                     {person.fullName ?? 'No name given'}
                   </span>
                   <span className="font-mono text-small text-ink-faint">
-                    {person.email ?? person.phone ?? '—'}
+                    {person.email ?? person.phone ?? '-'}
                   </span>
                   {person.staffNumber && (
                     <span className="font-mono text-micro uppercase tracking-label text-support">
@@ -121,7 +121,7 @@ export function PromoteForm() {
                 <p className="mt-1 text-small text-ink-faint">
                   {already.length > 0
                     ? `Already has: ${already.join(', ')}`
-                    : 'Customer account only — no staff access.'}
+                    : 'Customer account only - no staff access.'}
                 </p>
 
                 <form

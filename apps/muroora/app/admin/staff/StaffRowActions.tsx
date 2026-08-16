@@ -14,7 +14,7 @@ import {
  *
  * Suspending or marking someone as left removes their access at the same time,
  * so an admin does not have to remember two steps. That is the whole reason
- * this is one control rather than two — the gap between "he doesn't work here
+ * this is one control rather than two - the gap between "he doesn't work here
  * any more" and "his login still opens the till screen" is where trouble
  * lives.
  */

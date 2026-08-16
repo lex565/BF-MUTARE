@@ -12,12 +12,12 @@ import { OrderError, cancelOrder, getOrder } from '@/lib/services/orders'
  *   DELETE /api/orders/MM-000001   cancel it   { reason }
  *
  * An order number appears in WhatsApp messages and gets read down a phone
- * line, so it is guessable by design — MM-000002 follows MM-000001. That means
+ * line, so it is guessable by design - MM-000002 follows MM-000001. That means
  * the number ALONE MUST NEVER BE ENOUGH to see an order: it carries a
  * recipient's name, address and phone number.
  *
  * So: staff see any order. A signed-in buyer sees their own. Everyone else
- * gets 404 — not 403, which would confirm the order exists.
+ * gets 404 - not 403, which would confirm the order exists.
  */
 export const dynamic = 'force-dynamic'
 

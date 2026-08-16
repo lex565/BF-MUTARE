@@ -15,7 +15,7 @@ import {
 } from '@/lib/services/staff'
 
 /**
- * Staff admin actions. Thin wrappers — role check, validate, call the service.
+ * Staff admin actions. Thin wrappers - role check, validate, call the service.
  *
  * Every one requires ADMIN. SHOP_STAFF explicitly cannot reach these: a staff
  * member who could promote themselves to admin makes the whole role system
@@ -81,7 +81,7 @@ export async function promoteAction(
     )
 
     revalidatePath('/admin/staff')
-    return { message: `Done — staff number ${staffNumber}.` }
+    return { message: `Done - staff number ${staffNumber}.` }
   } catch (error) {
     if (error instanceof StaffError) return { error: error.message }
     console.error('[promoteAction]', error)

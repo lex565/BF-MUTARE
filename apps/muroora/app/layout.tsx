@@ -4,6 +4,7 @@ import { GroupBar, siteUrl } from '@pineberry/ui'
 import { Nav } from '@/app/components/Nav'
 import { Footer } from '@/app/components/Footer'
 import { StaffBar } from '@/app/components/StaffBar'
+import { IdleGuard } from '@/app/components/IdleGuard'
 import './globals.css'
 
 /* Figtree rather than the group's Archivo: it is rounder and reads friendlier
@@ -25,8 +26,8 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Muroora Mart — groceries and household goods, Mutare',
-    template: '%s — Muroora Mart',
+    default: 'Muroora Mart - groceries and household goods, Mutare',
+    template: '%s - Muroora Mart',
   },
   description:
     'Groceries and household goods in Mutare, with same-day local delivery and a diaspora shopping service that lets family abroad buy the goods directly.',
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_ZW',
     siteName: 'Muroora Mart',
-    title: 'Muroora Mart — quality goods, great value',
+    title: 'Muroora Mart - quality goods, great value',
     description:
       'Groceries and household goods in Mutare, with same-day delivery and a diaspora shopping service.',
   },
@@ -60,11 +61,13 @@ export default function RootLayout({
     >
       <body className="flex min-h-dvh flex-col">
         {/* One link back to the parent, above this site's own nav on every
-            page. It deliberately does not list the sister companies — see
+            page. It deliberately does not list the sister companies - see
             packages/ui/src/GroupBar.tsx for why. */}
         {/* Renders nothing at all unless a staff member is signed in, so the
             customer-facing design is unaffected. */}
         <StaffBar />
+        {/* Signs out after 30 minutes idle. Renders nothing when signed out. */}
+        <IdleGuard />
         <GroupBar />
         <Nav />
         <div className="flex-1">{children}</div>

@@ -13,7 +13,7 @@ try {
 
   console.log(`  users              ${users.n}`)
   console.log(
-    `  roles granted      ${roles.length === 0 ? 'NONE — no admin exists yet' : roles.map((r) => `${r.role}=${r.n}`).join(', ')}`,
+    `  roles granted      ${roles.length === 0 ? 'NONE - no admin exists yet' : roles.map((r) => `${r.role}=${r.n}`).join(', ')}`,
   )
   console.log(`  products           ${products.n}`)
   console.log(`  active zones       ${zones.n}`)

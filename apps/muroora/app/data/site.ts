@@ -1,5 +1,5 @@
 /**
- * Muroora Mart — business details and content.
+ * Muroora Mart - business details and content.
  *
  * SOURCE: `D:\DEV\Muroora_Mart\Muroora_Mart_Company_Profile.pdf`, the
  * company's own 2025 profile. Mission, vision, values, product lines, the
@@ -22,7 +22,7 @@ export const SITE = {
    * explains the whole positioning: the business is the relative who provides.
    */
   nameMeaning:
-    'From the Shona word muroora — the family member who supports and provides for the household.',
+    'From the Shona word muroora - the family member who supports and provides for the household.',
 
   city: 'Mutare',
   country: 'Zimbabwe',

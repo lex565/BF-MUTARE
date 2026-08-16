@@ -22,8 +22,8 @@ import {
  * single most reliable way to lose the sale. A guest order is identified by
  * the cart cookie; if they are signed in, the order is attached to them.
  *
- * IDEMPOTENCY IS REQUIRED, NOT OPTIONAL. Send a fresh `idempotencyKey` — a
- * UUID is ideal — with each genuine attempt, and THE SAME ONE on every retry
+ * IDEMPOTENCY IS REQUIRED, NOT OPTIONAL. Send a fresh `idempotencyKey` - a
+ * UUID is ideal - with each genuine attempt, and THE SAME ONE on every retry
  * of that attempt. On a bad connection the client cannot tell a lost response
  * from a lost request; the key is what makes retrying safe. Repeating a key
  * replays the original order rather than placing a second one.

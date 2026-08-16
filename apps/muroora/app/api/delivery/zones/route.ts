@@ -17,7 +17,7 @@ import { money } from '@/lib/money'
  * No authentication: a customer needs to know whether their aunt's suburb is
  * covered, and what it costs, before they will consider making an account.
  *
- * `subtotal` is the integer minor unit — cents — matching what the cart
+ * `subtotal` is the integer minor unit - cents - matching what the cart
  * endpoint returns as `subtotal.amount`. Send that value straight through; do
  * not send a decimal.
  */
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     if (error instanceof DeliveryError) {
-      // Not covered is an ordinary answer, not a server fault — 404 so a
+      // Not covered is an ordinary answer, not a server fault - 404 so a
       // client can branch on it, with the message ready to show.
       return fail('NOT_FOUND', error.message)
     }

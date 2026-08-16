@@ -16,7 +16,7 @@ import { id, softDelete, storeId, timestamps } from './_shared'
  * Identity, roles and addresses.
  *
  * Auth itself is Supabase's. `users.authId` points at `auth.users.id` there;
- * this table holds the application's own view of a person — their roles, their
+ * this table holds the application's own view of a person - their roles, their
  * addresses, their saved recipients. Keeping them separate means auth can be
  * swapped without touching the domain.
  */
@@ -35,14 +35,14 @@ export const roleEnum = pgEnum('role', [
   'ADMIN',
   'RIDER',
   'SUPER_ADMIN',
-  'MERCHANT', // reserved — not granted in v1
+  'MERCHANT', // reserved - not granted in v1
   /**
    * Read-only oversight. Sees every admin screen, changes nothing.
    *
    * Added for a named person whose access is "just overseeing no editing".
    * It is a role rather than a flag on ADMIN because the check has to be
    * "may this person write", not "is this person an admin who happens to be
-   * marked read-only" — the second reading is one forgotten condition away
+   * marked read-only" - the second reading is one forgotten condition away
    * from full access.
    *
    * A VIEWER does not count against the three-admin limit, because they
@@ -116,7 +116,7 @@ export const addresses = pgTable(
     recipientPhone: text('recipient_phone').notNull(),
     line1: text('line1').notNull(),
     line2: text('line2'),
-    /** Dangamvura, Chikanga, Yeovil — how addresses actually work here. */
+    /** Dangamvura, Chikanga, Yeovil - how addresses actually work here. */
     suburb: text('suburb').notNull(),
     city: text('city').notNull().default('Mutare'),
     /** Free text. Most of Mutare has no street numbering a courier can use. */
@@ -131,7 +131,7 @@ export const addresses = pgTable(
 )
 
 /**
- * Saved recipients — the diaspora feature, made concrete.
+ * Saved recipients - the diaspora feature, made concrete.
  *
  * The brief's own examples: "Mom - Dangamvura", "Brother - Chikanga". Someone
  * in Leeds buying groceries for their mother every month should not retype her
@@ -145,7 +145,7 @@ export const savedRecipients = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    /** "Mom", "Brother", "Gogo" — the buyer's own words. */
+    /** "Mom", "Brother", "Gogo" - the buyer's own words. */
     label: text('label').notNull(),
     fullName: text('full_name').notNull(),
     phone: text('phone').notNull(),

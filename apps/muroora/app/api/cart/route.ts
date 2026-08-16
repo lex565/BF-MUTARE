@@ -26,7 +26,7 @@ import {
  */
 export const dynamic = 'force-dynamic'
 
-/** Money is serialised the same way everywhere — see respond.ts. */
+/** Money is serialised the same way everywhere - see respond.ts. */
 function serialise(cart: CartView) {
   return {
     id: cart.id,

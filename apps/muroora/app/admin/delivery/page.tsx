@@ -39,7 +39,7 @@ export default async function AdminDeliveryPage() {
             </p>
             <p className="mt-3 text-small text-ink-soft">
               Checkout needs a delivery fee, and a fee only comes from an area.
-              No areas or prices have been invented for you — these are your
+              No areas or prices have been invented for you - these are your
               roads and your costs. Add the ones you actually cover below.
             </p>
           </div>
@@ -102,8 +102,8 @@ export default async function AdminDeliveryPage() {
                     </td>
                     <td className="py-4 pr-6 text-small text-ink-soft">
                       {zone.estimatedMinutesMin && zone.estimatedMinutesMax
-                        ? `${zone.estimatedMinutesMin}–${zone.estimatedMinutesMax} min`
-                        : '—'}
+                        ? `${zone.estimatedMinutesMin}-${zone.estimatedMinutesMax} min`
+                        : '-'}
                     </td>
                     <td className="py-4">
                       <ZoneToggle
@@ -118,7 +118,7 @@ export default async function AdminDeliveryPage() {
             </table>
 
             <p className="mt-6 max-w-measure text-small text-ink-faint">
-              An area is never deleted, only switched off — orders already
+              An area is never deleted, only switched off - orders already
               placed point at it, and deleting one would leave last month&rsquo;s
               deliveries unable to say what they were priced for. Switching an
               area off hides it from checkout straight away; orders already

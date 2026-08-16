@@ -29,7 +29,7 @@ try {
 
   console.log(`\nproducts: ${products}`)
   if (products === 0) {
-    console.log('  none, deliberately — the catalogue loads from the real stock list')
+    console.log('  none, deliberately - the catalogue loads from the real stock list')
   }
   console.log()
 } finally {

@@ -12,8 +12,8 @@
 -- audit trail said "STAFF_PROMOTED" without saying to which role, and
 -- "ORDER_CANCELLED" without the reason it was given.
 --
--- Converting to jsonb. Rows already written cannot be recovered — the detail
--- never reached the database — so they become NULL rather than being left as
+-- Converting to jsonb. Rows already written cannot be recovered - the detail
+-- never reached the database - so they become NULL rather than being left as
 -- a string that looks like data. Anything that IS valid JSON is kept.
 --
 -- ALTER TABLE is DDL, so the append-only triggers on audit_log and

@@ -17,7 +17,7 @@ import { users } from './identity'
  * Stores, categories and products.
  *
  * There is one store. `stores` exists anyway, because every other table
- * references it and the alternative — adding tenancy later — means backfilling
+ * references it and the alternative - adding tenancy later - means backfilling
  * every row and rewriting every query. See D-002.
  */
 
@@ -65,7 +65,7 @@ export const products = pgTable(
     slug: text('slug').notNull(),
     brand: text('brand'),
     description: text('description'),
-    /** "2kg", "750ml", "12-pack" — how the shop actually sells it. */
+    /** "2kg", "750ml", "12-pack" - how the shop actually sells it. */
     unitSize: text('unit_size'),
 
     /* ---- Money. Minor units, always with a currency. See lib/money.ts. ---- */
@@ -81,7 +81,7 @@ export const products = pgTable(
      *
      * This must never reach a customer-facing query. The read helpers in
      * lib/catalogue.ts select columns explicitly rather than `select *` for
-     * exactly this reason — a `select *` on a product row leaks the shop's
+     * exactly this reason - a `select *` on a product row leaks the shop's
      * margin to anyone who opens the network tab.
      */
     costPriceAmount: bigint('cost_price_amount', { mode: 'bigint' }),
@@ -109,7 +109,7 @@ export const productImages = pgTable(
     productId: uuid('product_id')
       .notNull()
       .references(() => products.id, { onDelete: 'cascade' }),
-    /** Supabase Storage path, not a public URL — resolved at render time. */
+    /** Supabase Storage path, not a public URL - resolved at render time. */
     path: text('path').notNull(),
     alt: text('alt'),
     sortOrder: integer('sort_order').notNull().default(0),

@@ -61,7 +61,7 @@ export default function ContactPage() {
               <p className="mt-4 text-lead text-ink-soft">
                 {SITE.name} trades from {SITE.city}, {SITE.country}. The phone
                 number, WhatsApp line and email address are not published here
-                yet — they were not in the company profile this site was built
+                yet - they were not in the company profile this site was built
                 from, and a made-up number is worse than none.
               </p>
               <p className="mt-4 text-ink-soft">

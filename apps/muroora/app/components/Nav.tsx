@@ -25,7 +25,7 @@ export function Nav() {
         aria-label="Primary"
         className="mx-auto flex max-w-[86rem] items-center justify-between px-gutter py-4"
       >
-        <Link href="/" aria-label="Muroora Mart — home">
+        <Link href="/" aria-label="Muroora Mart - home">
           <Logo />
         </Link>
 

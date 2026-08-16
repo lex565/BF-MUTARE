@@ -39,7 +39,7 @@ export interface Brand {
    * cross-link all read it from here.
    *
    * These are Vercel URLs and that is the current reality, not a stopgap to be
-   * papered over. The group owns no working domains yet — pineberryholdings.com
+   * papered over. The group owns no working domains yet - pineberryholdings.com
    * and bfmutare.co.zw do not resolve at all. Writing an aspirational domain
    * into a canonical URL or a sitemap does real damage: it points search
    * engines and link previews at nothing.
@@ -59,7 +59,7 @@ export interface Brand {
    * Path to the company's logo as served by the HOLDINGS site
    * (`apps/pineberry/public/logos/…`), or null where no artwork exists yet.
    * Null is a real state here, not an oversight: 420's brand document
-   * describes a logo — a clock frozen at 4:20 stylised into a bottle — that
+   * describes a logo - a clock frozen at 4:20 stylised into a bottle - that
    * has never been drawn, so its register entry sets the name as type instead
    * of showing a placeholder box.
    */
@@ -98,7 +98,7 @@ export const BRANDS: Brand[] = [
   {
     slug: 'muroora-mart',
     name: 'Muroora Mart',
-    line: 'Quality goods, great value — delivered in Mutare.',
+    line: 'Quality goods, great value - delivered in Mutare.',
     detail:
       'A neighbourhood retailer with an online catalogue and same-day delivery across Mutare. Its Diaspora Shopping Programme lets a relative abroad buy the actual groceries and have them delivered to a household here, which turns a remittance into goods rather than into an exchange-rate problem.',
     sector: 'Retail',
@@ -144,7 +144,7 @@ export const BRANDS: Brand[] = [
     fullName: '420 Liquor Store',
     line: 'Time to Toast.',
     detail:
-      'A licensed liquor store in Mutare built around a daily ritual: at 4:20 the work stops and you pour one. Premium spirits and Zimbabwean craft alongside tasting nights and cultural evenings. It reclaims “420” as a moment to pause — the brand is explicit that it is not a cannabis outlet.',
+      'A licensed liquor store in Mutare built around a daily ritual: at 4:20 the work stops and you pour one. Premium spirits and Zimbabwean craft alongside tasting nights and cultural evenings. It reclaims “420” as a moment to pause - the brand is explicit that it is not a cannabis outlet.',
     sector: 'Retail & lifestyle',
     base: 'Mutare',
     status: 'operating',

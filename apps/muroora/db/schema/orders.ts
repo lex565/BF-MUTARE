@@ -112,7 +112,7 @@ export const orders = pgTable(
      *
      * Not looked up at read time. Zimbabwe runs USD and ZWL in parallel at a
      * moving rate, so a ZWL order reconciled in six months against today's
-     * rate would be simply wrong. Captured here at the moment of sale — see
+     * rate would be simply wrong. Captured here at the moment of sale - see
      * D-003. Null when the order is already in USD.
      */
     fxRateToUsd: text('fx_rate_to_usd'),
@@ -175,7 +175,7 @@ export const orderItems = pgTable(
 )
 
 /**
- * The event log. APPEND-ONLY — see D-004.
+ * The event log. APPEND-ONLY - see D-004.
  *
  * `orders.status` is a cached projection of this table, not the source of
  * truth. The brief's "Never silently modify order states" is only enforceable

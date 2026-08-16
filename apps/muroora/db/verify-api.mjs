@@ -14,7 +14,7 @@
 import postgres from 'postgres'
 
 const BASE = 'http://localhost:3002'
-const COST_MARKER = '99999' // $999.99 — unmistakable in any payload
+const COST_MARKER = '99999' // $999.99 - unmistakable in any payload
 const SKU = 'VERIFY-COST-LEAK'
 
 const sql = postgres(process.env.DIRECT_URL, { prepare: false, max: 1 })
@@ -22,7 +22,7 @@ let failures = 0
 
 const expect = (label, ok, detail = '') => {
   if (!ok) failures += 1
-  console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${label}${detail ? ` — ${detail}` : ''}`)
+  console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${label}${detail ? ` - ${detail}` : ''}`)
 }
 
 try {

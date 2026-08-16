@@ -35,7 +35,7 @@ export default function DiasporaPage() {
               </p>
               <p>
                 Buying the goods directly closes that gap. The transfer stops
-                being a cash transfer and becomes a commodity transfer — you
+                being a cash transfer and becomes a commodity transfer - you
                 paid for maize meal and cooking oil, and maize meal and cooking
                 oil is what arrives.
               </p>

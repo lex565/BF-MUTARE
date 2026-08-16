@@ -21,7 +21,7 @@ export function ProductImage({
       <div
         className={`relative flex aspect-square items-end overflow-hidden bg-[linear-gradient(145deg,var(--color-paper-sunk),var(--color-accent-wash))] p-5 ${className}`}
         role="img"
-        aria-label={`${name} — photograph coming soon`}
+        aria-label={`${name} - photograph coming soon`}
       >
         <span
           aria-hidden

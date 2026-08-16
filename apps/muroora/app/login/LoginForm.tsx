@@ -12,7 +12,7 @@ import { signIn, signUp, type AuthState } from '@/app/login/actions'
  * whatever was already typed. Deliberately plain: email and password only.
  *
  * Google and Facebook are not here yet. Both need credentials from consoles
- * only the owner can open, and neither is worth blocking on — see the answer
+ * only the owner can open, and neither is worth blocking on - see the answer
  * to question 5. When those exist, two buttons go above the divider and
  * nothing else changes.
  */
@@ -153,7 +153,7 @@ export function LoginForm({ next }: { next?: string }) {
 
       <p className="mt-8 max-w-[42ch] text-small text-ink-faint">
         Creating an account here makes you a customer. Staff and rider access is
-        granted separately by the shop — it is not something you can pick.
+        granted separately by the shop - it is not something you can pick.
       </p>
     </div>
   )

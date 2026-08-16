@@ -26,7 +26,7 @@ let failures = 0
 
 const expect = (label, ok, detail = '') => {
   if (!ok) failures += 1
-  console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${label}${detail ? ` — ${detail}` : ''}`)
+  console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${label}${detail ? ` - ${detail}` : ''}`)
 }
 
 try {
@@ -84,7 +84,7 @@ try {
     )
   }
 
-  // Reserved may not exceed quantity — this is what stops the same last item
+  // Reserved may not exceed quantity - this is what stops the same last item
   // being promised to two customers.
   try {
     await sql.begin(async (tx) => {

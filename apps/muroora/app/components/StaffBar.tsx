@@ -7,7 +7,7 @@ import { signOut } from '@/app/login/actions'
  * The staff strip.
  *
  * Renders ONLY for signed-in staff. A customer, and anybody signed out, gets
- * nothing at all — not a hidden element, not a collapsed bar; the component
+ * nothing at all - not a hidden element, not a collapsed bar; the component
  * returns null and no markup reaches the page. The approved customer design is
  * therefore untouched, which is the whole reason this sits above the layout
  * rather than inside the nav.
@@ -34,6 +34,7 @@ export async function StaffBar() {
           { href: '/admin/products', label: 'Products' },
           { href: '/admin/delivery', label: 'Delivery' },
           { href: '/admin/staff', label: 'People' },
+          { href: '/admin/reports', label: 'Reports' },
         ]
       : []),
   ]
@@ -64,11 +65,12 @@ export async function StaffBar() {
         )}
 
         <div className="ml-auto flex items-center gap-4">
-          {firstName && (
-            <span className="font-mono text-micro text-paper/60">
-              {firstName}
-            </span>
-          )}
+          <Link
+            href="/staff/profile"
+            className="font-mono text-micro uppercase tracking-label text-paper/85 transition-colors hover:text-paper"
+          >
+            {firstName || 'You'}
+          </Link>
           <form action={signOut}>
             <button
               type="submit"

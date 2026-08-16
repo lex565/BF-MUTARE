@@ -6,7 +6,7 @@ import { listPublicProducts } from '@/lib/services/products'
 /**
  * GET /api/products
  *
- * The customer catalogue. PUBLIC — no authentication, by design: the brief is
+ * The customer catalogue. PUBLIC - no authentication, by design: the brief is
  * explicit that customers browse without an account, and that products must
  * not be hidden from visitors who are not signed in.
  *
@@ -15,7 +15,7 @@ import { listPublicProducts } from '@/lib/services/products'
  *   ?limit=50                   default 500
  *
  * This response NEVER contains cost price. It is built from
- * `listPublicProducts`, which selects its columns explicitly — see the note at
+ * `listPublicProducts`, which selects its columns explicitly - see the note at
  * the top of lib/services/products.ts about why the public and admin reads are
  * two functions rather than one with a flag.
  *

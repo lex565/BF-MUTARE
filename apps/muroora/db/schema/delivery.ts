@@ -19,8 +19,8 @@ import { users } from './identity'
 /**
  * Delivery zones and payments.
  *
- * Riders, dispatch and earnings are Phases 3–5 and are deliberately NOT here
- * yet. What is here is what Phase 1–2 needs: somewhere to compute a delivery
+ * Riders, dispatch and earnings are Phases 3-5 and are deliberately NOT here
+ * yet. What is here is what Phase 1-2 needs: somewhere to compute a delivery
  * fee, and a payments table that records money without committing to a
  * provider.
  */
@@ -30,7 +30,7 @@ import { users } from './identity'
  *
  * The brief: "Do not calculate arbitrary nationwide delivery yet." Zones are
  * admin-configured suburb lists with a flat fee, which is how delivery
- * actually gets priced in Mutare — by area, not by a routing API.
+ * actually gets priced in Mutare - by area, not by a routing API.
  *
  * `perKmFeeAmount` exists unused so distance pricing can be switched on later
  * without a migration.
@@ -71,8 +71,8 @@ export const deliveryZones = pgTable(
  * The brief: "Do not integrate a live payment gateway until the actual
  * Zimbabwe/business payment provider is selected. Build an abstraction."
  *
- * So `provider` is free text — 'ecocash', 'innbucks', 'cash_on_delivery',
- * 'manual' — and no SDK is imported anywhere. This table can record a payment
+ * So `provider` is free text - 'ecocash', 'innbucks', 'cash_on_delivery',
+ * 'manual' - and no SDK is imported anywhere. This table can record a payment
  * a staff member confirmed by hand today, and the same rows will describe a
  * gateway's callbacks later without changing shape.
  */
@@ -145,7 +145,7 @@ export const idempotencyKeys = pgTable(
  *
  * Separate from order_events: that one is the life of an order, this is every
  * privileged action anywhere in the system. It is what answers "who changed
- * this price", and — the reason it matters most — "who opened that rider's ID
+ * this price", and - the reason it matters most - "who opened that rider's ID
  * document, and when". See D-005.
  */
 export const auditLog = pgTable(

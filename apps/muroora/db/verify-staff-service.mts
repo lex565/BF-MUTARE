@@ -8,7 +8,7 @@
  *
  *   npm run db:verify-staff-service
  *
- * Uses the real service functions — not a copy of their logic — so it fails if
+ * Uses the real service functions - not a copy of their logic - so it fails if
  * somebody changes them. Creates its own throwaway accounts and deletes them.
  */
 
@@ -64,7 +64,7 @@ const rolesOf = async (userId: string) =>
       .where(and(eq(userRoles.userId, userId), eq(userRoles.storeId, STORE_ID)))
   ).map((r) => r.role)
 
-console.log('\nStaff service — exercising the real functions\n')
+console.log('\nStaff service - exercising the real functions\n')
 
 const leftover = await raw`
   SELECT id FROM users WHERE email LIKE ${'%' + TAG} AND deleted_at IS NULL
@@ -150,7 +150,7 @@ try {
    * Check the CONTENTS, not just that a row exists.
    *
    * The original version of this check stopped at "a row is there", and passed
-   * for weeks while every row stored the literal string "[object Object]" —
+   * for weeks while every row stored the literal string "[object Object]" -
    * the metadata column was `text` carrying a `$type` annotation, so the audit
    * trail recorded who did what and silently threw away what they did. An
    * existence check cannot catch that. This one can.
@@ -357,7 +357,7 @@ try {
 } finally {
   /**
    * Teardown does exactly what production does, because the database will not
-   * let it do anything else — and that is the point.
+   * let it do anything else - and that is the point.
    *
    * Once an account has acted, `audit_log` holds a foreign key to it, and
    * `audit_log` is append-only, so those rows cannot be removed either. The
@@ -383,7 +383,7 @@ try {
   }
   console.log(`\nCleanup: soft-deleted ${testIds.length} test account(s)`)
   console.log(
-    '        (hard delete is impossible once an account has an audit trail —',
+    '        (hard delete is impossible once an account has an audit trail -',
   )
   console.log('         that is the append-only rule working, not a failure)')
 

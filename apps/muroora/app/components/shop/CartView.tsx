@@ -121,8 +121,8 @@ export function CartView() {
         <span aria-hidden className="text-5xl">🛒</span>
         <h2 className="mt-5 text-h2">Your cart is ready when you are</h2>
         <p className="mx-auto mt-3 max-w-md text-ink-soft">
-          Browse real Muroora stock and add the things your household—or someone
-          back home—needs.
+          Browse real Muroora stock and add the things your household-or someone
+          back home-needs.
         </p>
         <Link
           href="/shop"

@@ -81,7 +81,7 @@ export default async function ShopPage({
             </h1>
             <p className="max-w-measure text-lead text-white/80">
               Browse what is actually available, build your basket without an
-              account, and send it to an address in Mutare—for yourself or
+              account, and send it to an address in Mutare-for yourself or
               somebody you care about.
             </p>
           </div>

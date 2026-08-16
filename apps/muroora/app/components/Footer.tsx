@@ -21,7 +21,7 @@ export function Footer() {
           <p className="mt-4 text-ink-soft">
             {SITE.city}, {SITE.country}
           </p>
-          {/* Contact details are genuinely unknown — the company profile gives
+          {/* Contact details are genuinely unknown - the company profile gives
               the city and nothing more. Saying so beats inventing a number. */}
           <p className="mt-4 max-w-[30ch] text-small text-ink-faint">
             Phone and email are still to be confirmed.
@@ -29,7 +29,7 @@ export function Footer() {
         </div>
 
         {/* Links to the parent only. The sister companies are listed on
-            Pineberry's own site, which is the page whose job that is — see
+            Pineberry's own site, which is the page whose job that is - see
             packages/ui/src/GroupBar.tsx. */}
         <div className="md:col-span-4 md:text-right">
           <p className="font-mono text-micro uppercase tracking-label text-ink-faint">

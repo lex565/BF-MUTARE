@@ -13,7 +13,7 @@
  *   - a failed line rolls the WHOLE order back, leaving no stock held
  *
  * Creates its own product, zone and cart, and clears them up. It creates a
- * temporary delivery zone because the shop has not configured real ones yet —
+ * temporary delivery zone because the shop has not configured real ones yet -
  * real zones and fees are the owner's to set, and none are invented here
  * beyond this throwaway.
  */
@@ -63,7 +63,7 @@ const buyer = { name: 'Test Buyer', email: 'buyer@verify.test', countryCode: 'GB
 
 const newKey = () => `verify-${Math.random().toString(36).slice(2)}-${Date.now()}`
 
-console.log('\nCheckout — money, stock, and what happens when it goes wrong\n')
+console.log('\nCheckout - money, stock, and what happens when it goes wrong\n')
 
 let productId = '', zoneId = '', token = '', secondToken = ''
 
@@ -94,7 +94,7 @@ try {
       suburbs: ['Verify Suburb', 'verify other'],
       baseFeeAmount: 300n, // $3.00
       // $4.00, so a single $4.99 item clears it. Set to $5.00 on the first
-      // draft, which put one item a penny under and stopped the run — the
+      // draft, which put one item a penny under and stopped the run - the
       // rule working, and a good reminder that a minimum set just above a
       // common single-item price blocks real sales.
       minimumOrderAmount: 400n,
@@ -113,7 +113,7 @@ try {
       slug: `verify-rice-${Date.now()}`,
       sku: TAG,
       unitSize: '2kg',
-      priceAmount: 499n, // $4.99 — the classic float trap
+      priceAmount: 499n, // $4.99 - the classic float trap
       isActive: true,
       lowStockThreshold: 2,
     } as never)
@@ -202,7 +202,7 @@ try {
     bad('total', toDecimal(order.total))
   }
   if (order.status === 'PENDING_PAYMENT') {
-    ok('it starts at PENDING_PAYMENT, not DRAFT — the customer has committed')
+    ok('it starts at PENDING_PAYMENT, not DRAFT - the customer has committed')
   } else {
     bad('initial status', order.status)
   }
@@ -314,7 +314,7 @@ try {
   }
 
   // Force a cart that asks for more than exists, bypassing the cart's own
-  // advisory check — this is the race the row lock has to catch.
+  // advisory check - this is the race the row lock has to catch.
   const thirdToken = `verify-cart3-${Date.now()}`
   const [c3] = await db
     .insert(carts)
@@ -344,7 +344,7 @@ try {
 
   const ordersAfter = await raw`SELECT count(*)::int AS n FROM orders`
   if (ordersBefore[0].n === ordersAfter[0].n) {
-    ok('and NO half-order was left behind — the whole thing rolled back')
+    ok('and NO half-order was left behind - the whole thing rolled back')
   } else {
     bad('rollback', `${ordersBefore[0].n} -> ${ordersAfter[0].n}`)
   }
@@ -498,7 +498,7 @@ try {
   }
 } catch (error) {
   // Printed rather than swallowed. A throw here means a check never ran, which
-  // is worse than a failed check — a silent skip looks like a pass.
+  // is worse than a failed check - a silent skip looks like a pass.
   failed++
   console.log('\n  FAIL  the run stopped early')
   console.log(`        ${error instanceof Error ? error.message : String(error)}`)
@@ -513,7 +513,7 @@ try {
    *
    * TEST ORDERS CANNOT BE DELETED, and that is correct: `order_events` is
    * append-only, so deleting an order to erase its history is refused. Orders
-   * are cancelled, never removed — the same rule a real mistaken order lives
+   * are cancelled, never removed - the same rule a real mistaken order lives
    * under.
    *
    * So the orders and their lines stay, cancelled, and the product they point
@@ -563,7 +563,7 @@ try {
     SELECT count(*)::int AS n FROM orders WHERE recipient_name = ${recipient.name}
   `
   console.log(
-    `  ${leftOrders[0].n} cancelled test order(s) remain — they cannot be deleted,`,
+    `  ${leftOrders[0].n} cancelled test order(s) remain - they cannot be deleted,`,
   )
   console.log('  because order_events is append-only. That is the rule working.')
 

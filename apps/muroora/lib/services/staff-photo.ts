@@ -9,7 +9,7 @@ import { StaffError } from '@/lib/services/staff'
  * Staff photographs.
  *
  * The owner's requirement: "for staff they cant finish creating the account
- * without the picture". A staff photo is not decoration here — it is how a
+ * without the picture". A staff photo is not decoration here - it is how a
  * customer at the door knows the person holding their shopping works for the
  * shop.
  *
@@ -109,7 +109,7 @@ export async function uploadStaffPhoto(params: {
     throw new StaffError(
       'NO_PHOTO',
       `That photo is ${(params.file.size / 1024 / 1024).toFixed(1)}MB. ` +
-        `The limit is 5MB — most phones can send a smaller copy.`,
+        `The limit is 5MB - most phones can send a smaller copy.`,
     )
   }
 
@@ -206,7 +206,7 @@ export async function signedPhotoUrl(params: {
 /**
  * Has this person finished setting up?
  *
- * "Staff cannot finish creating the account without the picture" — so this is
+ * "Staff cannot finish creating the account without the picture" - so this is
  * the check that decides whether the staff tools open. Their login works
  * either way; what is gated is the work.
  */
@@ -225,7 +225,7 @@ export async function staffSetupComplete(userId: string): Promise<{
     )
 
   const missing: string[] = []
-  if (!profile) missing.push('a staff record — an admin has to add you')
+  if (!profile) missing.push('a staff record - an admin has to add you')
   else if (!profile.photoPath) missing.push('your photograph')
 
   return { complete: missing.length === 0, missing }

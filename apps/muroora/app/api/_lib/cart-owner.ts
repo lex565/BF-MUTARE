@@ -12,7 +12,7 @@ import { newCartToken, type CartOwner } from '@/lib/services/cart'
  * THE COOKIE IS THE ONLY THING PROTECTING A GUEST CART, so it is httpOnly
  * (script cannot read it, which limits what an XSS bug could steal), sameSite
  * lax (not sent from another site's form post), and secure in production. The
- * token itself is 24 random bytes — long enough that guessing another
+ * token itself is 24 random bytes - long enough that guessing another
  * shopper's cart id is not a realistic attack.
  *
  * A guest cart holds no payment details and no address. It is a list of

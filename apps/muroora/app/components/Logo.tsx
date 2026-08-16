@@ -3,8 +3,8 @@ import Image from 'next/image'
 /**
  * Muroora Mart's own logo artwork, unmodified apart from a trim.
  *
- * Unlike BF Mutare's, this file arrived with a correct alpha channel — zero
- * opaque white pixels — so nothing was knocked out. It was only cropped to its
+ * Unlike BF Mutare's, this file arrived with a correct alpha channel - zero
+ * opaque white pixels - so nothing was knocked out. It was only cropped to its
  * bounding box, because the source had a lot of empty canvas that would
  * otherwise have shrunk the mark inside its box.
  *
@@ -16,7 +16,7 @@ export function Logo({ className = 'h-9' }: { className?: string }) {
   return (
     <Image
       src="/logo.png"
-      alt="Muroora Mart — quality goods, great value"
+      alt="Muroora Mart - quality goods, great value"
       width={1085}
       height={393}
       priority

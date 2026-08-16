@@ -51,7 +51,7 @@ export const carts = pgTable(
     userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
 
     /**
-     * Anonymous cart token, held in a cookie. Random and unguessable — it is
+     * Anonymous cart token, held in a cookie. Random and unguessable - it is
      * the only thing protecting a guest's cart from anyone who knows the id.
      */
     token: text('token').unique(),
@@ -87,7 +87,7 @@ export const cartItems = pgTable(
   },
   (t) => [
     // One row per product per cart. Adding the same item again increments the
-    // quantity rather than creating a second line — otherwise a cart shows
+    // quantity rather than creating a second line - otherwise a cart shows
     // "Rice x1, Rice x1" and the totals still work, which is worse than an
     // error because nobody notices.
     unique('cart_items_cart_product').on(t.cartId, t.productId),

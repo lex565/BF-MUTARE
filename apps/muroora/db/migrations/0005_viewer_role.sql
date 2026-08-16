@@ -10,7 +10,7 @@
 --
 -- The cap is enforced in lib/services/staff.ts, which is the only path that
 -- grants a role through the application. This index is the backstop for
--- anything that reaches the table another way — a psql session, a future
+-- anything that reaches the table another way - a psql session, a future
 -- script, a mistake.
 --
 -- It cannot be a CHECK constraint: a CHECK sees one row, and "no more than

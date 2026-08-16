@@ -9,7 +9,7 @@ import { auditLog, userRoles, users } from './schema'
  *   npm run db:grant -- someone@example.com ADMIN
  *
  * THIS EXISTS BECAUSE OF A DELIBERATE GAP. Public signup can only ever create
- * a CUSTOMER, and roles are granted by an existing admin — which leaves the
+ * a CUSTOMER, and roles are granted by an existing admin - which leaves the
  * question of where the FIRST admin comes from. The answer is here: somebody
  * with access to the server and the database credentials, on purpose, once.
  *

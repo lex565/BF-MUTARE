@@ -43,7 +43,7 @@ export default async function AdminStaffPage() {
         <h1 className="mt-3 text-h1">People</h1>
         <p className="mt-4 max-w-measure text-ink-soft">
           Who works here and what each of them is allowed to do. Nobody gets
-          staff access by signing up — an employee makes an ordinary account
+          staff access by signing up - an employee makes an ordinary account
           with their own password, then you give that account the access it
           needs from this page.
         </p>
@@ -82,7 +82,7 @@ export default async function AdminStaffPage() {
                   <span className="font-mono">
                     {person.email ?? person.phone ?? person.userId}
                   </span>{' '}
-                  — {person.roles.filter((r) => r !== 'CUSTOMER').join(', ')}
+                  - {person.roles.filter((r) => r !== 'CUSTOMER').join(', ')}
                 </li>
               ))}
             </ul>
@@ -99,7 +99,7 @@ export default async function AdminStaffPage() {
         <h2 className="text-h3 font-bold">Give someone access</h2>
         <p className="mt-3 max-w-measure text-ink-soft">
           They sign up at the normal login page first. Then find their account
-          here and choose what they may do. Their password stays theirs — you
+          here and choose what they may do. Their password stays theirs - you
           never see it, and there is no shared staff login.
         </p>
         <PromoteForm />
@@ -171,7 +171,7 @@ export default async function AdminStaffPage() {
                       </td>
                       <td className="py-4 pr-6">
                         <span className="font-bold">
-                          {person.fullName ?? '—'}
+                          {person.fullName ?? '-'}
                         </span>
                         {isMe && (
                           <span className="ml-2 font-mono text-micro uppercase tracking-label text-support">
@@ -180,7 +180,7 @@ export default async function AdminStaffPage() {
                         )}
                       </td>
                       <td className="py-4 pr-6 text-small text-ink-soft">
-                        {person.email ?? '—'}
+                        {person.email ?? '-'}
                         {person.phone && (
                           <span className="mt-1 block font-mono text-micro text-ink-faint">
                             {person.phone}
@@ -188,7 +188,7 @@ export default async function AdminStaffPage() {
                         )}
                       </td>
                       <td className="py-4 pr-6 text-small text-ink-soft">
-                        {person.jobTitle ?? '—'}
+                        {person.jobTitle ?? '-'}
                       </td>
                       <td className="py-4 pr-6 text-small">
                         {person.roles.filter((r) => r !== 'CUSTOMER').join(', ') ||
@@ -201,7 +201,7 @@ export default async function AdminStaffPage() {
                             : 'text-accent'
                         }`}
                       >
-                        {person.status ? STATUS_LABEL[person.status] : '—'}
+                        {person.status ? STATUS_LABEL[person.status] : '-'}
                       </td>
                       <td className="py-4 pr-6 font-mono text-small tabular-nums text-ink-faint">
                         {person.joinedAt
@@ -209,7 +209,7 @@ export default async function AdminStaffPage() {
                               'en-GB',
                               { day: '2-digit', month: 'short', year: 'numeric' },
                             )
-                          : '—'}
+                          : '-'}
                       </td>
                       <td className="py-4">
                         <StaffRowActions
@@ -227,7 +227,7 @@ export default async function AdminStaffPage() {
 
             <p className="mt-6 max-w-measure text-small text-ink-faint">
               Marking someone as suspended or left also takes away their access
-              straight away, but keeps their record — so last month&rsquo;s
+              straight away, but keeps their record - so last month&rsquo;s
               orders still show who packed them. Staff numbers are never reused.
               The system will not let you remove the last admin.
             </p>

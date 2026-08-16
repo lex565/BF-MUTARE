@@ -7,7 +7,7 @@
 -- two customers checking out in the same second must not receive the same
 -- number. `SELECT max(order_number) + 1` has exactly that race, and a random
 -- string is not something anyone can read down a phone line. A sequence is
--- atomic by definition and survives rollbacks (leaving gaps, which is fine —
+-- atomic by definition and survives rollbacks (leaving gaps, which is fine -
 -- the number identifies an order, it does not count them).
 --
 -- The UUID primary key remains the true identifier. This is the label.
@@ -57,7 +57,7 @@ CREATE TRIGGER audit_log_immutable
 --
 -- lib/inventory.ts checks this, but the check and the write are two steps and
 -- the database is the only place that can make the rule absolute. `reserved`
--- may never exceed what is on the shelf either — that is what stops the same
+-- may never exceed what is on the shelf either - that is what stops the same
 -- last bag of rice being promised to two customers.
 
 ALTER TABLE "inventory"

@@ -47,7 +47,7 @@ const parseSuburbs = (input: string): string[] => {
  * Refuse a suburb that is already in another zone.
  *
  * Two zones claiming Chikanga would mean the fee depends on which row the
- * database happened to return first — the same customer quoted $2 today and
+ * database happened to return first - the same customer quoted $2 today and
  * $4 tomorrow, with nothing in the data to explain it.
  */
 async function assertNoOverlap(
@@ -111,7 +111,7 @@ export async function createZone(
   } catch {
     throw new ZoneError(
       'INVALID',
-      'Fees must be an amount like 3.00 — digits and one decimal point.',
+      'Fees must be an amount like 3.00 - digits and one decimal point.',
     )
   }
 
@@ -243,7 +243,7 @@ export async function setZoneActive(
   if (!zone) throw new ZoneError('NOT_FOUND', 'No such zone.')
 
   // Reported back, not blocked. Switching a zone off because a road is out is
-  // legitimate even with deliveries pending — but the admin should be told
+  // legitimate even with deliveries pending - but the admin should be told
   // there are people waiting, rather than finding out later.
   const [{ n }] = await db
     .select({ n: sql<number>`count(*)::int` })

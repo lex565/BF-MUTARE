@@ -6,7 +6,7 @@
  * representing dollars anywhere in this codebase.
  *
  * Floats cannot represent money. `0.1 + 0.2 !== 0.3` is not a curiosity, it is
- * a till that does not balance — and this system has to reconcile a shop's
+ * a till that does not balance - and this system has to reconcile a shop's
  * stock, a customer's payment and a rider's earnings against each other.
  *
  * WHY CURRENCY IS NOT OPTIONAL HERE
@@ -16,7 +16,7 @@
  * rather than looked up when someone opens a report. That is why `Money`
  * carries its currency and why orders store `fxRateToUsd`.
  *
- * The master build prompt does not mention currency at all. It should — see
+ * The master build prompt does not mention currency at all. It should - see
  * D-003 in docs/18_DECISIONS.md.
  */
 
@@ -45,7 +45,7 @@ export function money(amount: bigint | number, currency: Currency): Money {
   if (typeof amount === 'number') {
     if (!Number.isInteger(amount)) {
       throw new TypeError(
-        `money() received a non-integer (${amount}). Amounts are minor units — ` +
+        `money() received a non-integer (${amount}). Amounts are minor units - ` +
           `pass 1234 for $12.34, or use fromDecimal() if you have a decimal string.`,
       )
     }
@@ -79,7 +79,7 @@ export function subtract(a: Money, b: Money): Money {
 }
 
 /**
- * Multiply by a whole quantity — a line total, three of something at $4.50.
+ * Multiply by a whole quantity - a line total, three of something at $4.50.
  * Deliberately integer-only: there is no rounding decision to get wrong.
  */
 export function multiply(m: Money, quantity: number): Money {
@@ -123,7 +123,7 @@ export function compare(a: Money, b: Money): -1 | 0 | 1 {
 }
 
 /**
- * Parse a decimal the way a human typed it — "12.50", "12.5", "12".
+ * Parse a decimal the way a human typed it - "12.50", "12.5", "12".
  *
  * Done by string, not by `parseFloat(x) * 100`, because that route is exactly
  * where the classic bug lives: 19.99 * 100 is 1998.9999999999998 in IEEE 754,
@@ -175,7 +175,7 @@ export function format(m: Money, locale = 'en-ZW'): string {
  *
  * Returns the rate alongside the result so the caller is pushed to persist it.
  * A converted amount whose rate was not stored cannot be audited later, and
- * this system has to be auditable — see D-003.
+ * this system has to be auditable - see D-003.
  */
 export function convert(
   m: Money,

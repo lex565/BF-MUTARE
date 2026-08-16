@@ -18,7 +18,7 @@ import { supabaseServer } from '@/lib/supabase/server'
  * CUSTOMER row here. Roles beyond that are granted by an existing admin,
  * writing to a table the signup path never touches.
  *
- * If roles lived in Supabase user metadata — which is the tempting shortcut —
+ * If roles lived in Supabase user metadata - which is the tempting shortcut -
  * they would be part of the object the client can see and, in some flows,
  * influence. They live in Postgres instead.
  */
@@ -63,7 +63,7 @@ export async function currentUser(): Promise<CurrentUser | null> {
     .from(users)
     .where(and(eq(users.authId, authUser.id), isNull(users.deletedAt)))
 
-  // Signed in with Supabase but no application row yet — first login after
+  // Signed in with Supabase but no application row yet - first login after
   // signup. Create the row with no roles; CUSTOMER is granted by the signup
   // action, and nothing else is ever granted here.
   if (!row) {
@@ -106,7 +106,7 @@ export const hasRole = (user: CurrentUser | null, ...roles: Role[]): boolean =>
  * Gate a page. Redirects rather than throwing, so an unauthorised visitor sees
  * a login screen rather than a stack trace.
  *
- * Always call this at the TOP of a protected page — not in a child component,
+ * Always call this at the TOP of a protected page - not in a child component,
  * and never rely on the middleware alone. Middleware can be bypassed by
  * direct server-action invocation; this cannot.
  */
@@ -126,7 +126,7 @@ export async function requireRole(...roles: Role[]): Promise<CurrentUser> {
  * MAY CHANGE THINGS. SUPER_ADMIN implies ADMIN.
  *
  * VIEWER is deliberately absent. Read and write are two different questions
- * and the code has to ask them separately — see `canViewAdmin` below.
+ * and the code has to ask them separately - see `canViewAdmin` below.
  */
 export const isAdmin = (user: CurrentUser | null): boolean =>
   hasRole(user, 'ADMIN', 'SUPER_ADMIN')

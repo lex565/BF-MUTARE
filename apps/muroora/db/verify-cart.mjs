@@ -1,7 +1,7 @@
 /**
  * Cart endpoint checks.
  *
- * Exercises the real HTTP API as a guest — no account — because that is the
+ * Exercises the real HTTP API as a guest - no account - because that is the
  * journey the brief insists must work: browse, add to cart, and only meet a
  * login if you want one.
  *
@@ -23,7 +23,7 @@ let cookie = ''
 
 const expect = (label, ok, detail = '') => {
   if (!ok) failures += 1
-  console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${label}${detail ? ` — ${detail}` : ''}`)
+  console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${label}${detail ? ` - ${detail}` : ''}`)
 }
 
 /** Keeps the guest cart cookie across calls, like a browser would. */

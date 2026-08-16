@@ -1,11 +1,11 @@
-# 18 — Decision Log
+# 18 - Decision Log
 
 Append-only. Each entry records what was decided, why, and what it costs to
 reverse. Newest last.
 
 ---
 
-## D-001 — One Next.js app, not two
+## D-001 - One Next.js app, not two
 
 **Date:** 2026-08-15 · **Status:** proposed, awaiting sign-off
 
@@ -23,7 +23,7 @@ extracting shared components and duplicating auth.
 
 ---
 
-## D-002 — `store_id` on every domain table from migration one
+## D-002 - `store_id` on every domain table from migration one
 
 **Date:** 2026-08-15 · **Status:** proposed
 
@@ -39,7 +39,7 @@ means backfilling every row in every table and rewriting every query.
 
 ---
 
-## D-003 — Money as integer minor units with an explicit currency
+## D-003 - Money as integer minor units with an explicit currency
 
 **Date:** 2026-08-15 · **Status:** proposed
 
@@ -48,7 +48,7 @@ a `currency` column. Never floats. The exchange rate in force is stored **on
 the order**, not looked up at read time.
 
 **Why:** floating point cannot represent money. And Zimbabwe runs USD and ZWL
-in parallel at a moving rate — an order placed today must still reconcile
+in parallel at a moving rate - an order placed today must still reconcile
 correctly in six months, which is only true if the rate is captured at the
 moment of sale. The brief does not raise currency at all; it should.
 
@@ -56,7 +56,7 @@ moment of sale. The brief does not raise currency at all; it should.
 
 ---
 
-## D-004 — Ledgers are append-only; status fields are projections
+## D-004 - Ledgers are append-only; status fields are projections
 
 **Date:** 2026-08-15 · **Status:** proposed
 
@@ -72,7 +72,7 @@ the change does not exist.
 
 ---
 
-## D-005 — Rider documents are a launch blocker, not a feature
+## D-005 - Rider documents are a launch blocker, not a feature
 
 **Date:** 2026-08-15 · **Status:** proposed
 
@@ -89,11 +89,11 @@ the website.
 
 ---
 
-## Open decisions — needed before Phase 1
+## Open decisions - needed before Phase 1
 
 | # | Decision | Options |
 | --- | --- | --- |
 | O-1 | Postgres host | Neon · Supabase (brings private storage with RLS, which suits D-005) |
 | O-2 | ORM and migrations | Drizzle + drizzle-kit (recommended) · Prisma |
-| O-3 | Git remote | Required before Phase 1 — see the 110MB blob blocker in `00_CODEBASE_AUDIT.md` |
+| O-3 | Git remote | Required before Phase 1 - see the 110MB blob blocker in `00_CODEBASE_AUDIT.md` |
 | O-4 | Who initiates rider payouts | Automatic from the platform, or manually by the business (materially different regulatory posture) |

@@ -8,7 +8,7 @@ import { PARENT, parentHref } from './brands'
  *
  * WHY IT DOES NOT LIST THE SISTER COMPANIES
  * It used to. That was wrong. A customer on the liquor store's site has no
- * reason to be offered a car importer and a garage in the header — the
+ * reason to be offered a car importer and a garage in the header - the
  * companies share an owner, not an audience, and cross-selling between them
  * makes each site feel like a directory page rather than that business's own
  * shopfront. It also put a permanent row of four names on every screen of

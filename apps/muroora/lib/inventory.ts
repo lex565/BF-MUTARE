@@ -7,15 +7,15 @@ import { inventory, inventoryTransactions } from '@/db/schema'
  * Stock movements.
  *
  * THIS IS THE ONLY MODULE ALLOWED TO WRITE TO `inventory` OR
- * `inventory_transactions`. Nothing else — no route handler, no server action,
- * no component — touches either table directly.
+ * `inventory_transactions`. Nothing else - no route handler, no server action,
+ * no component - touches either table directly.
  *
  * The reason is the invariant: the balance and the ledger row that explains it
  * must be written in the same database transaction, or the ledger stops being
  * able to account for the balance. Scattering `update inventory set quantity`
  * across the codebase is how a shop ends up with a number nobody can explain.
  *
- * Every function here takes an optional transaction so callers can compose —
+ * Every function here takes an optional transaction so callers can compose -
  * order creation reserves stock inside the same transaction that writes the
  * order, so a failure halfway leaves neither.
  */
@@ -115,7 +115,7 @@ export async function applyStockMove(
       )
     }
 
-    // Ledger first, then balance — both inside one transaction, so a crash
+    // Ledger first, then balance - both inside one transaction, so a crash
     // between them rolls back rather than leaving a balance nothing explains.
     await conn.insert(inventoryTransactions).values({
       storeId: move.storeId,
@@ -145,7 +145,7 @@ export async function applyStockMove(
 /**
  * Hold stock for an order that is placed but not yet packed.
  *
- * Reserving does not change `quantity` — the goods are still on the shelf.
+ * Reserving does not change `quantity` - the goods are still on the shelf.
  * It raises `reserved`, and sellable is quantity minus reserved. The brief
  * asks for stock to be reserved at checkout; this is that, and it is what
  * stops the shop selling the same last item twice.
@@ -213,7 +213,7 @@ export async function reserveStock(
   return tx ? run(tx) : db.transaction(run)
 }
 
-/** Release a hold — cancelled order, or the goods have now actually left. */
+/** Release a hold - cancelled order, or the goods have now actually left. */
 export async function releaseReservation(
   params: {
     storeId: string
@@ -303,7 +303,7 @@ export async function sellableQuantity(
  *
  * Sums every movement for a product and compares it to the stored quantity.
  * They must match exactly; if they do not, something wrote to `inventory`
- * without going through this module. Worth running as a scheduled check —
+ * without going through this module. Worth running as a scheduled check -
  * silent drift is the failure mode that costs a shop real money.
  */
 export async function reconcile(

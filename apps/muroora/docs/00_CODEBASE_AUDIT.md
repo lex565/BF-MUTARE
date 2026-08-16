@@ -1,4 +1,4 @@
-# 00 — Codebase Audit
+# 00 - Codebase Audit
 
 **Date:** 2026-08-15
 **Against:** `MUROORA_MART_MASTER_BUILD_PROMPT.txt` v1.0, Phase 0
@@ -8,7 +8,7 @@
 
 ## The headline finding
 
-**There is no backend. Not a thin one — none.**
+**There is no backend. Not a thin one - none.**
 
 I searched the entire monorepo for every signal of a stateful application:
 
@@ -25,7 +25,7 @@ I searched the entire monorepo for every signal of a stateful application:
 components, five shared components, one hand-written `site.ts` of copy, a logo
 and a hero image. It renders to static HTML and is served from a CDN.
 
-This is not a criticism of it — it does its job well and the brief explicitly
+This is not a criticism of it - it does its job well and the brief explicitly
 asks to keep it as the visual foundation. But it means the spec's scope must be
 read honestly: **products, inventory, cart, checkout, orders, roles, riders,
 dispatch, earnings, payments, notifications and audit logging are all new
@@ -53,7 +53,7 @@ because there is nothing there to extend.
 
 ### Routes
 
-`/`, `/shop`, `/diaspora`, `/about`, `/contact` — all marketing pages.
+`/`, `/shop`, `/diaspora`, `/about`, `/contact` - all marketing pages.
 `/shop` describes six product *categories* in prose. There is no product, no
 price, no basket and no way to buy anything.
 
@@ -61,10 +61,10 @@ price, no basket and no way to buy anything.
 
 Keep all of it. The design language is settled and the spec asks to preserve it:
 
-- `app/globals.css` — the brand layer. Green `#005029` and orange `#f25c13`
+- `app/globals.css` - the brand layer. Green `#005029` and orange `#f25c13`
   are sampled from the client's own logo artwork, not invented.
 - `components/Nav.tsx`, `Footer.tsx`, `PageHeader.tsx`, `Logo.tsx`
-- `@pineberry/ui` — shared tokens, `Reveal`, `GroupBar`
+- `@pineberry/ui` - shared tokens, `Reveal`, `GroupBar`
 - The hero photograph and its full-bleed treatment
 - The copy in `site.ts`, which came from the company's own profile document
 
@@ -93,7 +93,7 @@ Rationale:
 - One domain, one session cookie, one analytics view of the funnel.
 
 The cost: the project stops being a static site, so it now needs a database, a
-server runtime and private storage. That is unavoidable — the spec requires
+server runtime and private storage. That is unavoidable - the spec requires
 state.
 
 ### Recommended stack
@@ -136,7 +136,7 @@ Names are indicative; the full schema goes in `03_DATABASE_SCHEMA.md`.
 
 **Stock**
 `inventory` (current level per product per store)
-`inventory_transactions` (the ledger — every movement, typed, with
+`inventory_transactions` (the ledger - every movement, typed, with
 `quantity_before` / `quantity_after`, actor and reason)
 
 **Ordering**
@@ -168,7 +168,7 @@ The current site has no data to migrate, which makes this unusually clean.
 
 1. Provision Postgres; put the URL in an environment variable.
 2. Add Drizzle, create the initial migration for identity + catalogue + stock.
-3. Seed real Muroora products from the shop's own stock list — **not** invented
+3. Seed real Muroora products from the shop's own stock list - **not** invented
    demo data. This is a real business; fake products would end up in front of
    real customers.
 4. Move `CATEGORIES` out of `site.ts` into the `categories` table, and have
@@ -190,9 +190,9 @@ add is a realistic sense of size, because that is missing from the brief:
 | 0 | Audit, architecture, schema, decisions | This document |
 | 1 | DB, products, categories, inventory, accounts, cart, checkout, order creation, admin products, staff queue | The largest single phase |
 | 2 | Picking, packing, substitutions, order events, zones, delivery fees, tracking page | Large |
-| 3 | Rider registration, documents, verification, availability | Medium, high risk — see Risk 1 |
+| 3 | Rider registration, documents, verification, availability | Medium, high risk - see Risk 1 |
 | 4 | Dispatch, accept/decline, pickup, delivery, proof of delivery | Large |
-| 5 | Earnings ledger, payouts, reconciliation | Medium, high risk — money |
+| 5 | Earnings ledger, payouts, reconciliation | Medium, high risk - money |
 | 6 | Notification abstraction, WhatsApp once a number exists | Medium |
 | 7 | Analytics | Small |
 | 8 | Testing, security review, privacy review, backups, launch checklist | Do not skip |
@@ -205,7 +205,7 @@ it in week three.
 
 ## F. Risks and blockers
 
-### Risk 1 — Rider identity documents. The most serious thing in this spec.
+### Risk 1 - Rider identity documents. The most serious thing in this spec.
 
 Phase 3 collects national IDs, driving licences, police clearance, proof of
 residence and mobile-wallet details from real people who are not employees and
@@ -222,7 +222,7 @@ have little leverage.
 - The spec already says most of this. It should be treated as a launch
   blocker, not a nice-to-have.
 
-### Risk 2 — Payments and money movement
+### Risk 2 - Payments and money movement
 
 Rider earnings mean the platform holds money owed to third parties. That is a
 different regulatory posture from simply taking card payments. Before Phase 5,
@@ -230,7 +230,7 @@ someone needs to confirm what licensing (if any) applies to paying riders
 through the platform, and whether payouts should instead be initiated manually
 by the business.
 
-### Risk 3 — Currency
+### Risk 3 - Currency
 
 The brief never mentions it, but Zimbabwe runs USD and ZWL in parallel with a
 moving rate. Every price, fee, earning and payout needs a currency attached
@@ -238,13 +238,13 @@ from the first migration, and the rate used must be stored **on the order** at
 the time it was placed. Retrofitting multi-currency into a single-currency
 schema is one of the worst refactors in commerce software.
 
-### Risk 4 — No WhatsApp number, no shop contact details
+### Risk 4 - No WhatsApp number, no shop contact details
 
 Already handled correctly: the site shows nothing rather than a fake number.
 Keep that. `WHATSAPP_BUSINESS_NUMBER` unset must mean CTAs are hidden, never
 `undefined` in an href.
 
-### Blocker 1 — The repository cannot be pushed to GitHub
+### Blocker 1 - The repository cannot be pushed to GitHub
 
 `Images/video_2026-08-08_15-27-21.mp4` is **110MB and already in git history**.
 GitHub hard-rejects anything over 100MB, so a push is refused regardless of
@@ -254,14 +254,14 @@ This matters more now than it did for marketing sites. A commerce platform
 handling money and PII needs code review, CI, branch protection and a backup of
 the source that is not one laptop. **This should be resolved before Phase 1.**
 
-### Blocker 2 — A credential was nearly committed
+### Blocker 2 - A credential was nearly committed
 
 A Vercel token was left in the repo root as `vercell.txt`, untracked but not
 ignored. One `git add -A` would have committed it. It is now in `.gitignore`
 and `.vercelignore`, but the practice needs to stop before there are database
 URLs and payment keys in play.
 
-### Blocker 3 — No test infrastructure
+### Blocker 3 - No test infrastructure
 
 There is no test runner in the monorepo. Phase 1 should add one, because stock
 arithmetic and order state machines are exactly the code that must not be
@@ -276,11 +276,11 @@ verified by clicking around.
 `Logo.tsx` · `app/about/page.tsx` · `app/diaspora/page.tsx` · `app/page.tsx`
 
 **Changed**
-`app/shop/page.tsx` — reads the database instead of a constant
-`app/data/site.ts` — categories move out; marketing copy stays
-`app/layout.tsx` — session provider, cart context
-`package.json` — Drizzle, Auth.js, Zod, a test runner
-`vercel.json` / env — database URL, storage credentials
+`app/shop/page.tsx` - reads the database instead of a constant
+`app/data/site.ts` - categories move out; marketing copy stays
+`app/layout.tsx` - session provider, cart context
+`package.json` - Drizzle, Auth.js, Zod, a test runner
+`vercel.json` / env - database URL, storage credentials
 
 **New (Phase 1)**
 `db/schema/*`, `db/migrations/*`, `lib/auth/*`, `lib/money.ts`,
@@ -295,9 +295,9 @@ verified by clicking around.
 Confirm three decisions before any code is written, because each one is
 expensive to reverse:
 
-1. **Postgres host** — Neon or Supabase. Supabase brings private storage with
+1. **Postgres host** - Neon or Supabase. Supabase brings private storage with
    row-level security in the same product, which suits Risk 1.
-2. **ORM** — Drizzle (recommended) or Prisma.
+2. **ORM** - Drizzle (recommended) or Prisma.
 3. **Fix the GitHub blocker** so this work is reviewable and backed up.
 
 Then Phase 1 opens with the schema and the product catalogue.

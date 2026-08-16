@@ -9,7 +9,7 @@ import { compare, money, type Money } from '@/lib/money'
  *
  * The brief: "Do not calculate arbitrary nationwide delivery yet." A fee here
  * is a flat figure attached to a named zone with a list of suburbs, because
- * that is how delivery is actually priced in Mutare — by area, by someone who
+ * that is how delivery is actually priced in Mutare - by area, by someone who
  * knows the roads, not by a routing API charging per kilometre of a road that
  * may not be passable.
  *
@@ -76,8 +76,8 @@ const toZone = (row: typeof deliveryZones.$inferSelect): DeliveryZone => ({
 /**
  * Zones a customer may choose from.
  *
- * Only active ones. A zone switched off is switched off for a reason — the
- * road is out, or nobody covers it this week — and it must disappear from
+ * Only active ones. A zone switched off is switched off for a reason - the
+ * road is out, or nobody covers it this week - and it must disappear from
  * checkout the moment an admin says so.
  */
 export async function listActiveZones(): Promise<DeliveryZone[]> {
@@ -143,7 +143,7 @@ export async function findZoneForSuburb(
  * The fee for delivering an order of this size to this suburb.
  *
  * Refuses rather than guesses. If no active zone lists the suburb, the answer
- * is "we do not deliver there", not a default fee — a default would quietly
+ * is "we do not deliver there", not a default fee - a default would quietly
  * commit a rider to a trip nobody priced.
  *
  * The subtotal is passed in because zones carry a minimum order, and the

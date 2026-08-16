@@ -9,17 +9,17 @@ import type { Role } from '@/lib/auth'
  *
  * Implements addendum §7: an employee creates an ordinary account, has no
  * privileges, and an admin promotes them. There is no self-service route to
- * staff access anywhere in this codebase, and no shared staff password —
+ * staff access anywhere in this codebase, and no shared staff password -
  * every employee is a distinct account, so the audit log can name who picked
  * an order or changed a price.
  *
  * TWO SEPARATE FACTS, KEPT SEPARATE
  *
- *   `user_roles`     — what someone MAY DO. The security boundary.
- *   `staff_profiles` — who they ARE at work. Staff number, photo, status.
+ *   `user_roles`     - what someone MAY DO. The security boundary.
+ *   `staff_profiles` - who they ARE at work. Staff number, photo, status.
  *
  * Promotion writes both. Removing access writes only the first, because an
- * ex-employee's record has to outlive their login — otherwise last quarter's
+ * ex-employee's record has to outlive their login - otherwise last quarter's
  * order history points at nobody.
  */
 
@@ -40,7 +40,7 @@ export type GrantableRole = (typeof GRANTABLE_ROLES)[number]
  * The owner's instruction: "Only three owner-created admin accounts are
  * permitted; there must be no public admin registration."
  *
- * Counted as PEOPLE, not grants — somebody holding both ADMIN and SUPER_ADMIN
+ * Counted as PEOPLE, not grants - somebody holding both ADMIN and SUPER_ADMIN
  * is one person and takes one place. VIEWER does not count, because a
  * read-only account cannot do the thing the limit exists to restrict.
  *
@@ -113,7 +113,7 @@ export async function listStaff(): Promise<StaffMember[]> {
  * Find an account to promote.
  *
  * Search, not a full list. The customer table will run to thousands and an
- * admin promoting a colleague already knows their email — offering a browsable
+ * admin promoting a colleague already knows their email - offering a browsable
  * list of every customer is both useless and an unnecessary exposure of
  * personal data to anyone who reaches this screen.
  *
@@ -160,8 +160,8 @@ export async function findAccounts(query: string): Promise<StaffMember[]> {
  * How many people can reach the admin screens.
  *
  * Counts the ROLE, not the staff profile. Someone can hold ADMIN without
- * having been added to the staff list — the owner's own account starts that
- * way — and a screen that reported "Admins 0" to a signed-in admin would be
+ * having been added to the staff list - the owner's own account starts that
+ * way - and a screen that reported "Admins 0" to a signed-in admin would be
  * lying about the one number that matters for lockout.
  */
 export async function countAdmins(): Promise<number> {
@@ -260,7 +260,7 @@ export async function promoteToStaff(
    * The three-admin limit, checked before anything is written.
    *
    * Someone who is ALREADY an admin can be granted admin again without
-   * consuming a place — that is a no-op, and refusing it would be confusing.
+   * consuming a place - that is a no-op, and refusing it would be confusing.
    * The database trigger is the real backstop; this exists so the admin gets
    * a sentence instead of a Postgres exception.
    */
@@ -275,7 +275,7 @@ export async function promoteToStaff(
           'ADMIN_LIMIT',
           `Only ${MAX_ADMINS} accounts may have admin access, and there are ` +
             `already ${current}. Remove one first, or give this person ` +
-            `oversight instead — that sees everything and changes nothing.`,
+            `oversight instead - that sees everything and changes nothing.`,
         )
       }
     }
@@ -311,7 +311,7 @@ export async function promoteToStaff(
 
     if (existingProfile) {
       // Somebody returning, or being given a second role. Reactivate rather
-      // than issue a new number — their history belongs to the old one.
+      // than issue a new number - their history belongs to the old one.
       staffNumber = existingProfile.staffNumber
       await tx
         .update(staffProfiles)
@@ -331,7 +331,7 @@ export async function promoteToStaff(
           jobTitle: params.jobTitle ?? null,
           status: 'ACTIVE',
           createdBy: actorId,
-          // staffNumber omitted on purpose — the column default calls
+          // staffNumber omitted on purpose - the column default calls
           // next_staff_number(), which is atomic.
         } as never)
         .returning({ staffNumber: staffProfiles.staffNumber })
@@ -410,7 +410,7 @@ export async function revokeRole(
  * Change employment status.
  *
  * Setting LEFT or SUSPENDED also strips staff and rider roles, because the HR
- * fact and the access fact should not be able to disagree — a suspended
+ * fact and the access fact should not be able to disagree - a suspended
  * employee who can still pick orders is exactly the gap this closes.
  * The profile itself is kept, so their history still has a name against it.
  */

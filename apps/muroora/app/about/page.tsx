@@ -50,7 +50,7 @@ export default function AboutPage() {
                 <p>
                   A neighbourhood retailer in {SITE.city} that sits between the
                   way shops here have always worked and the way people buy now.
-                  There is a storefront, an online catalogue, and delivery — and
+                  There is a storefront, an online catalogue, and delivery - and
                   you can use whichever of the three suits the day you are
                   having.
                 </p>

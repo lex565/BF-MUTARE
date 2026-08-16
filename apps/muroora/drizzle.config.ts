@@ -18,12 +18,12 @@ try {
     if (!process.env[key]) process.env[key] = trimmed.slice(eq + 1).trim()
   }
 } catch {
-  // No .env.local yet — the error below is clearer than a parse failure here.
+  // No .env.local yet - the error below is clearer than a parse failure here.
 }
 
 /**
  * Migrations use the DIRECT connection (port 5432), not the pooled one the app
- * runs on. DDL through PgBouncer in transaction mode is unreliable — it can
+ * runs on. DDL through PgBouncer in transaction mode is unreliable - it can
  * hand successive statements of one migration to different backends.
  *
  * So: DIRECT_URL for drizzle-kit, DATABASE_URL for the running app.

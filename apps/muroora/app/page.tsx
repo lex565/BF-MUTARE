@@ -4,7 +4,7 @@ import { HomeShell } from '@/app/components/shop/HomeShell'
  * The homepage.
  *
  * Was rendering `DesignPreview` with `preview={false}`, which only hid the
- * "design preview" banner — the catalogue, cart, login and order confirmation
+ * "design preview" banner - the catalogue, cart, login and order confirmation
  * underneath were all simulated, so the live site looked like a working shop
  * and nothing reached the database.
  *

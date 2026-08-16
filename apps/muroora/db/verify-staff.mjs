@@ -2,7 +2,7 @@
  * Staff layer verification.
  *
  * Same discipline as db/verify.mjs: prove the rules by breaking them. A test
- * that only does the allowed thing proves nothing — every check below tries the
+ * that only does the allowed thing proves nothing - every check below tries the
  * thing that must be refused, and fails loudly if it is allowed.
  *
  *   npm run db:verify-staff
@@ -58,7 +58,7 @@ async function mustAllow(what, fn) {
   }
 }
 
-console.log('\nStaff layer — verifying by trying to break it\n')
+console.log('\nStaff layer - verifying by trying to break it\n')
 
 if (!STORE_ID) {
   console.error('NEXT_PUBLIC_STORE_ID is not set. Aborting.')
@@ -73,7 +73,7 @@ const leftovers = await sql`
 if (leftovers.length > 0) {
   console.error(
     `Found ${leftovers.length} leftover test account(s) from a previous run.\n` +
-      `Delete them first — this script will not write over an unknown state.`,
+      `Delete them first - this script will not write over an unknown state.`,
   )
   await sql.end()
   process.exit(1)
@@ -261,7 +261,7 @@ try {
     SELECT count(*)::int AS n FROM users WHERE email LIKE ${'%' + VERIFY_TAG}
   `
   console.log(
-    `\nCleanup: ${rest[0].n === 0 ? 'all test accounts removed' : `WARNING — ${rest[0].n} left behind`}`,
+    `\nCleanup: ${rest[0].n === 0 ? 'all test accounts removed' : `WARNING - ${rest[0].n} left behind`}`,
   )
   await sql.end()
 }

@@ -28,7 +28,7 @@ const ROLE_LABEL: Record<string, string> = {
  * Addendum §8 asks for a generated Muroora staff ID with a photo, name, role,
  * status and joined date, and says printable cards can come later. This is
  * that card on screen, laid out at the proportions of a real ID badge, and it
- * prints — `@media print` strips everything around it.
+ * prints - `@media print` strips everything around it.
  *
  * WHAT IS DELIBERATELY NOT ON IT: no email, no phone, no home address. A card
  * gets left on counters and photographed. It answers "does this person work
@@ -118,7 +118,7 @@ export default async function StaffCardPage({
         <h1 className="mt-3 text-h1">Staff card</h1>
         <p className="mt-4 max-w-measure text-ink-soft">
           Proof that this person works here. It carries no phone number, email
-          or address on purpose — a card gets left on counters and
+          or address on purpose - a card gets left on counters and
           photographed. Anything beyond &ldquo;they work here&rdquo; needs the
           staff number and an account.
         </p>

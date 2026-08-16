@@ -5,7 +5,7 @@ import { toDecimal, type Money } from '@/lib/money'
 /**
  * Shared response shape for every endpoint.
  *
- * One envelope, so a client — Codex's front end, a future native app — writes
+ * One envelope, so a client - Codex's front end, a future native app - writes
  * its error handling once instead of per endpoint:
  *
  *   success:  { "data": ... }
@@ -56,7 +56,7 @@ export const fail = (
  * arithmetic on. `decimal` is a convenience for display. JSON has no integer
  * type distinct from float, so a client that adds up `decimal` values in
  * JavaScript reintroduces exactly the floating-point bug lib/money.ts exists
- * to prevent — hence sending both, and saying so here.
+ * to prevent - hence sending both, and saying so here.
  */
 export const serialiseMoney = (m: Money) => ({
   amount: m.amount.toString(),

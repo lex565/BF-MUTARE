@@ -11,7 +11,7 @@ import { cookies } from 'next/headers'
  *
  * `supabaseAdmin()` uses the service-role key and IGNORES EVERY PERMISSION
  * RULE. It exists for the handful of operations that legitimately need to act
- * outside any user — creating the first admin, a scheduled job. Reaching for
+ * outside any user - creating the first admin, a scheduled job. Reaching for
  * it because something returned "not allowed" is how a system quietly loses
  * all its access control.
  */

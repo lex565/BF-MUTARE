@@ -32,7 +32,7 @@ function Submit({ label: text }: { label: string }) {
  * The photo upload.
  *
  * Shown prominently and on its own when it is missing, because until it is
- * there the staff tools stay shut — so it is not a settings field, it is the
+ * there the staff tools stay shut - so it is not a settings field, it is the
  * thing standing between them and their work.
  */
 export function PhotoForm({ hasPhoto }: { hasPhoto: boolean }) {
@@ -189,7 +189,7 @@ export function ProfileForm({
       </div>
 
       <p className="text-small text-ink-faint">
-        You cannot change your own access or staff number here — those belong
+        You cannot change your own access or staff number here - those belong
         to an admin.
       </p>
     </form>

@@ -4,7 +4,7 @@ import { signedPhotoUrl } from '@/lib/services/staff-photo'
  * A staff photograph.
  *
  * The path is turned into a signed URL HERE, on the server, at render time.
- * The URL lasts five minutes and is never stored — so a page saved or shared
+ * The URL lasts five minutes and is never stored - so a page saved or shared
  * carries a link that has already died, and the bucket stays private.
  *
  * Every render writes an audit entry naming who looked. That is deliberate:
@@ -44,7 +44,7 @@ export async function StaffPhoto({
         style={{ width: size, height: size }}
         className={`inline-flex shrink-0 items-center justify-center border border-rule bg-paper-sunk font-mono text-ink-faint ${className}`}
       >
-        {initials || '—'}
+        {initials || '-'}
       </span>
     )
   }

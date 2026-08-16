@@ -17,7 +17,7 @@ export interface RevealProps {
   children: ReactNode
   /** Which way the element travels in from. */
   from?: Direction
-  /** Seconds of delay — use to stagger siblings by index. */
+  /** Seconds of delay - use to stagger siblings by index. */
   delay?: number
   /** Fraction of the element that must be visible before it fires. */
   threshold?: number

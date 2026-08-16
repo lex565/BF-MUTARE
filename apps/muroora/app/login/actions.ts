@@ -16,7 +16,7 @@ import { supabaseServer } from '@/lib/supabase/server'
  * Sign in and sign up.
  *
  * THE RULE THAT MATTERS: signing up grants CUSTOMER and nothing else, ever.
- * The role is hard-coded below — it is not read from the form, so no amount of
+ * The role is hard-coded below - it is not read from the form, so no amount of
  * tampering with the request can ask for ADMIN. Staff and rider privileges are
  * granted afterwards by someone who already has them, writing to a table this
  * path never touches. That is the brief's rule 7, made structural rather than
@@ -44,7 +44,7 @@ function safeNext(next: string | undefined): string {
  * Carry a guest cart into the account being signed into.
  *
  * Without this, somebody who fills a basket and then signs in to check out
- * watches it empty — which is the most effective way there is to lose a sale
+ * watches it empty - which is the most effective way there is to lose a sale
  * at the last step.
  *
  * Never allowed to break the sign-in. A cart is recoverable; being unable to
@@ -91,7 +91,7 @@ export async function signIn(
   })
 
   if (error) {
-    // Deliberately not "no account with that email" — that tells an attacker
+    // Deliberately not "no account with that email" - that tells an attacker
     // which addresses are registered.
     return { error: 'That email and password do not match.' }
   }
@@ -192,7 +192,7 @@ const emailOnly = z.object({
  *
  * ALWAYS reports success, even when there is no such account. Saying "no
  * account with that email" turns this form into a way of discovering who
- * shops here — and for a staff login, who works here. The person who owns the
+ * shops here - and for a staff login, who works here. The person who owns the
  * address learns everything they need from the email itself.
  */
 export async function requestPasswordReset(
@@ -228,7 +228,7 @@ const newPassword = z
   .object({
     password: z
       .string()
-      .min(10, 'Use at least 10 characters — length beats punctuation.')
+      .min(10, 'Use at least 10 characters - length beats punctuation.')
       .max(200),
     confirm: z.string(),
   })
@@ -272,4 +272,17 @@ export async function completePasswordReset(
   if (error) return { error: error.message }
 
   redirect('/account?reset=1')
+}
+
+/**
+ * Sign out because nothing has happened for half an hour.
+ *
+ * Separate from `signOut` so the person lands somewhere that explains itself,
+ * rather than on the homepage wondering what happened.
+ */
+export async function signOutIdle() {
+  const supabase = await supabaseServer()
+  await supabase.auth.signOut()
+  revalidatePath('/', 'layout')
+  redirect('/login?idle=1')
 }

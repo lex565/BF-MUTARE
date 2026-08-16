@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic'
 /**
  * Where a signed-in person lands.
  *
- * Also where `requireRole` sends anyone who reached a page they may not open —
+ * Also where `requireRole` sends anyone who reached a page they may not open -
  * hence `?denied=1`. That redirect existed before this page did, which meant a
  * customer who typed /admin got a 404 and no explanation. A refusal should say
  * what happened and offer somewhere to go.

@@ -15,7 +15,7 @@ import { fromDecimal, money, toDecimal, type Money } from '@/lib/money'
  * Product and catalogue service.
  *
  * ALL product business logic lives here and nowhere else. Server actions and
- * HTTP route handlers are thin wrappers around these functions — see
+ * HTTP route handlers are thin wrappers around these functions - see
  * TASKS.md, and section 56 of the master build prompt: "Keep business logic
  * out of UI components... This will allow a future native app to use the same
  * backend."
@@ -27,9 +27,9 @@ import { fromDecimal, money, toDecimal, type Money } from '@/lib/money'
  * THE ONE RULE THAT MATTERS MOST HERE
  * There are two read paths, and they are separate on purpose:
  *
- *   `listPublicProducts` / `getPublicProduct`  — for customers. Selects
+ *   `listPublicProducts` / `getPublicProduct`  - for customers. Selects
  *       columns explicitly and NEVER includes cost price.
- *   `listAdminProducts`                        — for admins. Includes it.
+ *   `listAdminProducts`                        - for admins. Includes it.
  *
  * A single "get products" function with a boolean flag would eventually be
  * called with the wrong flag, and the shop's margin would be sitting in a JSON
@@ -56,7 +56,7 @@ export interface PublicProduct {
   categoryName: string | null
   categorySlug: string | null
   images: { path: string; alt: string | null }[]
-  /** Deliberately not the raw number — see availabilityOf(). */
+  /** Deliberately not the raw number - see availabilityOf(). */
   availability: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK'
 }
 
@@ -117,7 +117,7 @@ export const slugify = (value: string): string =>
  * The customer catalogue.
  *
  * Explicit column list, no `select *`. That is what keeps `costPriceAmount`
- * out of the response — a `select *` here would leak it the day somebody adds
+ * out of the response - a `select *` here would leak it the day somebody adds
  * a column and forgets.
  */
 export async function listPublicProducts(options?: {
@@ -348,7 +348,7 @@ export class ProductConflictError extends Error {
 }
 
 /**
- * Create a product, its inventory row, and its opening stock movement — all in
+ * Create a product, its inventory row, and its opening stock movement - all in
  * one transaction, so a failure part-way leaves none of them.
  *
  * Opening stock is recorded as a RESTOCK movement rather than written straight

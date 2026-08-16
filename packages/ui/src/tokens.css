@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------
-   Pineberry Holdings — shared design tokens
+   Pineberry Holdings - shared design tokens
    ---------------------------------------------------------------------------
    One rhythm, two voices. Everything structural (spacing, type scale, easing,
    radii) is shared so the family resemblance is real. Colour and typeface are
@@ -15,7 +15,7 @@
 --------------------------------------------------------------------------- */
 
 /* `static` matters here. Tailwind drops theme variables it cannot see used in
-   a class name, and several of these are read from inline styles instead —
+   a class name, and several of these are read from inline styles instead -
    Reveal reaches for --duration-base and --ease-out-quint that way. Without
    `static` those resolve to nothing and the animation silently stops easing. */
 @theme static {
@@ -30,7 +30,7 @@
   --color-accent: #c4402c; /* pineberry seed red */
   --color-accent-deep: #8f2c1e; /* pressed / hover */
   --color-accent-wash: #f2ded8; /* tinted backgrounds */
-  --color-support: #2f5d46; /* calyx green — secondary signal */
+  --color-support: #2f5d46; /* calyx green - secondary signal */
 
   /* -- Typefaces. Wired to next/font variables set in each app's layout. -- */
   --font-display: var(--font-display-family), Georgia, serif;
@@ -41,11 +41,11 @@
 
      Raised across the board in the 2026-08-14 pass. The previous scale started
      at 11px, and the labels that used it are uppercase mono at 0.16em
-     tracking — a combination that costs legibility on top of the small size,
+     tracking - a combination that costs legibility on top of the small size,
      and it showed on a real screen. Nothing here is decorative small print;
      if it is on the page it is meant to be read. */
-  --text-micro: 0.8125rem; /* 13px — eyebrow labels, plate codes */
-  --text-small: 0.9375rem; /* 15px — meta, captions */
+  --text-micro: 0.8125rem; /* 13px - eyebrow labels, plate codes */
+  --text-small: 0.9375rem; /* 15px - meta, captions */
   --text-body: 1.0625rem; /* 17px */
   --text-lead: clamp(1.1875rem, 1.08rem + 0.5vw, 1.4375rem);
   --text-h4: clamp(1.375rem, 1.24rem + 0.62vw, 1.625rem);
@@ -84,7 +84,7 @@
 }
 
 /* Panel entrance, used where content swaps in place (tab panels, filtered
-   grids) and a scroll reveal would be the wrong tool — nothing has scrolled. */
+   grids) and a scroll reveal would be the wrong tool - nothing has scrolled. */
 @keyframes fadeUp {
   from {
     opacity: 0;

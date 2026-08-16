@@ -11,7 +11,7 @@ import { Logo } from '@/app/components/Logo'
  *
  * WHAT CHANGED FROM DesignPreview, AND WHY.
  *
- * The markup, classes and copy of the home screen are preserved exactly — this
+ * The markup, classes and copy of the home screen are preserved exactly - this
  * is the approved design and it is not being redesigned. What has gone is the
  * simulation behind it:
  *

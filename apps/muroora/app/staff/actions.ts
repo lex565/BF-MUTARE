@@ -17,7 +17,7 @@ import { normalisePhone } from '@/lib/services/orders'
  * What a staff member may change about themselves.
  *
  * Their name, phone, job title and photograph. NOT their roles, NOT their
- * staff number, NOT their employment status — those belong to an admin, and
+ * staff number, NOT their employment status - those belong to an admin, and
  * a self-service route to any of them would make the People screen decorative.
  */
 
@@ -75,7 +75,7 @@ const passwordInput = z
   .object({
     password: z
       .string()
-      .min(10, 'Use at least 10 characters — length beats punctuation.')
+      .min(10, 'Use at least 10 characters - length beats punctuation.')
       .max(200),
     confirm: z.string(),
   })
@@ -88,7 +88,7 @@ const passwordInput = z
  * Change your own password.
  *
  * Goes through the signed-in user's own Supabase session, NOT the service-role
- * key — so it can only ever change the password of whoever is holding the
+ * key - so it can only ever change the password of whoever is holding the
  * session. There is no user id parameter to get wrong, and no path by which an
  * admin could set somebody else's password from here.
  */

@@ -15,7 +15,7 @@ import * as schema from './schema'
  *
  * 2. `prepare: false` is required with PgBouncer in transaction mode.
  *    Prepared statements are per-connection state, and the pooler hands the
- *    next query to a different backend — so a prepared statement silently
+ *    next query to a different backend - so a prepared statement silently
  *    disappears. This shows up as intermittent "prepared statement does not
  *    exist" errors under load and is miserable to diagnose after the fact.
  */

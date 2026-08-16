@@ -235,7 +235,7 @@ export function CheckoutView() {
         <h1 className="mt-3 text-mega leading-none">Thank you.</h1>
         <p className="mt-5 text-lead text-ink-soft">
           Your order for {order.recipientName} has been recorded. Keep the order
-          number below—it is the quickest way to ask Muroora about this delivery.
+          number below-it is the quickest way to ask Muroora about this delivery.
         </p>
 
         <div className="mt-8 grid gap-px bg-rule sm:grid-cols-2">
@@ -328,7 +328,7 @@ export function CheckoutView() {
             <div className="grid gap-5 sm:grid-cols-2">
               <label className={`${labelClass} sm:col-span-2`}>House number and street<input required value={form.line1} onChange={(e) => update('line1', e.target.value)} className={fieldClass} autoComplete="address-line1" /></label>
               <label className={labelClass}>Address line 2 <span className="font-normal text-ink-faint">(optional)</span><input value={form.line2} onChange={(e) => update('line2', e.target.value)} className={fieldClass} autoComplete="address-line2" /></label>
-              <label className={labelClass}>Suburb<select required value={form.suburb} onChange={(e) => void selectSuburb(e.target.value)} className={fieldClass}><option value="">Choose a covered suburb</option>{suburbOptions.map((item) => <option key={`${item.zone}-${item.suburb}`} value={item.suburb}>{item.suburb} — {item.zone}</option>)}</select></label>
+              <label className={labelClass}>Suburb<select required value={form.suburb} onChange={(e) => void selectSuburb(e.target.value)} className={fieldClass}><option value="">Choose a covered suburb</option>{suburbOptions.map((item) => <option key={`${item.zone}-${item.suburb}`} value={item.suburb}>{item.suburb} - {item.zone}</option>)}</select></label>
               <label className={`${labelClass} sm:col-span-2`}>Directions <span className="font-normal text-ink-faint">(optional)</span><textarea value={form.directions} onChange={(e) => update('directions', e.target.value)} className={`${fieldClass} min-h-24`} placeholder="Gate colour, nearby landmark, or anything that helps the rider find the address." /></label>
             </div>
           )}
@@ -363,7 +363,7 @@ export function CheckoutView() {
       <aside className="border border-rule bg-paper-sunk p-6 lg:sticky lg:top-28">
         <p className="font-mono text-micro font-bold uppercase tracking-label text-accent">Review order</p>
         <ul className="mt-5 space-y-3 border-b border-rule pb-5">{cart.lines.map((line) => <li key={line.itemId} className="flex justify-between gap-4 text-small"><span>{line.quantity} × {line.name}</span><strong>{moneyLabel(line.lineTotal)}</strong></li>)}</ul>
-        <dl className="mt-5 space-y-3"><div className="flex justify-between gap-4"><dt className="text-ink-soft">Merchandise</dt><dd className="font-bold">{moneyLabel(cart.subtotal)}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-soft">Delivery</dt><dd className="font-bold">{quote ? moneyLabel(quote.fee) : '—'}</dd></div></dl>
+        <dl className="mt-5 space-y-3"><div className="flex justify-between gap-4"><dt className="text-ink-soft">Merchandise</dt><dd className="font-bold">{moneyLabel(cart.subtotal)}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-soft">Delivery</dt><dd className="font-bold">{quote ? moneyLabel(quote.fee) : '-'}</dd></div></dl>
         <div className="mt-5 border-t border-rule pt-5"><p className="text-small text-ink-faint">Payment method</p><p className="mt-1 font-bold">To be configured</p><p className="mt-1 text-small text-ink-soft">No payment will be taken during this test.</p></div>
         <button type="submit" disabled={submitting || !quote?.deliverable || zones.length === 0 || cart.hasProblems} className="mt-7 min-h-12 w-full bg-accent px-6 py-4 font-mono text-micro font-bold uppercase tracking-label text-white hover:bg-accent-deep disabled:cursor-not-allowed disabled:bg-rule disabled:text-ink-faint">{submitting ? 'Placing order…' : 'Place test order'}</button>
         <p className="mt-3 text-center text-small text-ink-faint">Stock and delivery availability are checked again when you submit.</p>

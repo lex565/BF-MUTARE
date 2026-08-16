@@ -19,7 +19,7 @@ import { money, type Money } from '@/lib/money'
  * brief overview of what has been added and what workers are there what time
  * they logged in and other statistics".
  *
- * Everything here is read from what actually happened — the audit log, the
+ * Everything here is read from what actually happened - the audit log, the
  * stock ledger, the order events. Nothing is estimated and nothing is
  * invented; where there is no data yet, the screen says so rather than
  * showing a zero that looks like a real measurement.

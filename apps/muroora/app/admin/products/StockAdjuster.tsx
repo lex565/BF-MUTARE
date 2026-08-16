@@ -10,7 +10,7 @@ import { adjustStockAction, type ProductFormState } from '@/app/admin/products/a
  *
  * The type is a required choice rather than a free number, because "the count
  * went from 40 to 36" is not useful six months later and "4 damaged in
- * transit" is. Damage, loss and manual corrections also require a reason —
+ * transit" is. Damage, loss and manual corrections also require a reason -
  * lib/inventory.ts refuses them without one.
  */
 

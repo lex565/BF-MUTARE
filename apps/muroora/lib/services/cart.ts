@@ -9,7 +9,7 @@ import { add, money, multiply, zero, type Money } from '@/lib/money'
 /**
  * Cart service.
  *
- * Imports nothing from `next/*` — the same rule as the product service. The
+ * Imports nothing from `next/*` - the same rule as the product service. The
  * caller supplies who the cart belongs to; this file does not know or care
  * whether it was reached from a web page, a route handler, or a native app.
  *
@@ -22,7 +22,7 @@ import { add, money, multiply, zero, type Money } from '@/lib/money'
  *
  * 2. It does not reserve stock. Reservation happens at order creation. For a
  *    grocer with thin stock, an abandoned cart holding the last bag of rice
- *    hostage is worse than the race that reserving would prevent — and the
+ *    hostage is worse than the race that reserving would prevent - and the
  *    race is handled properly at checkout, under a row lock.
  *
  * Availability IS checked when adding, so a customer is told immediately
@@ -190,7 +190,7 @@ export async function getCart(owner: CartOwner): Promise<CartView> {
  * Add to the cart, or increase an existing line.
  *
  * `onConflictDoUpdate` on (cart, product) makes "add the same thing twice" an
- * increment rather than a second line — see the unique constraint in the
+ * increment rather than a second line - see the unique constraint in the
  * schema for why that matters.
  */
 export async function addToCart(
@@ -323,7 +323,7 @@ export async function clearCart(owner: CartOwner): Promise<CartView> {
  * Merge a guest cart into an account's cart at sign-in.
  *
  * Called after a successful login. Without it, somebody who fills a cart, then
- * signs in to check out, watches their basket empty — which is the single most
+ * signs in to check out, watches their basket empty - which is the single most
  * effective way to lose a sale.
  *
  * Quantities are ADDED, and capped at what is actually sellable. If the same
@@ -380,7 +380,7 @@ export async function mergeGuestCart(
     }
   }
 
-  // The guest cart is removed, not left behind — otherwise the same token
+  // The guest cart is removed, not left behind - otherwise the same token
   // would resurrect it on the next anonymous visit from that browser.
   await db.delete(carts).where(eq(carts.id, guest.id))
 }

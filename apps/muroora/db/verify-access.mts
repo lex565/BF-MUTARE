@@ -6,11 +6,11 @@
  * Three rules from the owner's staff list and brief:
  *
  *   1. Only THREE accounts may hold editing-admin power.
- *   2. One person oversees and edits nothing — VIEWER.
+ *   2. One person oversees and edits nothing - VIEWER.
  *   3. Staff cannot finish setting up without a photograph.
  *
  * Each is checked by trying to break it. The admin cap is checked at BOTH
- * levels — through the service, and by going round it straight to the table —
+ * levels - through the service, and by going round it straight to the table -
  * because a limit that only exists in application code is a limit until
  * somebody opens psql.
  */
@@ -64,7 +64,7 @@ async function makeAccount(local: string, name: string) {
   return row.id
 }
 
-console.log('\nAccess model — three admins, one observer, photo required\n')
+console.log('\nAccess model - three admins, one observer, photo required\n')
 
 const dirty = await raw`
   SELECT id FROM users WHERE email LIKE ${'%' + TAG} AND deleted_at IS NULL
@@ -152,7 +152,7 @@ try {
   }
 
   // Re-granting to somebody who already has it must not be treated as a new
-  // admin — otherwise a harmless repeat becomes an error.
+  // admin - otherwise a harmless repeat becomes an error.
   const existing = madeIds[0]
   try {
     await promoteToStaff({ userId: existing, role: 'ADMIN' }, existing)

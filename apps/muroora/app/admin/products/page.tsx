@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { requireAdminView } from '@/lib/auth'
+import { isAdmin, requireRole } from '@/lib/auth'
 import { format } from '@/lib/money'
 import {
   countLowStock,
@@ -9,26 +9,48 @@ import {
 } from '@/lib/services/products'
 import { AddProductForm } from '@/app/admin/products/AddProductForm'
 import { StockAdjuster } from '@/app/admin/products/StockAdjuster'
+import { ProductPhotos } from '@/app/admin/products/ProductPhotos'
+import { listProductPhotos } from '@/lib/services/product-photo'
 
 export const metadata: Metadata = {
   title: 'Products',
   robots: { index: false, follow: false },
 }
 
-/** Never cache an admin screen — stock changes while you are looking at it. */
+/** Never cache an admin screen - stock changes while you are looking at it. */
 export const dynamic = 'force-dynamic'
 
 export default async function AdminProductsPage() {
   // The real gate. See the note in actions.ts about why middleware is not it.
-  await requireAdminView()
+  /**
+   * Shop staff can reach this screen, not only admins.
+   *
+   * The shop manager fills the shelves: adding products, photographing them,
+   * correcting stock. Making him ask an admin for every picture means the
+   * pictures never get added. Cost price is still hidden from anyone who is
+   * not an admin, further down.
+   */
+  const me = await requireRole('SHOP_STAFF', 'ADMIN', 'SUPER_ADMIN', 'VIEWER')
+  const showCost = isAdmin(me)
 
   // Read through the service, not the database. This page holds no queries and
-  // no business rules — see TASKS.md and section 56 of the brief.
+  // no business rules - see TASKS.md and section 56 of the brief.
   const [categoryRows, rows, lowCount] = await Promise.all([
     listCategories(),
     listAdminProducts(),
     countLowStock(),
   ])
+
+  // One lookup per product. The catalogue is small enough that this is
+  // cheaper than the join gymnastics, and it keeps the row shape simple.
+  const photosByProduct = new Map(
+    await Promise.all(
+      rows.map(
+        async (r) =>
+          [r.id, await listProductPhotos(r.id)] as const,
+      ),
+    ),
+  )
 
   return (
     <main className="mx-auto max-w-[86rem] px-gutter py-12">
@@ -82,14 +104,14 @@ export default async function AdminProductsPage() {
 
         {rows.length === 0 ? (
           /* An empty catalogue that says so, rather than demo products. This
-             is a real shop — invented stock would be indistinguishable from
+             is a real shop - invented stock would be indistinguishable from
              real stock once it was in, and somebody would try to order it. */
           <div className="mt-6 max-w-2xl border-l-4 border-support bg-paper-sunk p-8">
             <p className="text-lead">
               No products yet. Nothing was invented to fill this page.
             </p>
             <p className="mt-4 text-ink-soft">
-              Add your real stock above — name, size, price and how many you
+              Add your real stock above - name, size, price and how many you
               have. Each one appears in the customer shop straight away, and its
               stock level is tracked from the moment you enter it.
             </p>
@@ -101,9 +123,10 @@ export default async function AdminProductsPage() {
                 <tr className="border-b border-ink text-left">
                   {[
                     'Product',
+                    'Photos',
                     'Category',
                     'Price',
-                    'Cost',
+                    ...(showCost ? ['Cost'] : []),
                     'In stock',
                     'Held',
                     'Adjust stock',
@@ -133,18 +156,32 @@ export default async function AdminProductsPage() {
                           {!row.isActive && ' · HIDDEN'}
                         </span>
                       </td>
+                      <td className="py-4 pr-6">
+                        <ProductPhotos
+                          productId={row.id}
+                          productName={row.name}
+                          photos={(photosByProduct.get(row.id) ?? []).map((p) => ({
+                            id: p.id,
+                            url: p.url,
+                            alt: p.alt,
+                          }))}
+                        />
+                      </td>
                       <td className="py-4 pr-6 text-small text-ink-soft">
-                        {row.categoryName ?? '—'}
+                        {row.categoryName ?? '-'}
                       </td>
                       <td className="py-4 pr-6 font-mono text-small tabular-nums">
                         {format(row.price)}
                       </td>
-                      {/* Cost price is on an admin-only screen behind
-                          requireRole. It must never appear in a customer
-                          query — see the note on the column in the schema. */}
-                      <td className="py-4 pr-6 font-mono text-small tabular-nums text-ink-faint">
-                        {row.costPrice ? format(row.costPrice) : '—'}
-                      </td>
+                      {/* Cost price is what the shop paid. Admins only: shop
+                          staff need stock levels to do their job and have no
+                          reason to see the margin, and it must never reach a
+                          customer query at all - see the schema note. */}
+                      {showCost && (
+                        <td className="py-4 pr-6 font-mono text-small tabular-nums text-ink-faint">
+                          {row.costPrice ? format(row.costPrice) : '-'}
+                        </td>
+                      )}
                       <td
                         className={`py-4 pr-6 font-mono text-small tabular-nums ${low ? 'font-bold text-accent' : ''}`}
                       >

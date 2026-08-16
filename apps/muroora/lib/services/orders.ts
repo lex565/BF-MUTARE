@@ -30,7 +30,7 @@ import type { CartOwner } from '@/lib/services/cart'
  *
  * 2. STOCK IS RESERVED IN THE SAME TRANSACTION. Reservation goes through
  *    lib/inventory.ts under a row lock, so two customers cannot both buy the
- *    last bag of rice. If any line fails, the whole order rolls back — there is
+ *    last bag of rice. If any line fails, the whole order rolls back - there is
  *    no such thing as a half-placed order.
  *
  * 3. THE ORDER IS IDEMPOTENT. A customer on a bad connection who taps "Place
@@ -127,7 +127,7 @@ export class OrderError extends Error {
  * Zimbabwean mobile numbers, loosely.
  *
  * Accepts +263771234567, 0771234567 and 263771234567. Deliberately not
- * strict about the operator prefix — a rule that rejects a real number
+ * strict about the operator prefix - a rule that rejects a real number
  * because a new prefix was issued last month is worse than one that lets an
  * odd number through to a human who will phone it anyway.
  */
@@ -194,7 +194,7 @@ const scopedKey = (rawKey: string, owner: CartOwner): string =>
  * Record a change and move the status to match.
  *
  * ALWAYS use this. Writing `orders.status` directly is what the append-only
- * event log exists to prevent — the column is a cache of the last event, and
+ * event log exists to prevent - the column is a cache of the last event, and
  * a status with no event behind it is a change nobody can attribute.
  */
 export async function recordOrderEvent(
@@ -254,7 +254,7 @@ export async function placeOrder(
   const key = scopedKey(input.idempotencyKey, input.owner)
 
   // Replay first, before touching anything. A retry must not even look at
-  // stock — the answer was decided the first time.
+  // stock - the answer was decided the first time.
   const [seen] = await db
     .select()
     .from(idempotencyKeys)
@@ -389,7 +389,7 @@ export async function placeOrder(
 
         // DRAFT would be wrong: the customer has committed. Payment has not
         // happened, and no provider exists yet, so PENDING_PAYMENT is the
-        // honest state — see the payments table note.
+        // honest state - see the payments table note.
         status: 'PENDING_PAYMENT',
         substitutionPreference: input.substitutionPreference ?? 'CONTACT_ME',
         customerNote: input.customerNote?.trim() || null,
@@ -413,7 +413,7 @@ export async function placeOrder(
       })),
     )
 
-    // Reserve every line. Under a row lock, in this same transaction — so if
+    // Reserve every line. Under a row lock, in this same transaction - so if
     // the last bag of rice went to somebody else two seconds ago, this whole
     // order disappears rather than being accepted and quietly short.
     for (const line of priced) {
@@ -434,7 +434,7 @@ export async function placeOrder(
             'STOCK_CHANGED',
             `Somebody just took the last of the ${line.name}. ` +
               `${error.available === 0 ? 'It is now out of stock' : `Only ${error.available} left`}. ` +
-              `Nothing has been ordered — please adjust your cart and try again.`,
+              `Nothing has been ordered - please adjust your cart and try again.`,
             { productId: line.productId, available: error.available },
           )
         }
@@ -682,7 +682,7 @@ const CUSTOMER_CANCELLABLE = new Set([
  * Cancel an order and put the stock back.
  *
  * The reservation is released in the same transaction as the status change,
- * so a cancelled order can never leave stock held against it — that is the
+ * so a cancelled order can never leave stock held against it - that is the
  * failure that slowly makes a shop look empty while the shelves are full.
  */
 export async function cancelOrder(params: {
@@ -711,7 +711,7 @@ export async function cancelOrder(params: {
     ) {
       throw new OrderError(
         'ILLEGAL_TRANSITION',
-        'This order is already being packed. Please phone the shop — ' +
+        'This order is already being packed. Please phone the shop - ' +
           'somebody is picking it right now.',
       )
     }
