@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { requireRole } from '@/lib/auth'
+import { requireAdminView } from '@/lib/auth'
 import { format } from '@/lib/money'
 import { listAllZones } from '@/lib/services/delivery'
 import { AddZoneForm, ZoneToggle } from '@/app/admin/delivery/ZoneForms'
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminDeliveryPage() {
-  await requireRole('ADMIN', 'SUPER_ADMIN')
+  await requireAdminView()
 
   const zones = await listAllZones()
   const active = zones.filter((z) => z.isActive)

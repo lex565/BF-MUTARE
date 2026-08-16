@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-import { requireRole } from '@/lib/auth'
+import { requireAdminWrite } from '@/lib/auth'
 import {
   ZoneError,
   createZone,
@@ -29,7 +29,7 @@ export async function createZoneAction(
   _prev: ZoneFormState,
   formData: FormData,
 ): Promise<ZoneFormState> {
-  const admin = await requireRole('ADMIN', 'SUPER_ADMIN')
+  const admin = await requireAdminWrite()
 
   const raw = Object.fromEntries(formData)
   const parsed = createInput.safeParse({
@@ -65,7 +65,7 @@ export async function updateZoneAction(
   _prev: ZoneFormState,
   formData: FormData,
 ): Promise<ZoneFormState> {
-  const admin = await requireRole('ADMIN', 'SUPER_ADMIN')
+  const admin = await requireAdminWrite()
 
   const parsed = updateInput.safeParse(Object.fromEntries(formData))
   if (!parsed.success) return { error: 'Those values do not look right.' }
@@ -90,7 +90,7 @@ export async function setZoneActiveAction(
   _prev: ZoneFormState,
   formData: FormData,
 ): Promise<ZoneFormState> {
-  const admin = await requireRole('ADMIN', 'SUPER_ADMIN')
+  const admin = await requireAdminWrite()
 
   const parsed = activeInput.safeParse(Object.fromEntries(formData))
   if (!parsed.success) return { error: 'Could not read that.' }

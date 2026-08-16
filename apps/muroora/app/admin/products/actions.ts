@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-import { requireRole } from '@/lib/auth'
+import { requireAdminWrite } from '@/lib/auth'
 import { applyStockMove } from '@/lib/inventory'
 import {
   ProductConflictError,
@@ -54,7 +54,7 @@ export async function createProductAction(
   _prev: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
-  const user = await requireRole('ADMIN', 'SUPER_ADMIN')
+  const user = await requireAdminWrite()
 
   const parsed = productInput.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
@@ -97,7 +97,7 @@ export async function adjustStockAction(
   _prev: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
-  const user = await requireRole('ADMIN', 'SUPER_ADMIN')
+  const user = await requireAdminWrite()
 
   const parsed = stockInput.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
@@ -131,7 +131,7 @@ export async function toggleProductActiveAction(
   productId: string,
   isActive: boolean,
 ): Promise<ProductFormState> {
-  const user = await requireRole('ADMIN', 'SUPER_ADMIN')
+  const user = await requireAdminWrite()
 
   await setProductActive(productId, isActive, user.id)
 

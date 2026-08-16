@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-import { requireRole } from '@/lib/auth'
+import { requireAdminWrite } from '@/lib/auth'
 import {
   GRANTABLE_ROLES,
   StaffError,
@@ -36,7 +36,7 @@ export async function searchAccountsAction(
   _prev: StaffFormState,
   formData: FormData,
 ): Promise<StaffFormState> {
-  await requireRole('ADMIN', 'SUPER_ADMIN')
+  await requireAdminWrite()
 
   const parsed = searchInput.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
@@ -63,7 +63,7 @@ export async function promoteAction(
   _prev: StaffFormState,
   formData: FormData,
 ): Promise<StaffFormState> {
-  const admin = await requireRole('ADMIN', 'SUPER_ADMIN')
+  const admin = await requireAdminWrite()
 
   const parsed = promoteInput.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
@@ -98,7 +98,7 @@ export async function revokeAction(
   _prev: StaffFormState,
   formData: FormData,
 ): Promise<StaffFormState> {
-  const admin = await requireRole('ADMIN', 'SUPER_ADMIN')
+  const admin = await requireAdminWrite()
 
   const parsed = revokeInput.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {
@@ -126,7 +126,7 @@ export async function setStatusAction(
   _prev: StaffFormState,
   formData: FormData,
 ): Promise<StaffFormState> {
-  const admin = await requireRole('ADMIN', 'SUPER_ADMIN')
+  const admin = await requireAdminWrite()
 
   const parsed = statusInput.safeParse(Object.fromEntries(formData))
   if (!parsed.success) {

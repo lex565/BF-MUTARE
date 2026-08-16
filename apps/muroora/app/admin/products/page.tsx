@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { requireRole } from '@/lib/auth'
+import { requireAdminView } from '@/lib/auth'
 import { format } from '@/lib/money'
 import {
   countLowStock,
@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function AdminProductsPage() {
   // The real gate. See the note in actions.ts about why middleware is not it.
-  await requireRole('ADMIN', 'SUPER_ADMIN')
+  await requireAdminView()
 
   // Read through the service, not the database. This page holds no queries and
   // no business rules — see TASKS.md and section 56 of the brief.

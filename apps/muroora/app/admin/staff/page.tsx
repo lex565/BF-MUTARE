@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { requireRole } from '@/lib/auth'
+import { requireAdminView } from '@/lib/auth'
 import {
   countAdmins,
   listStaff,
@@ -23,7 +23,7 @@ const STATUS_LABEL = {
 } as const
 
 export default async function AdminStaffPage() {
-  const me = await requireRole('ADMIN', 'SUPER_ADMIN')
+  const me = await requireAdminView()
 
   const [staff, adminCount, unrecorded] = await Promise.all([
     listStaff(),

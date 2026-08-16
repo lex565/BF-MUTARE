@@ -16,6 +16,7 @@
     "db:verify-staff": "node --env-file=.env.local db/verify-staff.mjs",
     "db:verify-staff-service": "tsx --env-file=.env.local db/verify-staff-service.mts",
     "db:verify-orders": "tsx --env-file=.env.local db/verify-orders.mts",
+    "db:verify-access": "tsx --env-file=.env.local db/verify-access.mts",
     "db:grant": "tsx --env-file=.env.local db/grant-role.ts"
   },
   "dependencies": {

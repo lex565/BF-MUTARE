@@ -30,6 +30,7 @@ export type Role =
   | 'RIDER'
   | 'SUPER_ADMIN'
   | 'MERCHANT'
+  | 'VIEWER'
 
 export interface CurrentUser {
   id: string
@@ -121,9 +122,42 @@ export async function requireRole(...roles: Role[]): Promise<CurrentUser> {
   return user
 }
 
-/** SUPER_ADMIN implies ADMIN everywhere admin rights are checked. */
+/**
+ * MAY CHANGE THINGS. SUPER_ADMIN implies ADMIN.
+ *
+ * VIEWER is deliberately absent. Read and write are two different questions
+ * and the code has to ask them separately — see `canViewAdmin` below.
+ */
 export const isAdmin = (user: CurrentUser | null): boolean =>
   hasRole(user, 'ADMIN', 'SUPER_ADMIN')
 
+/**
+ * MAY LOOK AT THE ADMIN SCREENS. Includes read-only oversight.
+ *
+ * Use this to gate admin PAGES. Use `requireAdminWrite` in every action that
+ * changes something. The split is the whole point of the VIEWER role: one
+ * named person oversees the shop and edits nothing, and "oversees" is
+ * worthless if it cannot see the numbers.
+ */
+export const canViewAdmin = (user: CurrentUser | null): boolean =>
+  hasRole(user, 'ADMIN', 'SUPER_ADMIN', 'VIEWER')
+
 export const isStaff = (user: CurrentUser | null): boolean =>
-  hasRole(user, 'SHOP_STAFF', 'ADMIN', 'SUPER_ADMIN')
+  hasRole(user, 'SHOP_STAFF', 'ADMIN', 'SUPER_ADMIN', 'VIEWER')
+
+/** Read-only oversight and nothing more. */
+export const isViewerOnly = (user: CurrentUser | null): boolean =>
+  hasRole(user, 'VIEWER') && !isAdmin(user) && !hasRole(user, 'SHOP_STAFF')
+
+/** Gate an admin PAGE. Read-only oversight is allowed through. */
+export const requireAdminView = () =>
+  requireRole('ADMIN', 'SUPER_ADMIN', 'VIEWER')
+
+/**
+ * Gate an ACTION that changes something.
+ *
+ * Every admin server action calls this, never `requireAdminView`. A VIEWER
+ * who reaches an action has either found a bug or is poking at it directly;
+ * either way the answer is no.
+ */
+export const requireAdminWrite = () => requireRole('ADMIN', 'SUPER_ADMIN')

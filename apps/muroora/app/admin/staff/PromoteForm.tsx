@@ -31,6 +31,12 @@ const ROLE_LABELS: Record<string, { label: string; blurb: string }> = {
     label: 'Rider',
     blurb: 'Delivery only. Sees the drops assigned to them, nothing else.',
   },
+  VIEWER: {
+    label: 'Oversight (view only)',
+    blurb:
+      'Sees every screen and every number. Cannot change anything at all. ' +
+      'Does not count towards the three admin places.',
+  },
 }
 
 function Submit({ label }: { label: string }) {
@@ -175,14 +181,6 @@ export function PromoteForm() {
         </p>
       )}
 
-      <dl className="mt-8 space-y-2 border-l-4 border-support bg-paper-sunk p-6 text-small">
-        {Object.values(ROLE_LABELS).map((meta) => (
-          <div key={meta.label} className="flex flex-wrap gap-x-2">
-            <dt className="font-bold">{meta.label}:</dt>
-            <dd className="text-ink-soft">{meta.blurb}</dd>
-          </div>
-        ))}
-      </dl>
     </div>
   )
 }

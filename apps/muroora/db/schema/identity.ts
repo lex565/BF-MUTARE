@@ -36,6 +36,19 @@ export const roleEnum = pgEnum('role', [
   'RIDER',
   'SUPER_ADMIN',
   'MERCHANT', // reserved — not granted in v1
+  /**
+   * Read-only oversight. Sees every admin screen, changes nothing.
+   *
+   * Added for a named person whose access is "just overseeing no editing".
+   * It is a role rather than a flag on ADMIN because the check has to be
+   * "may this person write", not "is this person an admin who happens to be
+   * marked read-only" — the second reading is one forgotten condition away
+   * from full access.
+   *
+   * A VIEWER does not count against the three-admin limit, because they
+   * cannot change anything a limit is protecting.
+   */
+  'VIEWER',
 ])
 
 export const users = pgTable(

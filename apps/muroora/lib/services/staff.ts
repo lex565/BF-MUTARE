@@ -26,8 +26,28 @@ import type { Role } from '@/lib/auth'
 const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID!
 
 /** Roles an admin may grant through the UI. */
-export const GRANTABLE_ROLES = ['SHOP_STAFF', 'ADMIN', 'RIDER'] as const
+export const GRANTABLE_ROLES = [
+  'SHOP_STAFF',
+  'ADMIN',
+  'RIDER',
+  'VIEWER',
+] as const
 export type GrantableRole = (typeof GRANTABLE_ROLES)[number]
+
+/**
+ * How many accounts may hold editing-admin power.
+ *
+ * The owner's instruction: "Only three owner-created admin accounts are
+ * permitted; there must be no public admin registration."
+ *
+ * Counted as PEOPLE, not grants — somebody holding both ADMIN and SUPER_ADMIN
+ * is one person and takes one place. VIEWER does not count, because a
+ * read-only account cannot do the thing the limit exists to restrict.
+ *
+ * Enforced here AND by a trigger in migration 0005, so a psql session or a
+ * future script cannot quietly make a fourth.
+ */
+export const MAX_ADMINS = 3
 
 export interface StaffMember {
   userId: string
@@ -45,7 +65,13 @@ export interface StaffMember {
 
 export class StaffError extends Error {
   constructor(
-    readonly code: 'NOT_FOUND' | 'ALREADY_STAFF' | 'LAST_ADMIN' | 'FORBIDDEN',
+    readonly code:
+      | 'NOT_FOUND'
+      | 'ALREADY_STAFF'
+      | 'LAST_ADMIN'
+      | 'FORBIDDEN'
+      | 'ADMIN_LIMIT'
+      | 'NO_PHOTO',
     message: string,
   ) {
     super(message)
@@ -228,6 +254,31 @@ export async function promoteToStaff(
 
   if (!target) {
     throw new StaffError('NOT_FOUND', 'No such account.')
+  }
+
+  /**
+   * The three-admin limit, checked before anything is written.
+   *
+   * Someone who is ALREADY an admin can be granted admin again without
+   * consuming a place — that is a no-op, and refusing it would be confusing.
+   * The database trigger is the real backstop; this exists so the admin gets
+   * a sentence instead of a Postgres exception.
+   */
+  if (params.role === 'ADMIN') {
+    const alreadyAdmin = (await rolesOf(params.userId)).some(
+      (r) => r === 'ADMIN' || r === 'SUPER_ADMIN',
+    )
+    if (!alreadyAdmin) {
+      const current = await countAdmins()
+      if (current >= MAX_ADMINS) {
+        throw new StaffError(
+          'ADMIN_LIMIT',
+          `Only ${MAX_ADMINS} accounts may have admin access, and there are ` +
+            `already ${current}. Remove one first, or give this person ` +
+            `oversight instead — that sees everything and changes nothing.`,
+        )
+      }
+    }
   }
 
   return db.transaction(async (tx) => {
