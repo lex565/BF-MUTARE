@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { EmailOtpType } from '@supabase/supabase-js'
 
 import { supabaseServer } from '@/lib/supabase/server'
 import { ResetPasswordForm } from '@/app/reset-password/ResetPasswordForm'
@@ -13,31 +14,55 @@ export const dynamic = 'force-dynamic'
 /**
  * Where the emailed link lands.
  *
- * Supabase sends a one-time `code`; exchanging it establishes a short-lived
- * recovery session, and only then may a new password be set. The exchange
- * happens here, server-side, so the code never sits in client JavaScript.
+ * Three ways in, because Supabase can arrive in three shapes depending on how
+ * the template is written and which flow the project is on:
  *
- * A link that has expired or already been used produces no session, and the
- * form says so rather than failing silently at the point of submission.
+ *   token_hash  the one we ask for. Works from any device.
+ *   code        the PKCE flow. Only works in the browser that asked for the
+ *               reset, because it needs a code_verifier cookie. This is what
+ *               used to be the only path, and it is why the page insisted
+ *               every link had expired when opened on a phone.
+ *   neither     already mid-reset and refreshed the page, so the recovery
+ *               session is already established.
+ *
+ * All three are handled rather than only the current one, because the email
+ * template is configured outside this repo and can be changed by somebody who
+ * has no reason to know what this page expects.
  */
 export default async function ResetPasswordPage({
   searchParams,
 }: {
-  searchParams: Promise<{ code?: string; error_description?: string }>
+  searchParams: Promise<{
+    code?: string
+    token_hash?: string
+    type?: string
+    error_description?: string
+  }>
 }) {
-  const { code, error_description } = await searchParams
+  const { code, token_hash, type, error_description } = await searchParams
 
   let ready = false
   let problem = error_description ?? null
 
-  if (code) {
-    const supabase = await supabaseServer()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+  const supabase = await supabaseServer()
+
+  if (token_hash) {
+    const { error } = await supabase.auth.verifyOtp({
+      type: (type as EmailOtpType) ?? 'recovery',
+      token_hash,
+    })
     if (error) problem = 'That link has expired or has already been used.'
     else ready = true
+  } else if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      problem =
+        'That link could not be opened on this device. Ask for a new one and ' +
+        'open it on the same phone or computer you asked from.'
+    } else {
+      ready = true
+    }
   } else {
-    // Somebody already mid-reset who refreshed the page still has the session.
-    const supabase = await supabaseServer()
     const {
       data: { user },
     } = await supabase.auth.getUser()

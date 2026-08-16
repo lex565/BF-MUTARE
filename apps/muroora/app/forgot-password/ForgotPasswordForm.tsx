@@ -20,7 +20,11 @@ function Submit() {
   )
 }
 
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({
+  expired = false,
+}: {
+  expired?: boolean
+}) {
   const [state, formAction] = useActionState<AuthState, FormData>(
     requestPasswordReset,
     {},
@@ -38,6 +42,16 @@ export function ForgotPasswordForm() {
           Put in the email address you signed up with and we will send you a
           link to set a new password.
         </p>
+
+        {expired && (
+          <p
+            role="status"
+            className="mt-6 border-l-4 border-accent bg-accent-wash px-4 py-3 text-small"
+          >
+            That link had already been used, or it was more than an hour old.
+            Ask for another below and it will work.
+          </p>
+        )}
 
         <form action={formAction} className="mt-8 space-y-5">
           <div>

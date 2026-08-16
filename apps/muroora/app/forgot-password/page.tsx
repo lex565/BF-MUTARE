@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default function ForgotPasswordPage() {
-  return <ForgotPasswordForm />
+export default async function ForgotPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ expired?: string; bad?: string }>
+}) {
+  const { expired, bad } = await searchParams
+  return <ForgotPasswordForm expired={Boolean(expired || bad)} />
 }
