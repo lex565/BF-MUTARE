@@ -28,6 +28,8 @@ const VALID = [
   'ADMIN',
   'RIDER',
   'SUPER_ADMIN',
+  /** Read-only oversight. Sees every screen, changes nothing. */
+  'VIEWER',
 ] as const
 
 type Role = (typeof VALID)[number]

@@ -10,14 +10,17 @@ interface ShopCatalogueProps {
   products: CatalogueProduct[]
   categories: CatalogueCategory[]
   initialCategory?: string
+  /** Search term carried in from the homepage search box. */
+  initialQuery?: string
 }
 
 export function ShopCatalogue({
   products,
   categories,
   initialCategory = 'all',
+  initialQuery = '',
 }: ShopCatalogueProps) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(initialQuery)
   const [category, setCategory] = useState(initialCategory)
   const [stockOnly, setStockOnly] = useState(false)
 

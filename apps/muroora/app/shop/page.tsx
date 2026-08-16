@@ -32,7 +32,12 @@ const categoryShape = (
   description: category.description,
 })
 
-export default async function ShopPage() {
+export default async function ShopPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
+  const { q } = await searchParams
   const [sourceProducts, sourceCategories] = await Promise.all([
     listPublicProducts(),
     listCategories(),
@@ -84,7 +89,7 @@ export default async function ShopPage() {
       </header>
 
       {products.length > 0 ? (
-        <ShopCatalogue products={products} categories={categories} />
+        <ShopCatalogue products={products} categories={categories} initialQuery={q ?? ""} />
       ) : (
         <section className="mx-auto max-w-[86rem] px-gutter py-section">
           <div className="border border-rule bg-paper-sunk px-6 py-16 text-center">
