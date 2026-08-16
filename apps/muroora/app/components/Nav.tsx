@@ -49,6 +49,17 @@ export function Nav() {
         </ul>
 
         <div className="flex items-center gap-1">
+          <Link
+            href="/account"
+            aria-label="Your account"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-ink-soft transition-colors hover:text-accent"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <circle cx="12" cy="8" r="3.5" />
+              <path d="M4.8 20c.7-4 3.1-6 7.2-6s6.5 2 7.2 6" />
+            </svg>
+            <span className="sr-only">Account</span>
+          </Link>
           <CartLink />
           <button
             type="button"

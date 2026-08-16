@@ -45,6 +45,12 @@ export function Footer() {
           <p className="mt-8 font-mono text-micro text-ink-faint">
             © {new Date().getFullYear()} {SITE.name}
           </p>
+          <Link
+            href="/team-access"
+            className="mt-3 inline-block font-mono text-[0.62rem] uppercase tracking-label text-ink-faint transition-colors hover:text-ink-soft"
+          >
+            Team access
+          </Link>
         </div>
       </div>
     </footer>

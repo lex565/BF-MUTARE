@@ -176,3 +176,100 @@ export async function signOut() {
   revalidatePath('/', 'layout')
   redirect('/')
 }
+
+/* ------------------------------------------------------- password reset */
+
+const emailOnly = z.object({
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email('That does not look like an email address.'),
+})
+
+/**
+ * Send a reset link.
+ *
+ * ALWAYS reports success, even when there is no such account. Saying "no
+ * account with that email" turns this form into a way of discovering who
+ * shops here — and for a staff login, who works here. The person who owns the
+ * address learns everything they need from the email itself.
+ */
+export async function requestPasswordReset(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const parsed = emailOnly.safeParse(Object.fromEntries(formData))
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message }
+  }
+
+  const supabase = await supabaseServer()
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://muroora-mart.vercel.app'
+
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    parsed.data.email,
+    { redirectTo: `${origin}/reset-password` },
+  )
+
+  // Logged, not shown. A provider outage is our problem, not a hint to hand
+  // to whoever is typing addresses into this box.
+  if (error) console.error('[requestPasswordReset]', error.message)
+
+  return {
+    message:
+      'If there is an account with that address, a link is on its way. It ' +
+      'lasts one hour. Check your spam folder if it does not arrive.',
+  }
+}
+
+const newPassword = z
+  .object({
+    password: z
+      .string()
+      .min(10, 'Use at least 10 characters — length beats punctuation.')
+      .max(200),
+    confirm: z.string(),
+  })
+  .refine((v) => v.password === v.confirm, {
+    message: 'Those two do not match.',
+    path: ['confirm'],
+  })
+
+/**
+ * Set a new password from a reset link.
+ *
+ * Requires the recovery session the link established. `getUser()` verifies it
+ * with Supabase rather than trusting the cookie, so a forged or expired token
+ * lands here with nobody signed in and is refused.
+ */
+export async function completePasswordReset(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const parsed = newPassword.safeParse(Object.fromEntries(formData))
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message }
+  }
+
+  const supabase = await supabaseServer()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return {
+      error:
+        'That link has expired or has already been used. Ask for a new one.',
+    }
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  })
+
+  if (error) return { error: error.message }
+
+  redirect('/account?reset=1')
+}

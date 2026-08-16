@@ -8,6 +8,7 @@ import {
 } from '@/lib/services/staff'
 import { PromoteForm } from '@/app/admin/staff/PromoteForm'
 import { StaffRowActions } from '@/app/admin/staff/StaffRowActions'
+import { StaffPhoto } from '@/app/components/StaffPhoto'
 
 export const metadata: Metadata = {
   title: 'People',
@@ -124,6 +125,7 @@ export default async function AdminStaffPage() {
               <thead>
                 <tr className="border-b border-ink text-left">
                   {[
+                    'Photo',
                     'Staff no.',
                     'Name',
                     'Contact',
@@ -150,8 +152,22 @@ export default async function AdminStaffPage() {
                       key={person.userId}
                       className="border-b border-rule align-top"
                     >
+                      <td className="py-4 pr-6">
+                        <StaffPhoto
+                          path={person.photoPath}
+                          name={person.fullName ?? person.staffNumber ?? '?'}
+                          viewerId={me.id}
+                          size={48}
+                        />
+                      </td>
                       <td className="py-4 pr-6 font-mono text-small tabular-nums">
                         {person.staffNumber}
+                        <a
+                          href={`/staff/card?staff=${person.staffNumber}`}
+                          className="mt-1 block font-mono text-micro uppercase tracking-label text-support hover:text-accent"
+                        >
+                          card
+                        </a>
                       </td>
                       <td className="py-4 pr-6">
                         <span className="font-bold">

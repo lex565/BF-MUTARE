@@ -10,6 +10,7 @@ import { format } from '@/lib/money'
 import { getStaffDashboard } from '@/lib/services/dashboard'
 import { staffSetupComplete } from '@/lib/services/staff-photo'
 import { PasswordForm, PhotoForm, ProfileForm } from '@/app/staff/ProfileForms'
+import { StaffPhoto } from '@/app/components/StaffPhoto'
 
 export const metadata: Metadata = {
   title: 'Staff',
@@ -268,7 +269,14 @@ export default async function StaffHomePage() {
 
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {dash.team.map((c) => (
-            <li key={c.staffNumber} className="border border-rule p-5">
+            <li key={c.staffNumber} className="flex gap-4 border border-rule p-5">
+              <StaffPhoto
+                path={c.photoPath}
+                name={c.name}
+                viewerId={me.id}
+                size={56}
+              />
+              <div className="min-w-0">
               <div className="flex flex-wrap items-baseline gap-x-3">
                 <span className="font-bold">{c.name}</span>
                 {c.isYou && (
@@ -286,6 +294,7 @@ export default async function StaffHomePage() {
               <p className="mt-2 text-small text-ink-faint">
                 {c.roles.length > 0 ? c.roles.join(', ') : 'no access yet'}
               </p>
+              </div>
             </li>
           ))}
         </ul>
@@ -367,6 +376,20 @@ export default async function StaffHomePage() {
           phone={userRow?.phone ?? ''}
           jobTitle={profileRow?.jobTitle ?? ''}
         />
+
+        <div className="mt-10 border-t border-rule pt-8">
+          <h3 className="font-bold">Your staff card</h3>
+          <p className="mt-2 max-w-measure text-small text-ink-soft">
+            Your photo, name, role and staff number on a card you can show or
+            print.
+          </p>
+          <Link
+            href="/staff/card"
+            className="mt-4 inline-block border border-ink px-4 py-2 font-mono text-micro uppercase tracking-label transition-colors hover:bg-ink hover:text-paper"
+          >
+            Open your card
+          </Link>
+        </div>
 
         <div className="mt-10 border-t border-rule pt-8">
           <h3 className="font-bold">Your photo</h3>

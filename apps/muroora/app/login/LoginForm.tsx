@@ -142,6 +142,15 @@ export function LoginForm({ next }: { next?: string }) {
         <Submit label={mode === 'in' ? 'Sign in' : 'Create account'} />
       </form>
 
+      {mode === 'in' && (
+        <a
+          href="/forgot-password"
+          className="mt-5 inline-block font-mono text-micro uppercase tracking-label text-support transition-colors hover:text-accent"
+        >
+          Forgotten your password?
+        </a>
+      )}
+
       <p className="mt-8 max-w-[42ch] text-small text-ink-faint">
         Creating an account here makes you a customer. Staff and rider access is
         granted separately by the shop — it is not something you can pick.
