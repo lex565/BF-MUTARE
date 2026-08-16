@@ -103,13 +103,18 @@ export async function changeMyPasswordAction(
     return { error: parsed.error.issues[0].message }
   }
 
-  const supabase = await supabaseServer()
-  const { error } = await supabase.auth.updateUser({
-    password: parsed.data.password,
-  })
-
-  if (error) {
-    return { error: error.message }
+  try {
+    const supabase = await supabaseServer()
+    const { error } = await supabase.auth.updateUser({
+      password: parsed.data.password,
+    })
+    if (error) return { error: error.message }
+  } catch (error) {
+    // supabase-js throws rather than returns when the session has lapsed.
+    console.warn('[changeMyPassword]', (error as Error).message)
+    return {
+      error: 'Your session has expired. Sign in again and then change it.',
+    }
   }
 
   return { message: 'Password changed. Use it next time you sign in.' }

@@ -50,6 +50,13 @@
       "when": 1786862679942,
       "tag": "0006_admin_limit_four",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1786870000000,
+      "tag": "0007_rider_foundation",
+      "breakpoints": true
     }
   ]
 }

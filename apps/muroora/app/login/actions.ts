@@ -170,9 +170,31 @@ export async function signUp(
   redirect(safeNext(parsed.data.next))
 }
 
+/**
+ * End the session.
+ *
+ * The signOut call is wrapped because supabase-js THROWS "Auth session
+ * missing!" when there is nothing to sign out of, and that is not an error
+ * from the person's point of view: it happens when a token has already
+ * lapsed, when they signed out in another tab, or when the idle timer fires
+ * on a session that had already gone. In every one of those cases the right
+ * answer is the one they asked for, which is to end up signed out.
+ *
+ * The catch is around the signOut alone, NOT the redirect. Next implements
+ * redirect() by throwing, so a try block wrapped around both would swallow
+ * the navigation and leave the person sitting on the page.
+ */
+async function endSession() {
+  try {
+    const supabase = await supabaseServer()
+    await supabase.auth.signOut()
+  } catch (error) {
+    console.warn('[signOut] no session to end:', (error as Error).message)
+  }
+}
+
 export async function signOut() {
-  const supabase = await supabaseServer()
-  await supabase.auth.signOut()
+  await endSession()
   revalidatePath('/', 'layout')
   redirect('/')
 }
@@ -265,11 +287,20 @@ export async function completePasswordReset(
     }
   }
 
-  const { error } = await supabase.auth.updateUser({
-    password: parsed.data.password,
-  })
+  let failed: string | null = null
+  try {
+    const { error } = await supabase.auth.updateUser({
+      password: parsed.data.password,
+    })
+    if (error) failed = error.message
+  } catch (error) {
+    // Thrown rather than returned when the recovery session has lapsed.
+    failed =
+      'That link is no longer valid. Ask for a new one and open it straight away.'
+    console.warn('[completePasswordReset]', (error as Error).message)
+  }
 
-  if (error) return { error: error.message }
+  if (failed) return { error: failed }
 
   redirect('/account?reset=1')
 }
@@ -281,8 +312,7 @@ export async function completePasswordReset(
  * rather than on the homepage wondering what happened.
  */
 export async function signOutIdle() {
-  const supabase = await supabaseServer()
-  await supabase.auth.signOut()
+  await endSession()
   revalidatePath('/', 'layout')
   redirect('/login?idle=1')
 }

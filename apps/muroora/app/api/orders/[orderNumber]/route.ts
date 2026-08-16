@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { fail, ok, serialiseMoney } from '@/app/api/_lib/respond'
 import { currentUser, isStaff } from '@/lib/auth'
 import { OrderError, cancelOrder, getOrder } from '@/lib/services/orders'
+import { publicRiderForOrder } from '@/lib/services/delivery-proof'
 
 /**
  * One order.
@@ -39,6 +40,8 @@ export async function GET(
     return fail('NOT_FOUND', 'No order with that number.')
   }
 
+  const rider = await publicRiderForOrder(order.id)
+
   return ok({
     orderNumber: order.orderNumber,
     status: order.status,
@@ -70,6 +73,20 @@ export async function GET(
       lineTotal: serialiseMoney(i.lineTotal),
       quantityPicked: i.quantityPicked,
     })),
+
+    // Operational identity only. Internal rider IDs, phone, trust level,
+    // exposure, documents and investigation notes never cross this boundary.
+    rider: rider
+      ? {
+          publicRiderId: rider.publicRiderId,
+          displayName: rider.displayName,
+          profilePhotoPath: rider.profilePhotoPath,
+          vehicleType: rider.vehicleType,
+          vehicleColour: rider.vehicleColour,
+          vehicleRegistration: rider.vehicleRegistration,
+          verified: rider.verificationStatus === 'VERIFIED',
+        }
+      : null,
 
     // The history, in plain terms. Staff get the internal status changes;
     // a customer gets what happened, not the internal state machine.

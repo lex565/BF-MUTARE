@@ -1,5 +1,6 @@
 import { and, eq, isNull } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
+import { createClient, type User as SupabaseUser } from '@supabase/supabase-js'
 
 import { db } from '@/db/client'
 import { userRoles, users } from '@/db/schema'
@@ -42,30 +43,12 @@ export interface CurrentUser {
 
 const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID!
 
-/**
- * The signed-in user, or null.
- *
- * Uses `getUser()`, never `getSession()`. `getSession()` reads the cookie and
- * trusts it; `getUser()` verifies the token with Supabase. On a server, where
- * the decision is "may this person edit prices", the cookie alone is not
- * evidence.
- */
-export async function currentUser(): Promise<CurrentUser | null> {
-  const supabase = await supabaseServer()
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser()
-
-  if (!authUser) return null
-
+async function applicationUser(authUser: SupabaseUser): Promise<CurrentUser> {
   const [row] = await db
     .select()
     .from(users)
     .where(and(eq(users.authId, authUser.id), isNull(users.deletedAt)))
 
-  // Signed in with Supabase but no application row yet - first login after
-  // signup. Create the row with no roles; CUSTOMER is granted by the signup
-  // action, and nothing else is ever granted here.
   if (!row) {
     const [created] = await db
       .insert(users)
@@ -75,14 +58,7 @@ export async function currentUser(): Promise<CurrentUser | null> {
         fullName: (authUser.user_metadata?.full_name as string) ?? null,
       })
       .returning()
-
-    return {
-      id: created.id,
-      authId: authUser.id,
-      email: created.email,
-      fullName: created.fullName,
-      roles: [],
-    }
+    return { id: created.id, authId: authUser.id, email: created.email, fullName: created.fullName, roles: [] }
   }
 
   const grants = await db
@@ -97,6 +73,36 @@ export async function currentUser(): Promise<CurrentUser | null> {
     fullName: row.fullName,
     roles: grants.map((g) => g.role as Role),
   }
+}
+
+/**
+ * The signed-in user, or null.
+ *
+ * Uses `getUser()`, never `getSession()`. `getSession()` reads the cookie and
+ * trusts it; `getUser()` verifies the token with Supabase. On a server, where
+ * the decision is "may this person edit prices", the cookie alone is not
+ * evidence.
+ */
+export async function currentUser(): Promise<CurrentUser | null> {
+  const supabase = await supabaseServer()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser()
+
+  return authUser ? applicationUser(authUser) : null
+}
+
+/** Verify a native app bearer token with Supabase before resolving app roles. */
+export async function currentUserFromAccessToken(accessToken: string): Promise<CurrentUser | null> {
+  if (!accessToken) return null
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false } },
+  )
+  const { data: { user }, error } = await supabase.auth.getUser(accessToken)
+  if (error || !user) return null
+  return applicationUser(user)
 }
 
 export const hasRole = (user: CurrentUser | null, ...roles: Role[]): boolean =>

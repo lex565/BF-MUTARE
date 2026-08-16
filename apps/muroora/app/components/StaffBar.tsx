@@ -29,10 +29,12 @@ export async function StaffBar() {
 
   const links = [
     { href: '/staff', label: 'Dashboard' },
+    { href: '/staff/deliveries', label: 'Handovers' },
     ...(admin
       ? [
           { href: '/admin/products', label: 'Products' },
           { href: '/admin/delivery', label: 'Delivery' },
+          { href: '/admin/riders', label: 'Riders' },
           { href: '/admin/staff', label: 'People' },
           { href: '/admin/reports', label: 'Reports' },
         ]

@@ -119,15 +119,24 @@ export function ResetPasswordForm({
     }
 
     setSaving(true)
-    const supabase = supabaseBrowser()
-    const { error: updateError } = await supabase.auth.updateUser({ password })
-    setSaving(false)
-
-    if (updateError) {
-      setError(updateError.message)
-      return
+    try {
+      const supabase = supabaseBrowser()
+      const { error: updateError } = await supabase.auth.updateUser({ password })
+      if (updateError) {
+        setError(updateError.message)
+        return
+      }
+      setDone(true)
+    } catch {
+      // supabase-js throws "Auth session missing!" rather than returning it
+      // when the recovery session has lapsed between opening the link and
+      // submitting the form. Say what to do instead of showing the raw text.
+      setError(
+        'That link is no longer valid. Ask for a new one and open it straight away.',
+      )
+    } finally {
+      setSaving(false)
     }
-    setDone(true)
   }
 
   return (

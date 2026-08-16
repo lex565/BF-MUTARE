@@ -111,6 +111,9 @@ That is the whole reason the boundary exists - section 56.
 | API-03 | Checkout + order creation | Claude | `db/verify-orders.mts` - 30 checks incl. frozen prices, one order from a double-tap, and a failed line leaving no stock held |
 | API-04 | Delivery fee by zone + `/admin/delivery` | Claude | Same script. A suburb belongs to one zone only; an uncovered suburb is refused rather than given a default fee. |
 | DOC-00 | Phase 0 audit + decision log | Claude | - |
+| RIDER-01 | Rider profiles, lifecycle, trust levels and exposure controls | Codex | Migration `0007_rider_foundation`; TypeScript, production build and rider policy verification passed 2026-08-16. |
+| RIDER-02 | Delivery assignment, dual-confirmation custody handover, secure OTP closure, returns, earnings and incidents | Codex | `db:verify-riders` 18/18; existing database verification also passed 2026-08-16. |
+| RIDER-03 | Rider APIs, admin management, staff handover UI, safe customer rider details and documentation | Codex | Next production build/lint passed; Expo web bundle served successfully 2026-08-16. |
 
 ---
 

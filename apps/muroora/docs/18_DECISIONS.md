@@ -89,6 +89,42 @@ the website.
 
 ---
 
+## D-006 - Rider custody and exposure are ledgers, not editable totals
+
+**Date:** 2026-08-16 · **Status:** implemented
+
+Assignment does not transfer goods. Shop staff starts handover, the assigned
+rider confirms collection, and only then does exposure increase. OTP-confirmed
+delivery or a recorded return decreases it. Each transition has an immutable
+custody/exposure event and an idempotency key.
+
+**Why:** a mutable “current rider value” field cannot explain who released the
+goods, prevent double counting, or reconstruct an incident. The profile total
+is only a cached projection of the append-only ledger.
+
+**Cost to reverse:** high and unsafe; removing history would weaken financial
+and custody reconciliation.
+
+---
+
+## D-007 - Sensitive rider verification remains off
+
+**Date:** 2026-08-16 · **Status:** implemented
+
+`ENABLE_SENSITIVE_RIDER_VERIFICATION=false` is the default. The current API and
+mobile test UI accept only operational profile, vehicle, safety, and agreement
+information. National ID and police/background document collection is not
+built into the public flow.
+
+**Why:** the owner has not yet approved the legal basis, retention period,
+reviewer access, or deletion workflow. A private bucket alone is not permission
+to collect sensitive data.
+
+**Cost to reverse:** enabling later requires a separate reviewed migration,
+private storage and signed access, audit logging, and explicit owner approval.
+
+---
+
 ## Open decisions - needed before Phase 1
 
 | # | Decision | Options |
