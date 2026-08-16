@@ -1,5 +1,6 @@
 # dependencies
 node_modules/
+.npm-cache/
 .pnp
 .pnp.*
 
@@ -52,6 +53,7 @@ vercel.txt
 *.pem
 server.log
 npm-debug.log*
+.codex-*.log
 yarn-debug.log*
 yarn-error.log*
 .idea/

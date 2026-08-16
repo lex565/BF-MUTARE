@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Muroora Beta",
+    "slug": "muroora-beta",
+    "version": "0.1.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "scheme": "muroora-beta",
+    "description": "Muroora Beta — private test release of the Muroora Mart mobile experience.",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#FFFDF8",
+    "plugins": [
+      "expo-sqlite"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "buildNumber": "1",
+      "bundleIdentifier": "co.muroora.mart"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "versionCode": 1,
+      "package": "co.muroora.mart"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "owner": "muroora-mart",
+    "extra": {
+      "eas": {
+        "projectId": "1da99634-840e-4cf1-8e23-60e6cb560d68"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1da99634-840e-4cf1-8e23-60e6cb560d68"
+    }
+  }
+}

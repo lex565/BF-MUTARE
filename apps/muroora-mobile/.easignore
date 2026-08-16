@@ -1,0 +1,16 @@
+# Everything the build does not need.
+#
+# The first build uploaded 213MB because the archive swept in built output,
+# caches and the web bundle. EAS installs dependencies on its own machines, so
+# none of this has to travel.
+node_modules/
+dist/
+web-build/
+.expo/
+.expo-shared/
+.next/
+*.log
+.claude/
+
+# Repo-level noise that is not part of the app
+../../Images/
