@@ -37,17 +37,21 @@ export type GrantableRole = (typeof GRANTABLE_ROLES)[number]
 /**
  * How many accounts may hold editing-admin power.
  *
- * The owner's instruction: "Only three owner-created admin accounts are
- * permitted; there must be no public admin registration."
+ * Started at three, on the instruction "only three owner-created admin
+ * accounts are permitted". The named people turned out to be four, all of whom
+ * need to edit, so the owner raised it rather than drop one to read-only.
+ *
+ * The ceiling is kept because admin access should be a deliberate act with a
+ * limit, not something that accumulates quietly over a year.
  *
  * Counted as PEOPLE, not grants - somebody holding both ADMIN and SUPER_ADMIN
  * is one person and takes one place. VIEWER does not count, because a
  * read-only account cannot do the thing the limit exists to restrict.
  *
- * Enforced here AND by a trigger in migration 0005, so a psql session or a
- * future script cannot quietly make a fourth.
+ * Enforced here AND by a trigger (migration 0006), so a psql session or a
+ * future script cannot quietly add one more. The two must agree.
  */
-export const MAX_ADMINS = 3
+export const MAX_ADMINS = 4
 
 export interface StaffMember {
   userId: string
@@ -257,7 +261,7 @@ export async function promoteToStaff(
   }
 
   /**
-   * The three-admin limit, checked before anything is written.
+   * The admin limit, checked before anything is written.
    *
    * Someone who is ALREADY an admin can be granted admin again without
    * consuming a place - that is a no-op, and refusing it would be confusing.

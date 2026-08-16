@@ -205,7 +205,7 @@ export function DesignPreview({ preview = true }: { preview?: boolean }) {
         <main className="mx-auto max-w-md px-gutter py-14">
           <p className="font-mono text-micro uppercase tracking-label text-accent">Restricted access</p>
           <h1 className="mt-3 text-h1">Admin login</h1>
-          <p className="mt-4 text-ink-soft">For the three authorised Muroora Mart administrators only.</p>
+          <p className="mt-4 text-ink-soft">For authorised Muroora Mart administrators only.</p>
           <form onSubmit={(event) => event.preventDefault()} className="mt-8 space-y-5 border border-rule bg-white p-6">
             <label className="block text-small font-bold">Admin email<input required type="email" className="mt-2 min-h-12 w-full border border-rule px-4" /></label>
             <label className="block text-small font-bold">Password<input required type="password" minLength={8} className="mt-2 min-h-12 w-full border border-rule px-4" /></label>

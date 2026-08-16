@@ -400,7 +400,7 @@ export default async function StaffHomePage() {
 
         {isAdmin(me) && (
           <p className="mt-6 max-w-measure text-small text-ink-faint">
-            You have admin access. Only three accounts may have it at once.
+            You have admin access. Only four accounts may have it at once.
           </p>
         )}
       </section>

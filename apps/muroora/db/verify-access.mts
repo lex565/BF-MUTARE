@@ -64,7 +64,9 @@ async function makeAccount(local: string, name: string) {
   return row.id
 }
 
-console.log('\nAccess model - three admins, one observer, photo required\n')
+console.log(
+  `\nAccess model - ${MAX_ADMINS} admins, one observer, photo required\n`,
+)
 
 const dirty = await raw`
   SELECT id FROM users WHERE email LIKE ${'%' + TAG} AND deleted_at IS NULL
@@ -126,12 +128,12 @@ try {
 
   try {
     await promoteToStaff({ userId: fourth, role: 'ADMIN' }, fourth)
-    bad('a fourth admin is refused')
+    bad(`admin number ${MAX_ADMINS + 1} is refused`)
   } catch (e) {
     if (e instanceof StaffError && e.code === 'ADMIN_LIMIT') {
-      ok('a fourth admin is refused, with an explanation')
+      ok(`admin number ${MAX_ADMINS + 1} is refused, with an explanation`)
     } else {
-      bad('a fourth admin is refused', String(e))
+      bad(`admin number ${MAX_ADMINS + 1} is refused`, String(e))
     }
   }
 
@@ -142,9 +144,12 @@ try {
       INSERT INTO user_roles (user_id, role, store_id)
       VALUES (${fourth}, 'ADMIN', ${STORE_ID})
     `
-    bad('the database also refuses a fourth admin')
+    bad('the database also refuses one past the limit')
   } catch (e) {
-    if (String((e as Error).message).includes('three accounts')) {
+    // Matched on shape, not on the number. The previous version asserted the
+    // words "three accounts" and broke the moment the cap moved to four,
+    // reporting a failure while the rule was in fact working.
+    if (/accounts may have admin access/i.test(String((e as Error).message))) {
       ok('the database ALSO refuses it, bypassing the service entirely')
     } else {
       bad('database-level cap', String(e))
@@ -181,7 +186,7 @@ try {
 
   const afterViewer = await countAdmins()
   if (afterViewer === MAX_ADMINS) {
-    ok('a VIEWER does not consume one of the three admin places')
+    ok(`a VIEWER does not consume one of the ${MAX_ADMINS} admin places`)
   } else {
     bad('viewer consumed an admin place', `count is ${afterViewer}`)
   }

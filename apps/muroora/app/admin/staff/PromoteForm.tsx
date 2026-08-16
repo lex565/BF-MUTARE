@@ -35,7 +35,7 @@ const ROLE_LABELS: Record<string, { label: string; blurb: string }> = {
     label: 'Oversight (view only)',
     blurb:
       'Sees every screen and every number. Cannot change anything at all. ' +
-      'Does not count towards the three admin places.',
+      'Does not count towards the admin places.',
   },
 }
 

@@ -43,6 +43,13 @@
       "when": 1786846313305,
       "tag": "0005_viewer_role",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786862679942,
+      "tag": "0006_admin_limit_four",
+      "breakpoints": true
     }
   ]
 }
