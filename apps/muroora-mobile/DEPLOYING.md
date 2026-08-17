@@ -1,27 +1,33 @@
-# Deploying Muroora Beta 0.1.0
+# Deploying Musuwo on the existing Expo project
 
-## Free iPhone testing now
+Do not deploy until the owner answers the mandatory questions in
+`../../CLAUDE_SME_MARKETPLACE_BACKEND_HANDOFF.md` and explicitly approves the
+plan.
 
-Use Expo Go. From this directory run `npx expo start --tunnel`, install Expo Go
-on the iPhone, and scan the QR code. This does not require an Apple Developer
-membership. The computer and Metro process must remain running during the test.
+Musuwo reuses the EAS project that previously hosted the Muroora beta:
 
-## EAS release preparation
+- owner: `muroora-mart`
+- project ID: `1da99634-840e-4cf1-8e23-60e6cb560d68`
+- update URL: `https://u.expo.dev/1da99634-840e-4cf1-8e23-60e6cb560d68`
 
-The `preview` and `production` profiles are in `eas.json`. Before the first EAS
-command:
+Never run `eas init` or create another Expo project. First run `eas whoami` and
+`eas project:info` to verify the existing linkage. Ask whether the new native
+IDs `zw.co.musuwo.app` should remain or the old Muroora IDs must be restored for
+an in-place upgrade; changing IDs creates a separate installed application.
 
-1. Run `eas login` using the owner's Expo account.
-2. Run `eas init` and allow it to add the real `extra.eas.projectId` and update
-   URL. Never invent this ID.
-3. Add `EXPO_PUBLIC_API_BASE_URL`, `EXPO_PUBLIC_SUPABASE_URL`, and
-   `EXPO_PUBLIC_SUPABASE_ANON_KEY` to the EAS preview/production environments.
-4. Deploy the matching Next backend before testing protected admin endpoints.
-5. Build Android preview with `eas build --platform android --profile preview`.
+Configure `EXPO_PUBLIC_API_BASE_URL`, `EXPO_PUBLIC_SUPABASE_URL` and
+`EXPO_PUBLIC_SUPABASE_ANON_KEY` in EAS preview/production environments. Never
+expose database URLs, payment secrets or the Supabase service-role key.
 
-An installable iOS build requires Apple signing/provisioning. That normally
-requires the paid Apple Developer Program; Expo Go remains the no-cost iPhone
-test path. App Store submission is not part of the beta test deployment.
+Deploy and smoke-test the existing Next backend first. Then build the Android
+internal preview with:
 
-Only public Expo/Supabase values belong in the mobile environment. Database
-URLs, direct URLs, and the Supabase service-role key must remain server-only.
+`eas build --platform android --profile preview`
+
+An installable iOS build requires valid Apple signing/provisioning. Validate
+the icon and splash with an installed preview/production binary; Expo Go and
+the web preview do not reproduce the native launch experience accurately.
+
+Production builds, store submission and OTA publication require separate
+explicit approval after backend migrations, RLS tests and device smoke tests
+have been reported. Keep rollback instructions and feature flags ready.

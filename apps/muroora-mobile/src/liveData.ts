@@ -28,6 +28,14 @@ const LOOK: Record<string, { icon: string; tint: string }> = {
   'household-essentials': { icon: '🕯️', tint: '#F6E0A8' },
 };
 const FALLBACK = { icon: '🛒', tint: '#F7F3E9' };
+const DISPLAY_CATEGORY:Record<string,string>={
+  'basic-groceries':'Pantry',
+  'packaged-food-drink':'Drinks',
+  'cleaning-supplies':'Home',
+  'personal-care':'Home',
+  'baby-products':'Baby',
+  'household-essentials':'Home',
+};
 
 type WireProduct = {
   id: string;
@@ -57,7 +65,7 @@ export function useProducts(): LiveState<Product[]> & { uuidFor: (id: number) =>
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`${API_BASE}/api/products`, { headers: { Accept: 'application/json' } })
+    fetch(`${API_BASE}/api/marketplace/products`, { headers: { Accept: 'application/json' } })
       .then((r) => r.json())
       .then((body: { data?: WireProduct[]; error?: { message: string } }) => {
         if (cancelled) return;
@@ -78,7 +86,7 @@ export function useProducts(): LiveState<Product[]> & { uuidFor: (id: number) =>
             price: Number(row.price.decimal),
             icon: look.icon,
             tint: look.tint,
-            category: (row.categoryName ?? 'Pantry') as Product['category'],
+            category: DISPLAY_CATEGORY[row.categorySlug ?? ''] ?? row.categoryName ?? 'Other',
             description: row.description ?? '',
           };
         });

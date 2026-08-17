@@ -1,35 +1,55 @@
 {
   "expo": {
-    "name": "Muroora Beta",
-    "slug": "muroora-beta",
-    "version": "0.1.0",
+    "name": "Musuwo Beta",
+    "slug": "musuwo",
+    "version": "0.2.0",
     "runtimeVersion": {
       "policy": "appVersion"
     },
-    "scheme": "muroora-beta",
-    "description": "Muroora Beta — private test release of the Muroora Mart mobile experience.",
+    "scheme": "musuwo",
+    "description": "Musuwo Beta — private test release. Discover local businesses, products, food, accommodation and services.",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/musuwo-app-icon.png",
     "userInterfaceStyle": "light",
     "backgroundColor": "#FFFDF8",
     "plugins": [
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFF8ED",
+          "image": "./assets/musuwo-splash-icon.png",
+          "imageWidth": 220
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Musuwo uses the camera to photograph identity documents for secure verification.",
+          "photosPermission": "Musuwo can access selected identity photos for secure verification.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Musuwo uses your location to add a precise delivery pin to the address you type."
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": false,
-      "buildNumber": "1",
-      "bundleIdentifier": "co.muroora.mart"
+      "buildNumber": "2",
+      "bundleIdentifier": "zw.co.musuwo.app"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#FFF8ED",
+        "foregroundImage": "./assets/musuwo-icon-mark.png"
       },
       "predictiveBackGestureEnabled": false,
-      "versionCode": 1,
-      "package": "co.muroora.mart"
+      "versionCode": 2,
+      "package": "zw.co.musuwo.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
