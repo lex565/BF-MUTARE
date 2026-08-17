@@ -1,0 +1,1748 @@
+MUROORA SME MARKETPLACE EXPANSION — COMPLETE CODEX IMPLEMENTATION PROMPT
+
+ROLE
+
+You are extending the EXISTING Muroora platform into a controlled SME marketplace that supports multiple business types beyond ordinary retail.
+
+This is a continuation of what has already been built.
+
+DO NOT rebuild Muroora from scratch.
+DO NOT create a separate backend.
+DO NOT create a second Supabase project.
+DO NOT create duplicate customer, merchant, order, chat, rider, staff, inventory, or authentication systems.
+
+The EXISTING Muroora backend remains the source of truth.
+
+These new features must be available in BOTH:
+1. THE EXISTING WEB APPLICATION
+2. THE EXISTING CUSTOMER MOBILE APPLICATION
+
+Merchant/business management may initially use a responsive web portal if that is simpler and safer, but customer discovery, search, business pages, listings, enquiries, chat, and contact-release flows must work coherently across both web and mobile.
+
+The platform is moving from:
+MUROORA MART
+→ DELIVERY
+→ CUSTOMER APP
+→ STAFF / RIDER OPERATIONS
+
+toward:
+MUROORA SME MARKETPLACE
+
+The focus is SMALL TO MEDIUM ENTERPRISES.
+
+The goal is to make it easy for a Zimbabwean SME to join Muroora without needing:
+- its own website
+- its own mobile app
+- advanced e-commerce knowledge
+- delivery infrastructure
+- search/SEO expertise
+- complicated technical setup
+
+The platform should remain SIMPLE.
+
+============================================================
+1. FIRST ACTION — AUDIT WHAT ALREADY EXISTS
+============================================================
+
+Before writing major code, inspect the current repository and report what already exists.
+
+Audit:
+- merchant/business tables
+- merchant_id / business_id / store_id fields
+- Muroora Mart merchant structure
+- product model
+- categories
+- inventory
+- customer search
+- mobile search
+- cart
+- checkout
+- customer accounts
+- merchant/admin roles
+- staff roles
+- rider/delivery architecture
+- messaging/chat
+- notifications
+- email infrastructure
+- file/image upload infrastructure
+- Supabase Storage
+- RLS / permissions
+- audit logs
+- admin approval workflows
+- business settings
+- analytics/event tracking
+- current web merchant pages
+- current mobile merchant/store screens
+- feature flags
+
+For each relevant feature classify it as:
+IMPLEMENTED
+PARTIALLY IMPLEMENTED
+NOT IMPLEMENTED
+NEEDS REVIEW
+
+Do not recreate anything already implemented correctly.
+
+============================================================
+2. CORE PLATFORM IDEA
+============================================================
+
+Muroora should no longer assume every business is a grocery store.
+
+All approved businesses share a common BUSINESS identity.
+
+Then the platform activates the correct tools based on what that business offers.
+
+Conceptually:
+
+BUSINESS
+→ BUSINESS TYPE
+→ CAPABILITIES
+→ LISTINGS
+→ CUSTOMER DISCOVERY
+→ COMMERCE / ENQUIRY / BOOKING
+
+Initial business types should support:
+1. RETAIL
+2. FOOD / TAKEAWAY / RESTAURANT
+3. ACCOMMODATION / BOARDING HOUSE
+4. SERVICES
+5. EDUCATION / TUTORS
+6. BEAUTY / PERSONAL CARE
+7. AUTOMOTIVE
+8. HOME SERVICES
+9. OTHER SME CATEGORY
+
+Do not make the category architecture rigid.
+Admin should be able to add/edit categories later.
+
+============================================================
+3. THREE CORE INTERACTION MODES
+============================================================
+
+Do NOT force every business into the same transaction flow.
+
+MODE 1 — COMMERCE
+For groceries, books, food, retail products and other direct purchases.
+
+Flow:
+Product / Menu Item
+→ Cart
+→ Checkout
+→ Fulfilment
+→ Delivery / Pickup
+
+MODE 2 — LEAD / ENQUIRY
+For boarding houses, tutors, plumbers, photographers and service providers.
+
+Flow:
+Listing
+→ Muroora Chat
+→ Customer expresses interest
+→ Business responds
+→ Controlled contact release
+→ Customer and business continue where appropriate
+
+MODE 3 — BOOKING / REQUEST
+For future appointment-based services.
+
+Examples:
+- barber
+- tutor
+- photographer
+- service appointment
+
+Do not build a giant booking engine unless required now.
+Prepare clean extension points.
+
+============================================================
+4. BUSINESS SELF-REGISTRATION GATEWAY
+============================================================
+
+Businesses should be able to apply to Muroora themselves.
+
+Do NOT require Muroora administrators to manually create every business.
+
+Create a public/business gateway such as:
+SELL / LIST ON MUROORA
+or
+MUROORA FOR BUSINESS
+
+Flow:
+CREATE ACCOUNT
+→ START BUSINESS APPLICATION
+→ ENTER BUSINESS DETAILS
+→ SELECT BUSINESS TYPE
+→ ADD LOCATION
+→ ADD DESCRIPTION
+→ ADD LOGO / PHOTOS
+→ ADD REQUIRED VERIFICATION
+→ SUBMIT
+→ UNDER REVIEW
+→ APPROVED / MORE INFORMATION / REJECTED
+→ MERCHANT PORTAL ACTIVATED
+
+Creating a normal account must NOT automatically make someone an approved merchant.
+
+============================================================
+5. BUSINESS APPLICATION FIELDS
+============================================================
+
+Common fields may include:
+- business name
+- legal/registered name where applicable
+- business category
+- short description
+- long description
+- owner/primary contact
+- phone
+- email
+- WhatsApp number if voluntarily provided for later approved contact release
+- physical address
+- city
+- province/region
+- map location / coordinates
+- operating hours
+- business logo
+- cover image
+- gallery photos
+- business registration details where applicable
+- licence/permit information where legally applicable
+- date business began operating
+- website/social links if available
+- preferred interaction mode
+- delivery availability
+- pickup availability
+
+Do not assume every SME has formal registration/licensing.
+Requirements must be configurable by category and legal requirements.
+
+============================================================
+6. BUSINESS APPLICATION STATES
+============================================================
+
+Support:
+DRAFT
+SUBMITTED
+UNDER REVIEW
+NEEDS INFORMATION
+APPROVED
+PILOT
+ACTIVE
+PAUSED
+SUSPENDED
+REJECTED
+INACTIVE
+
+Only APPROVED / PILOT / ACTIVE businesses should become publicly visible according to platform rules.
+
+============================================================
+7. MUROORA ADMIN APPROVAL
+============================================================
+
+Business approval must remain HUMAN-CONTROLLED initially.
+
+Admin should receive:
+NEW BUSINESS APPLICATION
+
+Show:
+Business name
+Category
+Location
+Owner/operator
+Business age
+Documents submitted
+Photos
+Description
+Contact details
+Missing information
+
+Admin actions:
+APPROVE
+REQUEST INFORMATION
+REJECT
+PAUSE
+SUSPEND
+
+Do NOT automatically approve businesses using an algorithm.
+
+============================================================
+8. BUSINESS IDENTITY / PUBLIC ID
+============================================================
+
+Generate a public business/merchant ID.
+
+Example:
+MUR-BIZ-0021
+
+Do not expose internal database primary keys.
+
+============================================================
+9. BUSINESS PORTAL
+============================================================
+
+Once approved, businesses receive a simple merchant portal.
+
+Recommended navigation:
+HOME
+LISTINGS / PRODUCTS / MENU
+ORDERS / ENQUIRIES
+MESSAGES
+AVAILABILITY
+PERFORMANCE
+BUSINESS PROFILE
+SETTINGS
+
+Add EARNINGS / SETTLEMENTS only where commerce transactions require it.
+
+The first screen should answer:
+WHAT NEEDS MY ATTENTION?
+
+Do not build enterprise software.
+
+============================================================
+10. COMMON BUSINESS PROFILE
+============================================================
+
+Every business should have a public profile page.
+
+Show:
+- logo
+- business name
+- verified status where appropriate
+- category
+- description
+- location
+- opening hours
+- gallery
+- interaction options
+- products/listings/services
+- customer feedback where implemented
+
+Do not expose private legal/verification documents publicly.
+
+============================================================
+11. DIFFERENT LISTING TYPES
+============================================================
+
+Do not store everything as a generic product.
+
+Support:
+
+PRODUCT
+Examples: cooking oil, books, clothing, stationery
+
+MENU ITEM
+Examples: sadza and chicken, burgers, cakes, drinks
+
+SERVICE
+Examples: haircut, plumbing, tutoring, printing, photography
+
+ACCOMMODATION / PROPERTY
+Examples: boarding house, student room, student residence, shared room
+
+Each listing belongs to a business.
+
+============================================================
+12. RETAIL BUSINESS EXPERIENCE
+============================================================
+
+Retail businesses should support:
+- product catalogue
+- categories
+- price
+- photos
+- descriptions
+- stock / availability
+- orders
+- delivery/pickup where allowed
+
+Reuse the existing Muroora Mart commerce architecture.
+
+============================================================
+13. FOOD BUSINESS EXPERIENCE
+============================================================
+
+Food businesses should support:
+- menu item
+- price
+- photo
+- description
+- available today
+- sold out
+- preparation time
+- category
+- delivery eligibility
+
+Do not force warehouse-style inventory.
+
+Availability:
+AVAILABLE
+SOLD OUT
+PAUSED
+UNAVAILABLE
+
+============================================================
+14. SERVICES BUSINESS EXPERIENCE
+============================================================
+
+Service providers should support:
+- service name
+- description
+- price or "from" price
+- portfolio images
+- location
+- availability/hours
+- enquiry/booking mode
+
+Do not require inventory fields.
+
+============================================================
+15. ACCOMMODATION / BOARDING HOUSE CATEGORY
+============================================================
+
+Accommodation is a higher-trust category.
+
+Do NOT model boarding houses as ordinary products.
+
+Customer journey:
+SEARCH
+→ VIEW PROPERTY
+→ MUROORA CHAT
+→ EXPRESS INTEREST
+→ CONTROLLED CONTACT RELEASE
+→ VIEWING / FURTHER DISCUSSION
+→ OPTIONAL OUTCOME FEEDBACK
+
+Do NOT initially build:
+PAY RENT
+PAY DEPOSIT
+INSTANT ROOM PURCHASE
+
+unless explicitly approved later after legal/payment review.
+
+============================================================
+16. BOARDING HOUSE OWNER / OPERATOR REGISTRATION
+============================================================
+
+Accommodation operators must register as accountable people/business operators.
+
+Separate:
+OPERATOR / OWNER ACCOUNT
+from
+PROPERTY / BOARDING HOUSE
+
+One operator may manage multiple properties.
+
+Example:
+OPERATOR MUR-AO-0027
+→ PROPERTY A
+→ PROPERTY B
+→ PROPERTY C
+
+Do not make one property equal one user account.
+
+============================================================
+17. ACCOMMODATION OPERATOR VERIFICATION
+============================================================
+
+Prepare stricter verification.
+
+Potential operator fields:
+- full legal name
+- profile photo
+- verified phone
+- verified email
+- government ID reference/document where legally approved
+- physical/contact address where legally appropriate
+- references where appropriate
+- business/management relationship
+
+Potential property verification:
+- property name
+- physical address
+- map coordinates
+- property photos
+- proof operator owns/manages/is authorized to list property
+- relevant licence/business documentation where legally required
+- date verified
+- reviewer
+- verification notes
+
+Do not assume Muroora is legally entitled to collect every sensitive field.
+Keep sensitive verification configurable and private.
+
+============================================================
+18. PROPERTY PUBLIC ID
+============================================================
+
+Generate:
+MUR-P-0104
+
+Customer-facing listing may show:
+Identity verified ✓
+Property information reviewed ✓
+Location verified ✓
+Muroora Property ID: MUR-P-0104
+
+Do NOT show government ID documents or private operator details.
+
+============================================================
+19. ACCOMMODATION LISTING FIELDS
+============================================================
+
+Support:
+- property name
+- description
+- photos
+- address/area
+- map location
+- monthly price
+- deposit if applicable
+- available rooms/beds
+- single/shared room
+- male/female/mixed eligibility where lawful and appropriate
+- furnished/unfurnished
+- Wi-Fi
+- electricity included
+- water included
+- cooking facilities
+- security features
+- house rules
+- distance from institution
+- nearest institution/campus
+- availability date
+- verification badges
+
+Keep the form simple.
+
+============================================================
+20. ACCOMMODATION SEARCH
+============================================================
+
+Support searches such as:
+"boarding house"
+"student accommodation"
+"room near university"
+
+Filters:
+- location
+- price
+- distance from campus
+- available now
+- single/shared
+- furnished
+- Wi-Fi
+- utilities
+- amenities
+
+Do not misrepresent straight-line distance as walking/travel time unless routing supports it.
+
+============================================================
+21. MUROORA CHAT
+============================================================
+
+Create or complete in-platform messaging for lead/enquiry businesses.
+
+Use cases:
+- accommodation
+- tutors
+- service providers
+
+CUSTOMER ↔ BUSINESS
+
+Purpose:
+- ask questions
+- confirm availability
+- clarify pricing
+- discuss viewing/appointment
+- qualify a lead
+
+Do not build chat as a surveillance system.
+
+============================================================
+22. CHAT PRIVACY / MODERATION
+============================================================
+
+Do not design normal operations around staff manually reading every conversation.
+
+Provide:
+- report conversation
+- block where appropriate
+- moderation for reported/suspicious activity
+- safety notices
+- sensible audit/retention rules
+
+============================================================
+23. CONTROLLED CONTACT RELEASE
+============================================================
+
+This is a core feature.
+
+Do NOT immediately expose private phone/WhatsApp details on lead-based listings.
+
+Flow:
+CUSTOMER VIEWS LISTING
+→ CHAT WITH BUSINESS
+→ BUSINESS RESPONDS
+→ CUSTOMER EXPRESSES INTEREST
+→ REQUEST CONTACT DETAILS
+→ RELEASE ACCORDING TO PLATFORM RULES
+→ CONTACT RELEASE RECORDED
+→ WHATSAPP / PHONE DETAILS AVAILABLE
+
+Record:
+- lead ID
+- customer ID
+- business ID
+- listing/property ID
+- timestamp
+- who requested
+- who approved where relevant
+- contact-release event
+
+Purpose:
+- protect customers
+- protect businesses
+- reduce scams
+- prevent Muroora becoming only a free phone-number directory
+- measure qualified leads
+
+============================================================
+24. LEAD OBJECT
+============================================================
+
+Create structured lead/enquiry data if missing.
+
+Potential fields:
+- lead ID
+- customer
+- business
+- listing
+- category
+- created date
+- conversation
+- interest status
+- contact requested
+- contact released
+- viewing requested where applicable
+- outcome
+- reported issue state
+
+Example:
+MUR-L-001482
+
+============================================================
+25. SCAM / SAFETY REPORTING
+============================================================
+
+Customers can report:
+- fake listing
+- property does not exist
+- suspicious payment request
+- misleading photos
+- misleading price
+- impersonation
+- harassment
+- unavailable business
+- other
+
+Businesses may report abusive/fraudulent customers.
+
+Report does NOT automatically mean guilt.
+
+Flow:
+REPORT
+→ CASE CREATED
+→ REVIEW
+→ REQUEST INFORMATION
+→ RESOLUTION
+→ WARNING / CORRECTION / PAUSE / SUSPENSION / DISMISSAL
+
+============================================================
+26. ACCOMMODATION SAFETY NOTICE
+============================================================
+
+Show safety messaging during pilot.
+
+Principle:
+Do not send deposits or payments solely because someone claims to represent a property. Verify the property and agreement before making off-platform payments.
+
+Do not claim Muroora guarantees a property is scam-free.
+
+============================================================
+27. ACCOMMODATION PILOT / TRIAL PERIOD
+============================================================
+
+Accommodation businesses should support a defined free pilot period.
+
+Flow:
+APPROVED
+→ FOUNDING ACCOMMODATION PILOT
+→ FREE FOR DEFINED ACADEMIC PERIOD
+→ PILOT END DATE
+→ PERFORMANCE SUMMARY
+→ OFFER PAID RENEWAL
+
+Do not automatically charge when trial expires.
+Business must explicitly choose paid continuation.
+
+============================================================
+28. ACADEMIC PERIOD / SEASONAL STRUCTURE
+============================================================
+
+Prepare configurable academic seasons.
+
+Do NOT hard-code one national calendar.
+
+Allow admin to define:
+- intake period
+- active semester
+- mid-year break
+- year-end break
+
+============================================================
+29. ACCOMMODATION MONETIZATION
+============================================================
+
+Do not use the same billing model as product sellers by default.
+
+Prepare architecture for:
+- annual subscription
+- qualified lead model later
+- featured listing later
+- premium business tools later
+
+Do not build complex recurring billing now.
+
+============================================================
+30. FOUNDING ACCOMMODATION PARTNER BENEFITS
+============================================================
+
+First accommodation partners may receive:
+- free first academic pilot
+- free onboarding
+- free property setup
+- Founding Accommodation Partner badge
+- discounted first paid year
+- seasonal/break-period discounts
+- early access to features
+- direct support
+
+Benefits must be configurable.
+
+Do NOT give permanent guaranteed #1 search ranking.
+
+============================================================
+31. GENERAL EARLY PARTNER PROGRAM
+============================================================
+
+Support:
+MUROORA FOUNDING PARTNER
+CATEGORY LAUNCH PARTNER
+EARLY PARTNER
+
+Potential benefits:
+- free pilot
+- reduced commission
+- reduced annual subscription
+- onboarding support
+- storefront setup
+- launch visibility
+- badge
+- early access
+
+Benefits store:
+- start date
+- end date
+- category
+- business
+- discount type
+- discount value
+- reason
+- status
+
+============================================================
+32. FIRST BUSINESS IN A CATEGORY
+============================================================
+
+Admin may award CATEGORY LAUNCH PARTNER to the first genuinely approved business in a category/market.
+
+Examples:
+First verified bookstore in Mutare
+First verified boarding-house partner
+First approved food partner
+
+Reward commercially, not with permanent organic rank.
+
+============================================================
+33. BUSINESS PRICING / BILLING FOUNDATION
+============================================================
+
+Different categories may use different models.
+
+Retail/Food:
+- commission per transaction
+
+Accommodation:
+- annual subscription
+- possible qualified-lead model later
+
+Services:
+- subscription
+- lead model
+- booking fee later
+
+Do not assume one revenue model for all SMEs.
+
+============================================================
+34. UNIVERSAL MUROORA SEARCH
+============================================================
+
+Search must return:
+- businesses
+- products
+- menu items
+- services
+- accommodation listings
+
+Pipeline:
+QUERY
+→ DETERMINE INTENT
+→ FIND RELEVANT BUSINESSES/LISTINGS
+→ FILTER AVAILABILITY/ELIGIBILITY
+→ RANK RESULTS
+
+Examples:
+
+"books"
+→ bookstores + book products
+
+"chicken"
+→ restaurants + menu items + butcheries
+
+"boarding house"
+→ accommodation
+
+"maths tutor"
+→ tutors/services
+
+============================================================
+35. SEARCH RESULT DESIGN — WEB + MOBILE
+============================================================
+
+Clearly distinguish result types.
+
+Example:
+
+SEARCH: BOOKS
+
+BUSINESSES
+Mutare Book Centre
+Knowledge House
+
+PRODUCTS
+Introduction to GIS — Mutare Book Centre
+Environmental Science — Knowledge House
+
+SEARCH: BOARDING HOUSE
+
+ACCOMMODATION
+Greenview Student House
+Tendai Student Residence
+
+============================================================
+36. SEARCH RANKING FOUNDATION
+============================================================
+
+Organic ranking begins with relevance.
+
+Then use quality signals.
+
+Potential signals:
+- search relevance
+- category match
+- listing completeness
+- product availability
+- fulfilment reliability
+- cancellation rate
+- preparation/response time
+- customer feedback
+- verification state
+- business tenure
+- successful Muroora tenure
+- distance where relevant
+- delivery eligibility
+- unresolved safety issues
+
+Do not publish exact scoring weights.
+
+============================================================
+37. LONG-STANDING BUSINESS BENEFIT
+============================================================
+
+Allow verified operating history such as:
+Operating since 2014
+
+Do not blindly trust self-entered dates for ranking-sensitive use.
+
+Business age may add trust, but must not override relevance or poor performance.
+
+============================================================
+38. MERCHANT / BUSINESS HEALTH
+============================================================
+
+Prepare a health concept using:
+- profile completeness
+- catalogue quality
+- availability accuracy
+- order reliability
+- response speed
+- customer experience
+- cancellations
+- fulfilment time
+- verification
+- unresolved incidents
+
+Do not expose a gameable ranking formula.
+
+============================================================
+39. BUSINESS INSIGHTS
+============================================================
+
+Use internal marketplace data to help SMEs improve.
+
+Examples:
+
+BOOKSTORE:
+"Customers searched 'A-Level Geography' 47 times this week but you have no matching products."
+
+BOARDING HOUSE:
+"83 students viewed your property but only 4 requested contact. Consider adding more bedroom photos."
+
+FOOD:
+"Most orders arrive between 12:00 and 14:00."
+
+RETAIL:
+"7 popular products are often unavailable."
+
+Keep insights rules/data-driven initially.
+Do not require paid AI infrastructure.
+
+============================================================
+40. MUROORA BUSINESS INBOX
+============================================================
+
+Businesses should receive platform messages:
+
+- onboarding guidance
+- missing profile warnings
+- performance suggestions
+- stock/availability reminders
+- trial expiry
+- renewal notices
+- category launch updates
+- safety/policy notices
+- milestones
+
+Examples:
+"12 products are missing photos."
+"Your accommodation listing received 34 enquiries this month."
+"Your pilot ends in 14 days."
+
+============================================================
+41. BUSINESS PERFORMANCE DASHBOARD
+============================================================
+
+Relevant metrics by business type.
+
+Common:
+- search appearances
+- profile visits
+- listing/product views
+- chats/enquiries
+- contact releases
+- orders
+- conversion
+- cancellations
+- response time
+
+Accommodation:
+- property views
+- enquiries
+- chats
+- contact releases
+- viewing requests
+- reported placements
+
+Retail:
+- orders
+- product views
+- availability
+- fulfilment
+
+============================================================
+42. ACCOMMODATION PLACEMENT OUTCOME
+============================================================
+
+After contact release, ask optional outcome feedback.
+
+Student:
+Did you successfully find accommodation through this listing?
+
+Business:
+Did this enquiry result in a placement?
+
+States:
+PLACED
+NOT PLACED
+STILL DISCUSSING
+NO RESPONSE
+OTHER
+
+Do not require excessive personal data.
+
+============================================================
+43. ACCOMMODATION RENEWAL VALUE
+============================================================
+
+Before paid renewal, show pilot value.
+
+Example:
+
+YOUR MUROORA PILOT
+Property views: 421
+Student enquiries: 37
+Contact releases: 18
+Reported viewings: 9
+Reported placements: 4
+
+Then offer:
+RENEW FOR NEXT ACADEMIC YEAR
+
+Do not automatically charge.
+
+============================================================
+44. CUSTOMER DISCOVERY HOME — WEB + MOBILE
+============================================================
+
+Keep home simple.
+
+Possible structure:
+Search Muroora
+
+SHOP
+FOOD
+ACCOMMODATION
+SERVICES
+
+Featured local businesses
+Popular near you
+Muroora Mart
+New / Founding partners
+
+============================================================
+45. BUSINESS CATEGORY PAGES
+============================================================
+
+Create:
+SHOPPING
+FOOD
+STUDENT ACCOMMODATION
+SERVICES
+EDUCATION
+
+Each uses the correct card/listing layout.
+
+Do not make accommodation look like groceries.
+
+============================================================
+46. CUSTOMER FAVOURITES
+============================================================
+
+If favourites already exist, extend them to:
+- business
+- product
+- property
+- service
+
+Do not force if this causes major scope expansion.
+
+============================================================
+47. DELIVERY INTEGRATION
+============================================================
+
+Commerce businesses may use Muroora delivery.
+
+Preserve:
+BICYCLE
+MOTORBIKE
+CAR
+
+Accommodation and lead businesses generally do not use delivery.
+
+============================================================
+48. MULTI-MERCHANT COMMERCE
+============================================================
+
+Products belong to businesses.
+Orders/suborders identify merchant.
+External merchant financials stay separate from Muroora Mart retail financials.
+
+If mixed-merchant checkout is unsafe, keep one merchant per checkout initially.
+
+Do not fake multi-pickup logistics.
+
+============================================================
+49. MERCHANT DATA ISOLATION
+============================================================
+
+Business A must not access Business B:
+- orders
+- customers
+- analytics
+- messages
+- financial data
+- verification documents
+
+Enforce via backend/RLS/server authorization.
+
+============================================================
+50. ACCOMMODATION DATA ISOLATION
+============================================================
+
+Operators access only:
+- their properties
+- their enquiries
+- their messages
+- their leads
+- their performance
+
+Private student contact remains hidden before approved contact release.
+
+============================================================
+51. CONTACT GATING / LEAD PROTECTION
+============================================================
+
+Do not publicly display raw WhatsApp/phone details by default for lead-mode businesses.
+
+Contact release must be server-authorized.
+
+A business cannot fetch all customer contacts through an API.
+
+A customer cannot retrieve all private operator contact information before release.
+
+============================================================
+52. VERIFIED BADGES
+============================================================
+
+Possible badges:
+Business Verified
+Identity Verified
+Property Reviewed
+Location Verified
+Founding Partner
+Category Launch Partner
+
+Do not make verification claims broader than what was actually checked.
+
+============================================================
+53. SPONSORED / PAID PLACEMENT — LATER
+============================================================
+
+Prepare distinction:
+ORGANIC
+RECOMMENDED
+SPONSORED
+
+Sponsored must be clearly labelled.
+
+Never secretly sell organic ranking.
+
+============================================================
+54. FREE / PILOT PRICING
+============================================================
+
+During early pilot:
+- businesses may be free
+- commission may be 0%
+- accommodation may receive one academic-period free trial
+- early partners may receive benefits
+
+Architecture must allow later pricing changes.
+
+============================================================
+55. SUBSCRIPTION / PLAN STATUS
+============================================================
+
+Prepare:
+FREE
+PILOT
+FOUNDING PARTNER
+PAID
+PAUSED
+EXPIRED
+
+Do not integrate paid recurring billing yet.
+
+Allow manual/admin plan assignment during pilot.
+
+============================================================
+56. SEASONAL DISCOUNTS
+============================================================
+
+Prepare configurable seasonal commercial benefits.
+
+Accommodation may receive lower effective pricing during long school breaks.
+
+Do not hard-code dates.
+
+============================================================
+57. BUSINESS PROFILE COMPLETENESS
+============================================================
+
+Calculate simple completeness:
+
+- logo missing
+- description missing
+- location missing
+- hours missing
+- product photos missing
+- property amenities incomplete
+
+Use this for guidance, not arbitrary punishment.
+
+============================================================
+58. ADMIN SME MARKETPLACE PANEL
+============================================================
+
+Admin navigation:
+
+BUSINESSES
+APPLICATIONS
+CATEGORIES
+ACCOMMODATION
+REPORTS / SAFETY
+EARLY PARTNERS
+PLANS / BENEFITS
+BUSINESS MESSAGES
+
+Admin actions:
+- review applications
+- approve/reject/request info
+- assign category
+- manage verification
+- assign benefits
+- configure pilot dates
+- pause/suspend
+- review cases
+- inspect merchant health
+- send messages
+- manage plans
+
+============================================================
+59. SAFETY / CASE MANAGEMENT
+============================================================
+
+General case system can relate to:
+- business
+- customer
+- property
+- listing
+- order
+- chat
+- lead
+
+States:
+OPEN
+UNDER REVIEW
+WAITING FOR INFORMATION
+RESOLVED
+DISMISSED
+ACTION TAKEN
+
+Keep audit history.
+
+============================================================
+60. PRIVACY AND SENSITIVE DOCUMENTS
+============================================================
+
+Sensitive verification documents must:
+- remain private
+- not use public storage URLs
+- have strict authorization
+- be accessible only to appropriate reviewers
+- have auditability where appropriate
+
+============================================================
+61. CONFIGURABLE VERIFICATION
+============================================================
+
+Do not hard-code unconfirmed Zimbabwean legal requirements.
+
+Create configurable requirements by:
+- business category
+- listing type
+- risk level
+- jurisdiction if needed
+
+Accommodation may require stronger verification than ordinary retail.
+
+============================================================
+62. WEB + MOBILE FEATURE PARITY
+============================================================
+
+Customer-facing features must work on web and mobile:
+
+- universal search
+- business discovery
+- category discovery
+- business profile
+- products
+- menu items
+- services
+- accommodation
+- chat
+- lead/enquiry
+- contact request/release
+- reporting
+- favourites where supported
+- verified badges
+- commerce order flow
+
+============================================================
+63. MERCHANT PORTAL MOBILE RESPONSIVENESS
+============================================================
+
+Merchant portal may be web-based initially but must work well on phones.
+
+Design for:
+- simple navigation
+- large buttons
+- image uploads
+- minimal typing
+- application status
+- orders/enquiries
+- low bandwidth
+
+============================================================
+64. LOW-BANDWIDTH DESIGN
+============================================================
+
+Avoid:
+- giant videos
+- unnecessary animation
+- excessive image sizes
+- huge initial data loads
+
+Use:
+- pagination
+- lazy loading
+- safe image compression
+- retry states
+
+============================================================
+65. NOTIFICATIONS
+============================================================
+
+Reuse existing notification infrastructure.
+
+Customer:
+- business replied
+- contact approved
+- order updated
+- accommodation message
+
+Business:
+- new order
+- new enquiry
+- new message
+- contact requested
+- listing issue
+- trial ending
+- approval
+- needs information
+
+Do not introduce paid notification services unnecessarily.
+
+============================================================
+66. ANALYTICS / EVENT FOUNDATION
+============================================================
+
+Track useful first-party events:
+
+- search performed
+- search result impression
+- business profile viewed
+- listing viewed
+- product viewed
+- chat started
+- message sent
+- contact requested
+- contact released
+- order placed
+- enquiry outcome
+- property saved
+- business reported
+
+Do not collect unnecessary invasive data.
+
+============================================================
+67. BUSINESS INSIGHT RULES
+============================================================
+
+Examples:
+
+High views + low enquiries:
+"Consider improving photos, description or pricing."
+
+High demand search + no matching items:
+"Customers are searching for X."
+
+High stock-outs:
+"Review availability."
+
+Slow replies:
+"Faster replies may improve lead conversion."
+
+Use cautious language.
+
+============================================================
+68. PILOT METRICS
+============================================================
+
+Admin should see:
+
+- approved businesses
+- active businesses
+- applications
+- categories
+- searches
+- orders
+- enquiries
+- chats
+- contact releases
+- placements where reported
+- repeat customers
+- merchant retention
+- pilot-to-paid conversion later
+
+============================================================
+69. EARLY-PARTNER BENEFIT AUDIT
+============================================================
+
+Store every benefit:
+- business
+- type
+- reason
+- category
+- start
+- end
+- value/discount
+- approved by
+- timestamp
+
+============================================================
+70. DO NOT PERMANENTLY REWARD EARLY BUSINESSES IN SEARCH
+============================================================
+
+Early businesses can receive:
+- free pilot
+- discounts
+- launch promotion
+- badge
+- support
+- clearly labelled temporary featured placement
+
+Organic search must remain quality/relevance driven.
+
+============================================================
+71. CUSTOMER TRUST
+============================================================
+
+Clearly show:
+- seller/business
+- verification state
+- listing type
+- location
+- availability
+- report option
+- chat/contact flow
+
+Do not create false guarantees.
+
+============================================================
+72. BUSINESS TRUST
+============================================================
+
+Businesses can:
+- report abusive customers
+- block inappropriate contact where justified
+- keep private contact gated
+- see qualified leads
+- retain permitted lead/chat history
+
+============================================================
+73. RANKING GAMING PROTECTION
+============================================================
+
+Do not expose exact ranking coefficients.
+
+Tell merchants high-level principles only:
+- relevance
+- availability
+- reliability
+- customer experience
+- verification
+- listing quality
+- geography/logistics where relevant
+
+============================================================
+74. SEARCH QUALITY FIRST
+============================================================
+
+A restaurant must not outrank a bookstore for "textbook" simply because it has better ratings.
+
+RELEVANCE FIRST.
+QUALITY SECOND.
+
+============================================================
+75. INITIAL PUBLIC MARKETPLACE CONTROL
+============================================================
+
+Use feature flags/configuration such as:
+
+ENABLE_BUSINESS_APPLICATIONS=true
+ENABLE_ACCOMMODATION=true
+ENABLE_SERVICE_LISTINGS=true
+ENABLE_SENSITIVE_VERIFICATION=false
+ENABLE_AUTOMATIC_MERCHANT_APPROVAL=false
+ENABLE_PAID_BUSINESS_PLANS=false initially
+
+Use existing feature-flag conventions.
+
+============================================================
+76. SECURITY
+============================================================
+
+Review:
+- merchant RLS
+- chat access
+- lead/contact data
+- hidden phone numbers
+- accommodation verification docs
+- admin approval permissions
+- cross-business leakage
+- upload validation
+- malicious files
+- role escalation
+- report/case permissions
+
+Never put service-role keys or secrets in web/mobile clients.
+
+============================================================
+77. FILE UPLOAD SECURITY
+============================================================
+
+Validate:
+- file type
+- size
+- storage bucket
+- public/private classification
+- ownership
+- authorization
+
+Public marketing images may be safely public.
+Sensitive verification files remain private.
+
+============================================================
+78. TESTING — GENERAL MARKETPLACE
+============================================================
+
+Test:
+1. User can create business application.
+2. Applicant cannot approve themselves.
+3. Unapproved business is not public.
+4. Admin can request more info.
+5. Approved business gets portal.
+6. Business A cannot access Business B private data.
+7. Search works across listing types.
+8. Search relevance prevents category nonsense.
+9. Product shows business attribution.
+10. Service uses enquiry mode.
+11. Accommodation uses chat/enquiry mode.
+12. Contact stays gated until release.
+13. Hidden contact cannot be fetched via unauthorized API.
+14. Contact release is logged.
+15. Customer can report business/listing.
+16. Business can report customer where allowed.
+17. Early-partner benefits do not permanently override organic search.
+18. Web/mobile use same marketplace data.
+19. Existing Muroora Mart commerce still works.
+20. Rider/staff/order systems do not regress.
+
+============================================================
+79. TESTING — ACCOMMODATION
+============================================================
+
+Test:
+1. Accommodation operator can apply.
+2. Operator can manage multiple properties if permitted.
+3. Property stays private until approved.
+4. Customer sees only approved properties.
+5. Private verification data is inaccessible to customer.
+6. Student can chat with property.
+7. Student cannot access WhatsApp/phone before release.
+8. Business cannot fetch all student contacts.
+9. Contact release creates lead event.
+10. Report creates case.
+11. Trial dates work.
+12. Trial expiration does not auto-charge.
+13. Founding Partner benefit is recorded.
+14. Accommodation search filters work.
+15. Suspension disables listings appropriately.
+
+============================================================
+80. IMPLEMENTATION ORDER
+============================================================
+
+PHASE A — AUDIT / FOUNDATION
+1. Audit multi-merchant readiness.
+2. Confirm/create common Business entity.
+3. Confirm category/capability architecture.
+4. Confirm merchant-scoped security.
+
+PHASE B — BUSINESS APPLICATION
+5. Self-service business application.
+6. Admin review/approval.
+7. Merchant lifecycle.
+8. Business portal shell.
+
+PHASE C — LISTING TYPES
+9. Product
+10. Menu item
+11. Service
+12. Accommodation/property
+
+PHASE D — CUSTOMER DISCOVERY
+13. Universal search
+14. Category pages
+15. Business pages
+16. Web + mobile result types
+
+PHASE E — LEADS / CHAT
+17. Chat
+18. Lead entity
+19. Controlled contact release
+20. Reporting/case workflow
+
+PHASE F — ACCOMMODATION
+21. Operator model
+22. Property model
+23. Verification states
+24. Property search
+25. Student enquiry/contact flow
+26. Trial/subscription foundation
+
+PHASE G — EARLY PARTNERS
+27. Founding Partner
+28. Category Launch Partner
+29. Pilot benefits
+30. Seasonal/accommodation discounts
+
+PHASE H — BUSINESS INTELLIGENCE
+31. Performance metrics
+32. Health/completeness
+33. Business inbox
+34. Improvement suggestions
+
+PHASE I — HARDENING
+35. RLS/security tests
+36. Cross-business isolation
+37. Mobile parity
+38. Low-bandwidth polish
+39. Regression tests
+
+============================================================
+81. WHAT NOT TO BUILD YET
+============================================================
+
+Do NOT unnecessarily build:
+- automatic merchant approval
+- rent/deposit payments
+- escrow
+- stored-value wallets
+- automatic police reporting
+- facial recognition
+- expensive identity APIs
+- exact public ranking formula
+- paid sponsored ads
+- complex recurring billing
+- giant CRM
+- enterprise property management
+- tenancy contracts
+- complex AI recommendation infrastructure
+- AI moderation dependence
+
+============================================================
+82. REQUIRED FIRST RESPONSE FROM CODEX
+============================================================
+
+Before implementation, report:
+
+1. What multi-business architecture already exists.
+2. What must change for self-service business applications.
+3. Whether products are properly merchant-scoped.
+4. Whether current search can support businesses + products + services + accommodation.
+5. Whether chat already exists.
+6. Whether contact gating can reuse current messaging/auth.
+7. What database additions are required.
+8. What RLS/security changes are required.
+9. How web and mobile will share the new features.
+10. How accommodation differs from retail.
+11. How Founding Partner benefits will be represented.
+12. How annual accommodation plans can be prepared without enabling billing.
+13. What stays disabled during pilot.
+14. Security/privacy concerns.
+15. Confirmation no paid service is being introduced.
+16. What you will implement first.
+17. What you will NOT touch.
+18. Whether any destructive change needs owner permission.
+
+Do not perform destructive migrations before this review.
+
+============================================================
+83. FINAL PRODUCT PRINCIPLE
+============================================================
+
+Muroora should become easy enough that a small Zimbabwean business owner can join without understanding technology.
+
+Business owner:
+TELL MUROORA ABOUT MY BUSINESS
+→ GET VERIFIED / APPROVED
+→ CREATE MY STORE / LISTINGS
+→ RECEIVE ORDERS OR ENQUIRIES
+→ COMMUNICATE WITH CUSTOMERS
+→ IMPROVE USING MUROORA INSIGHTS
+→ CONTINUE AFTER A FAIR PILOT
+
+Customer:
+SEARCH WHAT I NEED
+→ FIND TRUSTWORTHY LOCAL OPTIONS
+→ BUY / CHAT / ENQUIRE
+→ USE MUROORA AS THE GATEWAY
+→ RECEIVE DELIVERY OR CONNECT SAFELY
+
+Different SME realities must be supported without forcing everyone into the same model.
+
+RETAIL = COMMERCE
+FOOD = COMMERCE
+ACCOMMODATION = VERIFIED LEADS / ENQUIRIES
+SERVICES = LEADS / BOOKINGS
+EDUCATION = LEADS / BOOKINGS
+
+Muroora Mart remains the original operating merchant, but it must not define the architecture of the entire platform.
+
+The long-term goal is:
+
+A Zimbabwe-focused local business discovery, commerce, enquiry and delivery platform built around verified SMEs, useful search, controlled trust, practical customer access and measurable value to participating businesses.

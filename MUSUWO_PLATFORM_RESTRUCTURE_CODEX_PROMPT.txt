@@ -1,0 +1,1639 @@
+MUSUWO APP — MASTER CODEX BUILD PROMPT
+PINDUODUO-INSPIRED STRUCTURE, USING THE EXISTING MUSUWO/MUROORA ARCHITECTURE
+REVISED DELIVERY MODEL: MUSUWO HANDLES DELIVERY, MERCHANT BRANDING REMAINS CUSTOMER-FACING
+
+IMPORTANT:
+THIS IS A CONTINUATION OF THE EXISTING PROJECT.
+
+DO NOT REBUILD FROM SCRATCH.
+DO NOT REMOVE OR REPLACE THE STRUCTURE ALREADY CREATED.
+DO NOT CREATE A SECOND BACKEND.
+DO NOT CREATE A SECOND SUPABASE PROJECT.
+DO NOT DUPLICATE AUTH, ORDERS, INVENTORY, CHAT, MERCHANTS, DELIVERY, RIDERS, CUSTOMERS OR ANALYTICS.
+
+The purpose is to create MUSUWO as the parent marketplace platform with a discovery-first structure inspired by Pinduoduo, while keeping everything already established.
+
+Musuwo should be:
+- discovery-first
+- category-led
+- social-commerce friendly
+- low-friction
+- merchant-based
+- mobile-first
+- web-enabled
+- simple enough for Zimbabwean users
+- useful to small and medium enterprises
+- future-ready for group buying and delivery at scale
+
+Pinduoduo is inspiration for MARKETPLACE STRUCTURE only.
+
+Do NOT clone Pinduoduo's UI, wording, graphics, exact ranking systems, gamification, or China-specific payment assumptions.
+
+============================================================
+1. FIRST RULE — PRESERVE WHAT ALREADY EXISTS
+============================================================
+
+Before changing anything, AUDIT the current codebase.
+
+DO NOT assume what exists.
+DO NOT overwrite working functionality.
+DO NOT rename database structures blindly.
+DO NOT remove existing Muroora-specific functionality that is still needed.
+
+Classify every relevant feature as:
+
+IMPLEMENTED
+PARTIALLY IMPLEMENTED
+NOT IMPLEMENTED
+NEEDS REVIEW
+
+Explicitly preserve all working logic for:
+
+- authentication
+- customer accounts
+- Muroora Mart
+- products
+- inventory
+- cart
+- checkout
+- orders
+- staff
+- Supabase
+- database
+- RLS
+- notifications
+- messaging/chat
+- business/merchant tables
+- admin controls
+- rider backend work
+- mobile application
+- web application
+- payment logic
+- delivery logic
+- order status logic
+- image/storage logic
+- audit logs
+- analytics
+
+The existing technical foundation becomes the MUSUWO PLATFORM CORE.
+
+============================================================
+2. PLATFORM HIERARCHY — KEEP THIS
+============================================================
+
+MUSUWO is the platform.
+
+MUROORA MART is the founding merchant / first business on Musuwo.
+
+Do not treat Musuwo and Muroora Mart as the same thing.
+
+Concept:
+
+MUSUWO
+│
+├── SHOPPING
+│   ├── Muroora Mart
+│   ├── Bookstores
+│   ├── Clothing stores
+│   ├── Electronics
+│   └── Other SMEs
+│
+├── FOOD
+│   ├── Restaurants
+│   ├── Takeaways
+│   ├── Bakeries
+│   └── Food vendors
+│
+├── ACCOMMODATION
+│   ├── Boarding houses
+│   ├── Student residences
+│   └── Rooms
+│
+├── SERVICES
+│   ├── Tutors
+│   ├── Printing
+│   ├── Barbers
+│   ├── Repairs
+│   ├── Plumbers
+│   ├── Photographers
+│   └── Other services
+│
+└── MUSUWO LOGISTICS
+    └── Musuwo handles eligible marketplace delivery behind the scenes
+
+Muroora Mart remains:
+- its own brand
+- its own business
+- its own catalogue
+- its own stock
+- its own staff
+- its own order fulfilment operation
+
+But delivery for marketplace orders is coordinated through MUSUWO.
+
+============================================================
+3. CRITICAL DELIVERY MODEL — REVISED
+============================================================
+
+THIS REPLACES THE PREVIOUS "MUROORA HANDLES ITS OWN DELIVERY" RULE.
+
+NEW RULE:
+
+MUSUWO HANDLES DELIVERY.
+
+However:
+
+THE CUSTOMER-FACING DELIVERY EXPERIENCE SHOULD REMAIN BRANDED AS THE BUSINESS THEY PURCHASED FROM.
+
+Example:
+
+Customer buys from MUROORA MART.
+
+Customer should primarily see:
+
+MUROORA MART
+Order #...
+Preparing your order
+Out for delivery
+Delivered
+
+Merchant logo:
+MUROORA MART LOGO
+
+Merchant name:
+MUROORA MART
+
+Not:
+
+"Generic Musuwo Shop Delivery"
+
+The customer must still feel that they are buying from Muroora Mart.
+
+Musuwo operates the logistics infrastructure behind the transaction.
+
+============================================================
+4. DELIVERY BRANDING PRINCIPLE
+============================================================
+
+Customer-facing merchant identity always remains strong.
+
+Example:
+
+SOLD BY
+MUROORA MART
+
+FULFILLED BY
+MUROORA MART
+
+DELIVERY EXPERIENCE
+Muroora Mart branded customer interface
+
+LOGISTICS ENGINE
+MUSUWO
+
+This same principle applies to future merchants.
+
+Example:
+
+Customer buys from:
+MUTARE BOOK CENTRE
+
+The order/tracking page should prominently show:
+
+MUTARE BOOK CENTRE
+logo
+merchant name
+order items
+merchant-specific customer identity
+
+Musuwo handles the actual delivery infrastructure.
+
+Do NOT make every order appear visually as though the customer bought from Musuwo itself.
+
+============================================================
+5. TRANSPARENCY / OPERATIONAL ATTRIBUTION
+============================================================
+
+Do not hide the real platform relationship from receipts, terms, support systems, internal audit logs or legally important information.
+
+The visible customer experience may say:
+
+Delivery for Mutare Book Centre
+
+or:
+
+Your Mutare Book Centre order is on the way.
+
+Where operational transparency is useful, a smaller secondary line may say:
+
+Delivery coordinated by Musuwo
+
+or:
+
+Powered by Musuwo Logistics
+
+Do NOT make Musuwo the dominant visual brand on merchant order tracking pages.
+
+Merchant branding comes first.
+
+Musuwo attribution is secondary.
+
+============================================================
+6. MUSUWO DELIVERY ARCHITECTURE
+============================================================
+
+Concept:
+
+CUSTOMER
+→ buys from a merchant on Musuwo
+→ merchant receives order
+→ merchant prepares order
+→ merchant marks order READY
+→ MUSUWO DELIVERY takes custody
+→ Musuwo assigns appropriate delivery handling
+→ customer receives merchant-branded tracking
+→ delivery completed
+→ custody closes
+→ order completes
+
+Shared delivery infrastructure should support all eligible commerce merchants.
+
+Do NOT build one separate delivery engine per merchant.
+
+============================================================
+7. MERCHANT DELIVERY BRANDING
+============================================================
+
+Each merchant should have delivery-brand settings that can inherit from its business profile.
+
+Potential fields:
+
+- merchant display name
+- logo
+- primary brand colour
+- secondary brand colour
+- support label
+- order tracking header
+- customer-facing fulfilment name
+
+Do NOT over-engineer white-label theming.
+
+Start simple:
+- merchant logo
+- merchant name
+- merchant colours where current UI architecture supports safe theming
+
+If the merchant has no branding settings, use Musuwo's neutral default.
+
+============================================================
+8. DELIVERY STATUS
+============================================================
+
+Use clear statuses such as:
+
+ORDER RECEIVED
+PREPARING
+READY FOR COLLECTION
+COLLECTED FOR DELIVERY
+OUT FOR DELIVERY
+DELIVERED
+
+Customer-facing wording may be merchant-branded.
+
+Example:
+
+Muroora Mart is preparing your order.
+
+Your Muroora Mart order is ready.
+
+Your Muroora Mart order is out for delivery.
+
+Your Muroora Mart order has been delivered.
+
+Internally, Musuwo tracks logistics state and custody.
+
+============================================================
+9. MUSUWO RIDERS
+============================================================
+
+Musuwo owns the rider/delivery network architecture.
+
+The rider system should be built as a MUSUWO PLATFORM capability, not a Muroora-only capability.
+
+Do NOT create:
+MUROORA RIDERS
+MUTARE BOOK CENTRE RIDERS
+RESTAURANT X RIDERS
+
+as separate platform roles.
+
+Instead:
+
+MUSUWO RIDER
+→ can fulfil eligible deliveries for approved Musuwo merchants
+
+The customer still sees merchant-branded order tracking.
+
+============================================================
+10. RIDER PUBLIC SECTION — KEEP COMING SOON FOR NOW
+============================================================
+
+The public rider recruitment/marketplace section should remain:
+
+COMING SOON
+
+This means:
+
+- do not publicly launch open rider signup yet
+- do not imply anyone can currently become a Musuwo rider
+- do not expose live rider marketplace functionality to the public
+
+BUT:
+
+the underlying Musuwo logistics/rider system may remain established and testable internally.
+
+If current rider functionality already exists:
+- preserve it
+- audit it
+- secure it
+- keep it behind feature flags
+- use controlled/internal riders or test records only until public launch is approved
+
+Public route:
+
+MUSUWO RIDERS
+COMING SOON
+
+Possible flag:
+
+ENABLE_PUBLIC_RIDER_APPLICATIONS=false
+
+This is different from:
+
+ENABLE_MUSUWO_DELIVERY
+
+Musuwo delivery may be operational with controlled/internal delivery capacity while PUBLIC rider recruitment remains Coming Soon.
+
+============================================================
+11. DO NOT CONFUSE DELIVERY WITH PUBLIC RIDER RECRUITMENT
+============================================================
+
+This distinction is important.
+
+MUSUWO DELIVERY:
+can exist and operate.
+
+PUBLIC "BECOME A MUSUWO RIDER":
+COMING SOON.
+
+Therefore:
+
+Musuwo can coordinate merchant deliveries without opening rider registration to everyone.
+
+Do NOT disable Musuwo delivery merely because public rider recruitment is Coming Soon.
+
+============================================================
+12. MUSUWO SHOULD FEEL STRUCTURALLY LIKE PINDUODUO
+============================================================
+
+Borrow structural ideas:
+
+A. DISCOVERY-FIRST HOME
+B. LARGE SEARCH ENTRY
+C. CATEGORY BROWSING
+D. PRODUCT + MERCHANT DISCOVERY
+E. VALUE / DEAL SECTIONS
+F. SOCIAL SHARING
+G. GROUP BUY FOUNDATION
+H. LOW-FRICTION BROWSING
+I. RELEVANT DISCOVERY FEED
+J. MOBILE-FIRST COMMERCE
+
+Do NOT clone exact Pinduoduo UI.
+
+============================================================
+13. MUSUWO CUSTOMER APP STRUCTURE
+============================================================
+
+Recommended bottom navigation:
+
+HOME
+CATEGORIES
+SEARCH
+ORDERS
+ACCOUNT
+
+If current navigation is already strong, adapt it instead of rebuilding.
+
+Do not overcrowd navigation.
+
+============================================================
+14. HOME SCREEN
+============================================================
+
+Recommended structure:
+
+1. MUSUWO HEADER
+- Musuwo logo
+- location selector
+- notifications
+
+2. LARGE SEARCH BAR
+
+Placeholder:
+"Search shops, food, rooms, services..."
+
+3. QUICK CATEGORY GRID
+
+Shop
+Food
+Accommodation
+Services
+Education
+Beauty
+Electronics
+Home
+More
+
+4. FEATURED / USEFUL NOW
+
+Examples:
+- Muroora Mart
+- Founding Businesses
+- Popular nearby
+- Student essentials
+- Food nearby
+- New merchants
+
+5. LOCAL DEALS
+
+Examples:
+- Best Value Today
+- Student Deals
+- Local Deals
+- Combo Deals
+- Group Buy — Coming Soon/Beta
+
+6. DISCOVERY FEED
+
+Mixed:
+- product
+- merchant
+- food
+- accommodation
+- service
+
+7. NEARBY / LOCAL
+
+Use location only where permission is available.
+
+============================================================
+15. DISCOVERY FEED
+============================================================
+
+Support separate card types.
+
+PRODUCT CARD:
+- image
+- price
+- merchant
+- availability
+- deal badge
+
+BUSINESS CARD:
+- logo
+- business
+- category
+- verification
+- area
+- open/closed
+
+FOOD CARD:
+- image
+- item/restaurant
+- price
+- availability
+- prep time if available
+
+ACCOMMODATION CARD:
+- property
+- monthly price
+- area
+- availability
+- verification
+
+SERVICE CARD:
+- service
+- provider
+- starting price if applicable
+- area
+- enquiry button
+
+Do not force everything into one generic card.
+
+============================================================
+16. UNIVERSAL SEARCH
+============================================================
+
+Search across:
+
+- merchants
+- products
+- menu items
+- services
+- accommodation
+
+Examples:
+
+"books"
+→ bookstores
+→ book products
+
+"boarding house"
+→ accommodation
+
+"chicken"
+→ food items
+→ restaurants
+→ grocery products
+
+"maths tutor"
+→ education/service providers
+
+Search relevance comes first.
+
+============================================================
+17. SEARCH RANKING
+============================================================
+
+FIRST:
+RELEVANCE
+
+THEN:
+QUALITY
+
+Potential signals:
+- category match
+- verification
+- availability
+- fulfilment reliability
+- cancellation rate
+- response speed
+- customer feedback
+- listing completeness
+- merchant tenure
+- location/serviceability
+
+Do not permanently rank Muroora first.
+
+Do not permanently rank founding merchants first.
+
+============================================================
+18. SOCIAL COMMERCE
+============================================================
+
+Make listings shareable.
+
+Primary channel:
+WHATSAPP
+
+Support sharing:
+- product
+- merchant
+- food item
+- service
+- accommodation
+- future group-buy deal
+
+WhatsApp is NOT authentication.
+
+============================================================
+19. GROUP BUY FOUNDATION
+============================================================
+
+Prepare Pinduoduo-inspired group buying.
+
+Do not fully activate unless payment/order/delivery systems support it safely.
+
+Concept:
+
+NORMAL PRICE
+$X
+
+GROUP PRICE
+$Y
+
+2 people
+3 people
+5 people
+
+Flow:
+Customer A starts group
+→ shares via WhatsApp
+→ other users join
+→ required group size reached
+→ group price activates
+→ merchant fulfils
+→ Musuwo delivery can aggregate/batch where operationally useful
+
+Do not fake savings.
+
+Merchant must authorize the offer.
+
+============================================================
+20. GROUP BUY + DELIVERY SYNERGY
+============================================================
+
+Design future group buying with Musuwo delivery in mind.
+
+Possible benefit:
+
+multiple customers in nearby areas
+→ same merchant/category
+→ grouped demand
+→ lower delivery cost per order
+→ better economics
+
+Do NOT automatically promise reduced delivery fees before route economics are tested.
+
+Prepare the architecture.
+
+============================================================
+21. MUROORA MART IN MUSUWO
+============================================================
+
+Muroora Mart should appear as:
+
+MUROORA MART
+Founding Merchant
+
+Store page:
+- Muroora logo
+- Muroora colours
+- categories
+- products
+- store info
+- deals
+- availability
+
+Order:
+Sold by Muroora Mart
+
+Customer sees Muroora branding throughout the merchant-specific order experience.
+
+Musuwo handles logistics behind the scenes.
+
+============================================================
+22. FUTURE MERCHANT EXAMPLE
+============================================================
+
+Example:
+
+MUTARE BOOK CENTRE joins Musuwo.
+
+Customer flow:
+
+Musuwo
+→ search "books"
+→ choose Mutare Book Centre
+→ buy textbook
+→ checkout
+→ merchant prepares order
+→ Musuwo handles delivery
+→ tracking remains Mutare Book Centre branded
+→ subtle "Delivery coordinated by Musuwo" attribution where appropriate
+
+This model should work without creating custom code for every merchant.
+
+============================================================
+23. BUSINESS SELF-REGISTRATION
+============================================================
+
+Keep:
+
+MUSUWO FOR BUSINESS
+
+Flow:
+
+CREATE ACCOUNT
+→ APPLY
+→ SELECT BUSINESS TYPE
+→ ADD BUSINESS INFORMATION
+→ LOCATION
+→ LOGO / IMAGES
+→ VERIFICATION
+→ SUBMIT
+→ UNDER REVIEW
+→ APPROVED / NEEDS INFO / REJECTED
+→ BUSINESS PORTAL
+
+Account creation does not equal merchant approval.
+
+============================================================
+24. BUSINESS TYPES
+============================================================
+
+Keep:
+
+RETAIL
+FOOD
+ACCOMMODATION
+SERVICES
+EDUCATION
+BEAUTY
+AUTOMOTIVE
+HOME SERVICES
+OTHER
+
+Admin should be able to extend categories later.
+
+============================================================
+25. THREE INTERACTION MODES
+============================================================
+
+Keep exactly:
+
+MODE 1 — COMMERCE
+
+Product
+→ Cart
+→ Checkout
+→ Merchant fulfilment
+→ Musuwo delivery where eligible
+
+MODE 2 — LEAD / ENQUIRY
+
+Listing
+→ Musuwo Chat
+→ customer interest
+→ controlled contact release
+
+MODE 3 — BOOKING / REQUEST
+
+Future appointments/services.
+
+============================================================
+26. ACCOMMODATION
+============================================================
+
+Keep the existing accommodation architecture.
+
+Accommodation is not normal commerce.
+
+Keep:
+- operator registration
+- operator verification
+- property registration
+- property public ID
+- private docs
+- property approval
+- Musuwo Chat
+- controlled contact release
+- reporting
+- academic-period trial
+- annual subscription foundation
+- seasonal discounts
+- Founding Accommodation Partner
+
+Do not add automatic rent/deposit handling yet.
+
+============================================================
+27. BOARDING HOUSE VERIFICATION
+============================================================
+
+Separate:
+
+OPERATOR
+from
+PROPERTY
+
+One operator can manage multiple properties.
+
+Customer may see:
+- Identity Verified
+- Property Reviewed
+- Location Verified
+
+Do not expose private documents.
+
+============================================================
+28. CONTACT GATING
+============================================================
+
+For lead/enquiry businesses:
+
+CUSTOMER
+→ listing
+→ Musuwo Chat
+→ interest
+→ contact request
+→ contact release logged
+→ WhatsApp/phone revealed
+
+Track:
+- lead ID
+- customer
+- business
+- listing/property
+- timestamp
+- release status
+
+============================================================
+29. ACCOMMODATION PILOT / PRICING FOUNDATION
+============================================================
+
+Keep:
+
+APPROVED
+→ FREE ACADEMIC PILOT
+→ PILOT END
+→ PERFORMANCE SUMMARY
+→ PAID RENEWAL OFFER
+
+No automatic charge.
+
+Prepare:
+- annual plans
+- seasonal discounts
+- early-partner discounts
+- qualified-lead pricing later
+
+============================================================
+30. EARLY PARTNERS
+============================================================
+
+Keep:
+
+FOUNDING MERCHANT
+CATEGORY LAUNCH PARTNER
+FOUNDING ACCOMMODATION PARTNER
+EARLY PARTNER
+
+Benefits:
+- free pilot
+- discounts
+- launch support
+- badge
+- promotional visibility
+- direct support
+
+Do not permanently manipulate organic search.
+
+============================================================
+31. BUSINESS PORTAL
+============================================================
+
+Recommended:
+
+HOME
+ORDERS / ENQUIRIES
+PRODUCTS / LISTINGS
+MESSAGES
+AVAILABILITY
+PERFORMANCE
+BUSINESS PROFILE
+DELIVERY / FULFILMENT
+SETTINGS
+
+Only show relevant modules.
+
+Retail/food merchants may see:
+DELIVERY / FULFILMENT
+
+Accommodation should not see delivery.
+
+============================================================
+32. MERCHANT DELIVERY / FULFILMENT PORTAL
+============================================================
+
+For commerce merchants, create a clear handoff state.
+
+Merchant side:
+
+NEW ORDER
+→ ACCEPT / PREPARE
+→ PICK/PACK
+→ READY FOR MUSUWO DELIVERY
+→ HANDED OVER
+→ COMPLETED
+
+Merchant does not need to manage the Musuwo rider network.
+
+Musuwo handles logistics assignment.
+
+Merchant should be able to see:
+- order status
+- pickup state
+- handover confirmation
+- delivery completion
+
+Do not expose sensitive rider/internal logistics data unnecessarily.
+
+============================================================
+33. CHAIN OF CUSTODY
+============================================================
+
+Preserve the existing custody architecture where already built.
+
+Concept:
+
+MERCHANT CUSTODY
+→ READY FOR PICKUP
+→ MUSUWO DELIVERY ASSIGNED
+→ HANDOVER STARTED
+→ IN MUSUWO DELIVERY CUSTODY
+→ OUT FOR DELIVERY
+→ DELIVERED
+→ CUSTODY CLOSED
+
+Exceptions:
+- failed delivery
+- return
+- damaged
+- disputed
+- cancelled
+- lost pending investigation
+
+Keep audit timestamps.
+
+============================================================
+34. RIDER SECURITY FOUNDATION
+============================================================
+
+Preserve current rider concepts if already built:
+
+- rider IDs
+- verification
+- trust levels
+- exposure limits
+- custody
+- OTP/proof of delivery
+- incidents
+- admin controls
+- suspension
+- audit logs
+
+Do not delete this work.
+
+Public rider recruitment remains Coming Soon.
+
+============================================================
+35. DELIVERY BRANDING IN RIDER FLOW
+============================================================
+
+Rider operational app may show:
+
+Musuwo Delivery
+Merchant: Muroora Mart
+Order: ...
+
+Customer-facing interface should instead prioritize:
+
+Muroora Mart
+Your order is on the way.
+
+This avoids confusing internal logistics branding with merchant/customer branding.
+
+============================================================
+36. BUSINESS INSIGHTS
+============================================================
+
+Keep business intelligence.
+
+Examples:
+
+Bookstore:
+"Customers searched A-Level Geography 47 times."
+
+Boarding house:
+"83 students viewed your property. 4 requested contact."
+
+Restaurant:
+"Most orders arrive 12:00–14:00."
+
+Retail:
+"These products are frequently searched but unavailable."
+
+Rule/data-driven initially.
+
+============================================================
+37. BUSINESS HEALTH
+============================================================
+
+Potential dimensions:
+
+- completeness
+- availability
+- response speed
+- fulfilment reliability
+- cancellation
+- customer experience
+- verification
+- incidents
+
+Do not expose exact ranking coefficients.
+
+============================================================
+38. CATEGORY EXPERIENCE
+============================================================
+
+Main categories:
+
+SHOP
+FOOD
+ACCOMMODATION
+SERVICES
+EDUCATION
+BEAUTY
+ELECTRONICS
+HOME
+MORE
+
+Each category:
+- subcategories
+- merchants
+- listings
+- deals
+- discovery
+
+============================================================
+39. DEALS
+============================================================
+
+Prepare:
+
+- product discounts
+- bundles
+- merchant promotions
+- student deals
+- first-order deals
+- category campaigns
+- group-buy pricing
+
+Merchant/admin authorization required.
+
+No fake discounts.
+
+============================================================
+40. STUDENT LIFE
+============================================================
+
+Optional collection:
+
+STUDENT LIFE
+
+- Boarding Houses
+- Groceries
+- Food
+- Textbooks
+- Printing
+- Tutors
+- Repairs
+- Stationery
+
+This is a collection, not a separate app.
+
+============================================================
+41. LOCATION-AWARE DISCOVERY
+============================================================
+
+Use location where useful.
+
+Support:
+- manual area selection
+- nearby merchants
+- nearby food
+- accommodation near campus
+- delivery eligibility
+
+Do not force location permission.
+
+Do not expose exact customer location unnecessarily.
+
+============================================================
+42. LOW-BANDWIDTH DESIGN
+============================================================
+
+Essential for Zimbabwe.
+
+Use:
+- compressed images
+- lazy loading
+- pagination
+- caching where safe
+- retry states
+- minimal API calls
+
+Avoid:
+- autoplay video
+- giant animations
+- excessive image resolution
+- huge first-load feeds
+
+============================================================
+43. CUSTOMER AUTH
+============================================================
+
+Browsing without login.
+
+Require login only when needed:
+- checkout
+- chat
+- contact request
+- order history
+- favourites
+- business application
+
+Reuse existing auth.
+
+============================================================
+44. BUYER ≠ RECIPIENT
+============================================================
+
+Keep diaspora-friendly structure.
+
+Buyer may be abroad.
+
+Recipient may be in Zimbabwe.
+
+Preserve:
+- buyer info
+- recipient info
+- saved recipient
+- saved delivery address
+
+============================================================
+45. CUSTOMER ACCOUNT
+============================================================
+
+Recommended:
+
+PROFILE
+ORDERS
+SAVED ITEMS
+SAVED BUSINESSES
+SAVED RECIPIENTS
+SAVED ADDRESSES
+MESSAGES
+BUSINESS APPLICATION
+SETTINGS
+LOGOUT
+
+Public:
+BECOME A MUSUWO RIDER
+Coming Soon
+
+============================================================
+46. MUSUWO BRANDING
+============================================================
+
+Musuwo branding:
+- app shell
+- search
+- categories
+- marketplace
+- business onboarding
+- marketplace chat
+- admin
+- platform-level pages
+
+Merchant branding:
+- merchant storefront
+- merchant products
+- merchant order
+- merchant-specific tracking
+- customer-facing delivery presentation
+
+Muroora remains Muroora Mart.
+
+Do not globally rename merchant identity to Musuwo.
+
+============================================================
+47. WEB + MOBILE PARITY
+============================================================
+
+Both must support:
+
+- Musuwo branding
+- discovery
+- universal search
+- categories
+- merchant storefronts
+- products
+- food
+- accommodation
+- services
+- chat
+- contact gating
+- orders
+- merchant-branded order tracking
+- Musuwo delivery backend
+- rider Coming Soon public state
+
+============================================================
+48. ADMIN
+============================================================
+
+MUSUWO ADMIN manages:
+
+- businesses
+- applications
+- categories
+- listings
+- accommodation
+- services
+- reports
+- early partners
+- promotions
+- search
+- business plans
+- logistics
+- rider system
+- platform messages
+
+Muroora staff remains merchant-scoped.
+
+============================================================
+49. DATA MODEL PRINCIPLE
+============================================================
+
+ONE SOURCE OF TRUTH.
+
+Business
+→ Listing/Product
+→ Customer
+→ Order/Lead
+→ Merchant fulfilment
+→ Musuwo logistics
+
+Muroora:
+business_id = founding merchant
+
+Other business:
+their own business_id
+
+Do not duplicate delivery records for each front end.
+
+============================================================
+50. MULTI-MERCHANT CART
+============================================================
+
+Audit before enabling.
+
+If current logistics/payment/refund architecture cannot safely handle mixed merchants:
+
+keep:
+ONE MERCHANT PER CHECKOUT
+
+Users can browse all merchants.
+
+Do not fake multi-pickup logistics.
+
+Prepare future:
+master order
+merchant suborders
+multiple pickup points
+
+============================================================
+51. SOCIAL SHARE
+============================================================
+
+Support:
+SHARE
+→ WhatsApp
+→ system share sheet
+
+Useful for:
+- products
+- merchants
+- accommodation
+- services
+- future group buying
+
+============================================================
+52. NOTIFICATIONS
+============================================================
+
+Reuse current infrastructure.
+
+Customer:
+- merchant order update
+- delivery update
+- business reply
+- contact approved
+
+Merchant:
+- order
+- enquiry
+- message
+- contact request
+- order ready handoff
+- delivery completed
+
+Internal Musuwo:
+- logistics assignment
+- custody event
+- incident
+
+============================================================
+53. SECURITY
+============================================================
+
+Review:
+
+- RLS
+- merchant scoping
+- rider scoping
+- custody
+- private customer data
+- contact gating
+- verification documents
+- role escalation
+- admin authorization
+- service keys
+- file uploads
+- delivery assignment endpoints
+
+Do not trust client-supplied merchant_id or rider_id.
+
+============================================================
+54. CUSTOMER DELIVERY PRIVACY
+============================================================
+
+Riders should only receive customer data required for active delivery.
+
+Do not expose:
+- account history
+- unrelated orders
+- payment details
+- private messages
+- saved recipients unrelated to current order
+
+============================================================
+55. PINDUODUO-INSPIRED, NOT A CLONE
+============================================================
+
+Musuwo should borrow:
+
+- discovery
+- value
+- categories
+- social sharing
+- group-commerce foundation
+- repeated discovery
+- merchant breadth
+
+But remain Zimbabwe-adapted.
+
+No Chinese-specific assumptions.
+
+============================================================
+56. HOME PAGE EXAMPLE
+============================================================
+
+Concept:
+
+------------------------------------------------
+MUSUWO
+
+[ Search shops, food, rooms, services... ]
+
+Shop   Food   Accommodation   Services
+Education   Beauty   Electronics   More
+
+------------------------------------------------
+FOUNDING BUSINESSES
+
+[Muroora Mart]
+Founding Merchant
+Groceries • Household
+[Shop]
+
+------------------------------------------------
+LOCAL DEALS
+
+[Product] [Food] [Product] [Service]
+
+------------------------------------------------
+STUDENT LIFE
+
+Boarding Houses
+Textbooks
+Printing
+Food
+Tutors
+
+------------------------------------------------
+POPULAR NEAR YOU
+
+[Merchant cards]
+
+------------------------------------------------
+DISCOVER ON MUSUWO
+
+Mixed feed
+
+------------------------------------------------
+GROUP BUY
+Coming Soon
+------------------------------------------------
+
+============================================================
+57. MERCHANT ORDER TRACKING EXAMPLE
+============================================================
+
+Example customer buys from Muroora Mart:
+
+------------------------------------------------
+MUROORA MART LOGO
+
+Your Muroora Mart Order
+#MUR-...
+
+Preparing
+Ready
+Out for delivery
+Delivered
+
+[Order items]
+
+Delivery status:
+Out for delivery
+
+Small secondary attribution:
+Delivery coordinated by Musuwo
+------------------------------------------------
+
+For another merchant:
+
+------------------------------------------------
+MUTARE BOOK CENTRE LOGO
+
+Your Mutare Book Centre Order
+#...
+
+Out for delivery
+
+Small secondary attribution:
+Delivery coordinated by Musuwo
+------------------------------------------------
+
+This branding hierarchy is required.
+
+============================================================
+58. DO NOT REMOVE EXISTING FEATURES
+============================================================
+
+If an existing feature is already better:
+KEEP IT.
+
+When this prompt conflicts with current safe implementation:
+
+1. explain the conflict
+2. preserve data
+3. propose smallest migration
+4. ask before destructive changes
+
+============================================================
+59. IMPLEMENTATION PHASES
+============================================================
+
+PHASE 1 — AUDIT
+- existing web/mobile
+- merchant structure
+- Muroora
+- delivery
+- rider system
+- search
+- chat
+- accommodation
+- feature flags
+
+PHASE 2 — MUSUWO SHELL
+- branding
+- navigation
+- discovery home
+- categories
+- search
+
+PHASE 3 — MERCHANT MODEL
+- Muroora founding merchant
+- reusable merchant storefront
+- merchant branding
+
+PHASE 4 — MUSUWO DELIVERY
+- merchant preparation
+- Musuwo pickup
+- custody
+- delivery assignment
+- merchant-branded customer tracking
+
+PHASE 5 — RIDER PRE-LAUNCH
+- preserve rider architecture
+- controlled internal use
+- public recruitment Coming Soon
+
+PHASE 6 — SME MARKETPLACE
+- self-registration
+- approval
+- portal
+- listings
+
+PHASE 7 — ACCOMMODATION/SERVICES
+- property
+- operator
+- chat
+- contact gating
+- pilots
+
+PHASE 8 — SOCIAL COMMERCE
+- WhatsApp share
+- deals
+- group-buy foundation
+
+PHASE 9 — HARDENING
+- RLS
+- cross-merchant isolation
+- delivery security
+- low-bandwidth
+- regression tests
+- web/mobile parity
+
+============================================================
+60. REQUIRED FIRST RESPONSE FROM CODEX
+============================================================
+
+BEFORE LARGE CHANGES, REPORT:
+
+1. What already exists.
+2. What current Muroora code becomes Musuwo platform core.
+3. What remains specifically Muroora Mart.
+4. Current web architecture.
+5. Current mobile architecture.
+6. Current merchant structure.
+7. Current search structure.
+8. Current delivery structure.
+9. Current rider structure.
+10. Whether Muroora currently depends on Muroora-specific riders.
+11. How to migrate delivery responsibility to Musuwo without duplicating the delivery engine.
+12. How merchant branding will remain visible during Musuwo delivery.
+13. Which customer tracking components need modification.
+14. Which rider functions can operate internally while public rider recruitment stays Coming Soon.
+15. How custody/handover currently works.
+16. Whether OTP/proof of delivery already exists.
+17. Whether one-merchant-per-checkout should remain.
+18. Required database migrations.
+19. Required RLS changes.
+20. Reusable UI components.
+21. What should be deferred.
+22. Which destructive changes require explicit permission.
+
+============================================================
+61. FINAL PRODUCT PRINCIPLE
+============================================================
+
+MUSUWO = THE PLATFORM
+
+MUROORA MART = FOUNDING MERCHANT
+
+OTHER SMEs = MERCHANTS / LISTING PROVIDERS
+
+MUSUWO = DELIVERY INFRASTRUCTURE
+
+MERCHANT BRAND = CUSTOMER-FACING ORDER / DELIVERY BRAND
+
+PUBLIC RIDER RECRUITMENT = COMING SOON
+
+Musuwo should feel like:
+
+OPEN APP
+→ DISCOVER
+→ SEARCH
+→ FIND LOCAL BUSINESSES / PRODUCTS / FOOD / ROOMS / SERVICES
+→ SHOP OR ENQUIRE
+→ MUSUWO COORDINATES THE PLATFORM AND DELIVERY
+→ CUSTOMER STILL EXPERIENCES THE BRAND THEY CHOSE TO BUY FROM
+
+The customer should never feel that every merchant has been erased behind the Musuwo brand.
+
+Musuwo is the infrastructure and marketplace.
+
+The merchant remains the merchant.
+
+FINAL NON-NEGOTIABLES:
+
+1. MUSUWO IS THE PLATFORM.
+2. MUROORA MART IS THE FOUNDING MERCHANT.
+3. EXISTING WORK MUST BE PRESERVED.
+4. ONE SHARED BACKEND REMAINS THE SOURCE OF TRUTH.
+5. MUSUWO HANDLES ELIGIBLE DELIVERY.
+6. CUSTOMER-FACING DELIVERY IS BRANDED BY THE MERCHANT THEY BOUGHT FROM.
+7. MUSUWO DELIVERY ATTRIBUTION MAY APPEAR SECONDARILY FOR TRANSPARENCY.
+8. PUBLIC RIDER RECRUITMENT REMAINS COMING SOON.
+9. RIDER/DELIVERY BACKEND WORK MUST NOT BE DELETED IF SOUND.
+10. BUSINESSES SELF-APPLY BUT MUSUWO APPROVES THEM.
+11. ACCOMMODATION USES VERIFIED LEAD/ENQUIRY MODEL.
+12. CONTACT DETAILS REMAIN GATED UNTIL QUALIFIED INTERACTION.
+13. WEB + MOBILE BOTH USE MUSUWO.
+14. DO NOT DUPLICATE SYSTEMS.
+15. DO NOT PERFORM DESTRUCTIVE REBUILDS WITHOUT EXPLICIT PERMISSION.

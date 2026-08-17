@@ -1,0 +1,37 @@
+ > The app is already published, and I asked another intended admin to create an account and log in.
+  > Please inspect and complete the production account integration without redesigning the approved
+  > frontend.
+  >
+  > Important issue: the account buttons inside the official one-page homepage currently use simulated
+  > local state. They must be connected to the real Supabase authentication and role-protected routes.
+  >
+  > Please inspect:
+  >
+  > - apps/muroora/app/components/shop/DesignPreview.tsx — approved official interface; preserve its
+  >   appearance.
+  >
+  > - apps/muroora/app/page.tsx — currently renders that interface.
+  > - apps/muroora/app/login/actions.ts — real sign-in, signup, password reset and sign-out actions.
+  > - apps/muroora/app/login/LoginForm.tsx
+  > - apps/muroora/app/components/auth/AccessLoginForm.tsx
+  > - apps/muroora/app/team-access/page.tsx
+  > - apps/muroora/app/management-access/page.tsx
+  > - apps/muroora/app/account/page.tsx
+  > - apps/muroora/app/admin/staff/page.tsx
+  > - apps/muroora/app/admin/staff/actions.ts
+  > - apps/muroora/lib/auth.ts
+  > - apps/muroora/middleware.ts
+  > - apps/muroora/lib/services/staff.ts
+  >
+  > Connect the approved homepage as follows:
+  >
+  > 1. Customer Log in must use the real customer login/signup actions.
+  > 2. Checkout must require a real authenticated customer and return to checkout after login.
+  > 3. Staff login must use real authentication.
+  > 4. “Create staff account” must create an ordinary account awaiting admin approval—it must never
+  >    self-grant a staff role.
+  >
+  > 5. Admin login must use real authentication and must not offer admin registration.
+  > 6. Preserve the maximum of three admins at both service and database level.
+  > 7. Replace simulated products, carts, checkout and order submission with the existing backend
+  >    services.

@@ -1,0 +1,2231 @@
+
+MUROORA MART — MASTER BUILD PROMPT FOR CLAUDE + CODEX
+Version: 1.0
+Purpose: Turn the existing Muroora Mart website into the first version of a real Zimbabwean e-commerce + local delivery platform, while preserving the current brand and keeping the architecture ready for future third-party merchants.
+
+======================================================================
+0. IMPORTANT CONTEXT
+======================================================================
+
+Muroora Mart is NOT a hypothetical project.
+
+It is an operating retail business in Zimbabwe with its own stock and physical shop operations.
+
+The current website already exists and should be treated as the visual/brand foundation. Do not rebuild the entire website from scratch unless absolutely necessary.
+
+The short-term goal is:
+
+1. Sell Muroora Mart's own inventory online.
+2. Allow customers in Zimbabwe and the diaspora to order goods for recipients in Zimbabwe.
+3. Allow Muroora Mart staff to receive, prepare and manage orders.
+4. Build a delivery system using verified delivery partners/riders, preferably motorcycle owners.
+5. Pay riders based on completed deliveries rather than assuming a fixed monthly salary model.
+6. Provide proper order tracking, delivery status, proof of delivery and rider accountability.
+7. Keep the underlying architecture capable of supporting third-party businesses later, but DO NOT turn the first release into an open marketplace.
+
+The long-term direction is:
+
+Muroora Mart -> Muroora Delivery -> Muroora local-commerce platform.
+
+The system must therefore be future-proof without being over-engineered.
+
+======================================================================
+1. PRIMARY DEVELOPMENT PRINCIPLE
+======================================================================
+
+BUILD IN PHASES.
+
+Do not attempt to build a full Meituan/Uber Eats clone immediately.
+
+The first production version should be operationally useful, secure, understandable and maintainable.
+
+Priority order:
+
+A. Existing Muroora Mart storefront
+B. Product catalogue and inventory
+C. Cart and checkout
+D. Buyer versus recipient handling
+E. Order-management dashboard
+F. Delivery zones and delivery pricing
+G. Rider onboarding and verification
+H. Manual rider dispatch
+I. Delivery tracking/status system
+J. Rider earnings ledger
+K. Proof of delivery
+L. Notifications
+M. Analytics and reporting
+N. Future multi-merchant capability
+
+======================================================================
+2. FIRST TASK: AUDIT THE EXISTING CODEBASE
+======================================================================
+
+Before modifying anything:
+
+1. Inspect the complete current project structure.
+2. Identify:
+   - framework
+   - frontend stack
+   - backend/API approach
+   - database if present
+   - authentication system if present
+   - deployment platform
+   - environment-variable structure
+   - image/storage approach
+   - existing components
+   - current routing
+   - styling system
+   - current product data structure
+3. Produce a short CODEBASE_AUDIT.md before major implementation.
+4. Reuse existing components where sensible.
+5. Preserve current design language and branding.
+6. Do not destroy working functionality.
+7. Avoid unnecessary framework migrations.
+8. Prefer incremental changes.
+9. If a migration is genuinely necessary, document the reason before doing it.
+10. Do not hard-code secrets, phone numbers, API keys or payment credentials.
+
+======================================================================
+3. BRAND AND FRONTEND DIRECTION
+======================================================================
+
+Muroora Mart should feel:
+
+- modern
+- Zimbabwean
+- warm
+- trustworthy
+- culturally grounded
+- premium but accessible
+- family-oriented
+- useful to both local and diaspora customers
+
+The new hero/background image already follows this direction.
+
+Do NOT turn the site into a traditional-art shop.
+
+The business remains a modern grocery/household-commerce and delivery service.
+
+Suggested brand message:
+
+"The shopping gets done, wherever you are."
+
+The visual identity can use Zimbabwean cultural cues while keeping the shopping experience clean and modern.
+
+The site must be fully mobile responsive.
+
+Mobile is a first-class experience, not an afterthought.
+
+======================================================================
+4. USER TYPES / ROLES
+======================================================================
+
+Implement role-based access control.
+
+Required roles:
+
+1. CUSTOMER
+   - browse products
+   - manage cart
+   - checkout
+   - save addresses
+   - place orders
+   - track orders
+   - view order history
+   - receive notifications
+   - order for themselves or another recipient
+
+2. SHOP_STAFF
+   - view assigned/new orders
+   - confirm stock availability
+   - pick items
+   - mark items packed
+   - flag substitutions/out-of-stock items
+   - mark order ready for rider
+
+3. ADMIN
+   - full product management
+   - inventory management
+   - pricing
+   - order management
+   - delivery-zone management
+   - rider verification
+   - rider suspension/reactivation
+   - dispatch
+   - reports
+   - payouts/earnings review
+   - audit-log access
+   - system settings
+
+4. RIDER
+   - complete onboarding
+   - upload verification documents
+   - set availability
+   - see eligible delivery jobs
+   - accept or decline a delivery
+   - navigate to pickup
+   - mark pickup complete
+   - navigate to customer
+   - mark arrival
+   - complete proof of delivery
+   - view earnings
+   - view delivery history
+   - report a problem
+
+5. SUPER_ADMIN
+   - optional internal role
+   - system-level access
+   - manage admins/permissions
+   - access security/configuration areas
+
+FUTURE ROLE ONLY:
+
+6. MERCHANT
+   - DO NOT fully expose this role in Version 1.
+   - Design the database so it can be added later.
+
+======================================================================
+5. CUSTOMER SHOPPING EXPERIENCE
+======================================================================
+
+Build or improve these routes/pages:
+
+/
+Home
+
+/shop
+All products
+
+/shop/category/[slug]
+Category pages
+
+/product/[slug]
+Product details
+
+/cart
+Cart
+
+/checkout
+Checkout
+
+/order/[orderId]
+Order confirmation + tracking
+
+/account
+Customer account
+
+/account/orders
+Order history
+
+/account/addresses
+Saved addresses
+
+/account/profile
+Profile
+
+Optional later:
+/favorites
+/promotions
+/bundles
+
+Product fields should support:
+
+- id
+- sku
+- name
+- slug
+- brand
+- description
+- category
+- subcategory
+- unit/size
+- price
+- promotional price
+- cost price (admin only)
+- stock quantity
+- low-stock threshold
+- availability
+- images
+- featured
+- active/inactive
+- business/store id
+- created at
+- updated at
+
+======================================================================
+6. BUYER VS RECIPIENT — VERY IMPORTANT
+======================================================================
+
+The system MUST treat buyer and recipient as potentially different people.
+
+This is central to diaspora ordering.
+
+Checkout should support:
+
+BUYER
+- full name
+- email
+- phone
+- country
+
+RECIPIENT
+- full name
+- Zimbabwe phone number
+- relationship/optional label
+- delivery address
+- suburb/area
+- delivery notes
+- map pin/location if available
+- alternative contact
+- preferred delivery date/time if enabled
+
+Provide a checkbox:
+
+[ ] I am the recipient
+
+If checked:
+reuse customer details where appropriate.
+
+If not checked:
+show full recipient form.
+
+Customers should be able to save recipients for future orders.
+
+Example:
+"Mom - Dangamvura"
+"Brother - Chikanga"
+
+======================================================================
+7. DELIVERY ZONES
+======================================================================
+
+Do not calculate arbitrary nationwide delivery yet.
+
+Start with configured service zones around the current operating area.
+
+Create an admin-configurable delivery-zone system.
+
+Each zone should support:
+
+- zone id
+- name
+- description
+- geographic boundary or suburb list
+- base delivery fee
+- optional per-km fee
+- minimum order
+- estimated delivery time
+- active/inactive
+- maximum delivery distance
+
+Allow the admin to define zones such as:
+
+Zone A
+Zone B
+Zone C
+etc.
+
+Do not hard-code the examples into production.
+
+The delivery-fee engine should be replaceable later with distance-based pricing.
+
+======================================================================
+8. WHATSAPP — CURRENTLY NO FINAL SHOP NUMBER
+======================================================================
+
+The final WhatsApp business number is NOT available yet.
+
+DO NOT hard-code a fake number.
+
+Implement WhatsApp integration so it can be activated later through configuration.
+
+Use an environment/configuration value such as:
+
+WHATSAPP_BUSINESS_NUMBER=
+
+or an application setting stored securely.
+
+Current behaviour:
+
+- if no WhatsApp number is configured:
+  - hide WhatsApp CTAs OR
+  - show them disabled with a safe admin-controlled state
+- do not expose "undefined" or fake links
+- do not block the rest of development
+
+Once configured, support:
+
+1. General WhatsApp contact
+2. Product enquiry
+3. Cart enquiry
+4. Order support
+
+Example generated message:
+
+Hello Muroora Mart. I need help with order MM-000124.
+
+For cart-based messages, optionally include:
+- item names
+- quantities
+- estimated cart total
+
+Do not expose sensitive customer data unnecessarily.
+
+======================================================================
+9. INVENTORY
+======================================================================
+
+Muroora Mart owns its stock.
+
+Build real inventory management.
+
+Required functionality:
+
+- current stock quantity
+- stock adjustment
+- reason for adjustment
+- purchase/restock entry
+- sale deduction
+- damaged/lost stock adjustment
+- returned stock
+- manual correction
+- audit history
+
+Create an inventory ledger rather than only overwriting one number.
+
+Suggested structure:
+
+INVENTORY_TRANSACTIONS
+- id
+- product_id
+- store_id
+- type
+- quantity_change
+- quantity_before
+- quantity_after
+- reference_type
+- reference_id
+- reason
+- performed_by
+- timestamp
+
+Possible types:
+
+RESTOCK
+SALE
+RETURN
+DAMAGED
+LOST
+MANUAL_ADJUSTMENT
+CANCELLED_ORDER_RESTOCK
+
+Stock should be reserved appropriately during checkout/order confirmation depending on the chosen payment workflow.
+
+Do not allow negative stock unless explicitly configured.
+
+======================================================================
+10. ORDER MODEL
+======================================================================
+
+Order statuses should be event-driven.
+
+Suggested order statuses:
+
+DRAFT
+PENDING_PAYMENT
+PAYMENT_CONFIRMED
+ORDER_RECEIVED
+ACCEPTED
+PICKING
+AWAITING_SUBSTITUTION_APPROVAL
+PACKED
+READY_FOR_PICKUP
+DRIVER_ASSIGNED
+RIDER_AT_STORE
+COLLECTED
+OUT_FOR_DELIVERY
+RIDER_ARRIVED
+DELIVERED
+DELIVERY_FAILED
+CANCELLED
+REFUNDED
+PARTIALLY_REFUNDED
+
+Do not force every status into the customer UI.
+
+Customer-facing statuses can be simplified to:
+
+Order received
+Preparing
+Packed
+Driver assigned
+On the way
+Delivered
+
+Maintain a full internal event history.
+
+ORDER_EVENTS
+- id
+- order_id
+- event_type
+- previous_status
+- new_status
+- actor_type
+- actor_id
+- metadata
+- timestamp
+
+Never silently modify order states.
+
+======================================================================
+11. ORDER IDENTIFIERS
+======================================================================
+
+Create human-friendly identifiers.
+
+Example:
+
+MM-000001
+MM-000002
+
+Do not expose raw sequential database IDs if avoidable.
+
+Use immutable internal UUIDs as the true database identifiers.
+
+======================================================================
+12. SHOP/STAFF DASHBOARD
+======================================================================
+
+Create a responsive staff dashboard.
+
+Main screens:
+
+/staff/orders
+/staff/orders/[id]
+/staff/inventory
+
+Order queue should allow filters:
+
+- New
+- Paid
+- Picking
+- Waiting on customer
+- Packed
+- Ready for delivery
+- Completed
+- Cancelled
+
+Individual order view should display:
+
+- order number
+- payment state
+- buyer
+- recipient
+- recipient phone
+- address
+- delivery instructions
+- ordered products
+- quantities
+- substitution state
+- packing checklist
+- order total
+- delivery fee
+- order timeline
+- rider information after assignment
+
+Staff should be able to tick items as picked.
+
+======================================================================
+13. PRODUCT SUBSTITUTIONS
+======================================================================
+
+This is important for grocery operations.
+
+At checkout allow customer preference:
+
+A. No substitutions
+B. Substitute with similar product
+C. Contact me before substituting
+
+If an item is unavailable during picking:
+
+- staff flags unavailable item
+- system records it
+- staff can propose replacement
+- customer/admin approval can be handled
+- totals must be recalculated safely
+- all changes must be logged
+
+Version 1 can keep this process simple.
+
+======================================================================
+14. RIDER REGISTRATION
+======================================================================
+
+Create a dedicated mobile-first rider onboarding flow.
+
+Route examples:
+
+/rider/apply
+/rider/onboarding
+/rider/dashboard
+/rider/deliveries
+/rider/earnings
+/rider/profile
+/rider/documents
+
+Application fields:
+
+PERSONAL
+- full legal name
+- preferred display name
+- phone
+- email optional
+- date of birth
+- national ID/passport identifier
+- home area
+- emergency contact
+- profile photograph/selfie
+
+VERIFICATION DOCUMENTS
+- national ID image
+- police clearance certificate
+- driver's licence
+- vehicle licence/registration
+- insurance document
+- other required compliance documents
+
+VEHICLE
+- vehicle type
+- motorcycle preferred initially
+- make/model
+- registration number
+- colour
+- vehicle photo
+- optional engine capacity
+
+PAYMENT
+- payout method
+- EcoCash or supported wallet/bank details
+- account holder name
+
+CONSENTS
+- platform terms
+- privacy acknowledgement
+- rider agreement
+- safety rules
+- location permission acknowledgement
+
+Do not claim these documents are legally sufficient by themselves.
+
+The application must have:
+
+DRAFT
+SUBMITTED
+UNDER_REVIEW
+NEEDS_INFORMATION
+APPROVED
+REJECTED
+SUSPENDED
+
+======================================================================
+15. RIDER DOCUMENT SECURITY
+======================================================================
+
+Rider verification documents are sensitive.
+
+Implement:
+
+- private storage
+- authenticated access only
+- admin-only access where appropriate
+- no public file URLs
+- document metadata
+- expiry date
+- verification status
+- reviewer
+- verification timestamp
+- notes
+- audit history
+
+Public rider profiles must NEVER expose:
+
+- national ID
+- home address
+- police clearance document
+- licence scans
+- bank/mobile-wallet details
+- private emergency contact
+
+Customer-visible rider information can include:
+
+- display name
+- profile photo
+- rating
+- vehicle type
+- vehicle colour
+- registration number if the business decides it is appropriate
+- completed-delivery count
+- verified badge
+
+======================================================================
+16. DOCUMENT EXPIRY
+======================================================================
+
+Allow admins to record expiry dates for:
+
+- driver's licence
+- vehicle licence
+- insurance
+- any document requiring renewal
+
+System should support reminders/statuses:
+
+VALID
+EXPIRING_SOON
+EXPIRED
+
+An expired mandatory document should be able to prevent a rider from becoming AVAILABLE.
+
+Do not permanently delete the rider.
+
+Set status to document hold/suspended until reviewed.
+
+======================================================================
+17. RIDER AVAILABILITY
+======================================================================
+
+Riders should be able to:
+
+GO ONLINE
+GO OFFLINE
+
+Possible states:
+
+OFFLINE
+AVAILABLE
+OFFERED_DELIVERY
+ON_DELIVERY
+PAUSED
+SUSPENDED
+
+The application must prevent multiple conflicting assignments unless multi-order delivery is intentionally added later.
+
+Version 1:
+one active delivery per rider is acceptable.
+
+======================================================================
+18. DELIVERY JOB OFFER
+======================================================================
+
+Before a rider accepts, show:
+
+- pickup location
+- approximate destination area
+- estimated distance
+- estimated time
+- rider earnings
+- order size/weight class if relevant
+- payment/COD indicator
+- special handling indicator
+
+Do not reveal unnecessary recipient information before acceptance.
+
+Buttons:
+
+DECLINE
+ACCEPT
+
+Rider should not be punished merely for declining an offer if the chosen legal/operating model treats riders as independent delivery partners.
+
+After accepting, normal platform performance standards apply.
+
+======================================================================
+19. MANUAL DISPATCH FIRST
+======================================================================
+
+Version 1 should use manual admin dispatch.
+
+Admin sees:
+
+READY ORDERS
+
+and
+
+AVAILABLE RIDERS
+
+Admin can assign a rider.
+
+Suggested dispatch screen:
+
+Order
+Pickup
+Destination
+Distance
+Order size
+Rider earnings
+
+Available riders:
+- name
+- current status
+- approximate proximity
+- current rating
+- active delivery count
+- vehicle type
+
+[ASSIGN]
+
+Build the data model so automatic dispatch can be added later.
+
+Do NOT spend early development time building sophisticated AI dispatch.
+
+======================================================================
+20. DELIVERY LIFECYCLE
+======================================================================
+
+Delivery statuses:
+
+CREATED
+ASSIGNED
+ACCEPTED
+RIDER_EN_ROUTE_TO_PICKUP
+RIDER_ARRIVED_PICKUP
+PICKED_UP
+EN_ROUTE_TO_CUSTOMER
+ARRIVED
+DELIVERED
+FAILED
+CANCELLED
+RETURNING_TO_STORE
+RETURNED
+
+Maintain DELIVERY_EVENTS.
+
+Each event can include:
+
+- latitude/longitude if available and permitted
+- timestamp
+- actor
+- notes
+
+======================================================================
+21. LOCATION TRACKING
+======================================================================
+
+Do not implement invasive 24/7 surveillance.
+
+Rider location should be collected only when operationally necessary and legally/privacy appropriate.
+
+Recommended:
+
+- location while rider is AVAILABLE: low-frequency, if needed for dispatch
+- location during ACTIVE DELIVERY: higher frequency where supported
+- location while OFFLINE: no tracking
+
+Customer live tracking can be introduced carefully.
+
+Version 1 may begin with status-based tracking instead of high-frequency live maps.
+
+Architecture should allow live tracking later.
+
+======================================================================
+22. PROOF OF DELIVERY
+======================================================================
+
+Support at least one proof mechanism.
+
+Options:
+
+A. Delivery OTP
+B. Recipient signature
+C. Delivery photo
+D. Admin-confirmed exception
+
+Recommended Version 1:
+OTP + optional photo.
+
+Process:
+
+1. Customer/recipient receives OTP.
+2. Rider arrives.
+3. Rider enters OTP.
+4. Order marked delivered.
+5. Timestamp saved.
+
+If OTP cannot be used, provide exception workflow requiring reason.
+
+Never allow riders to simply mark expensive orders delivered without a verifiable trail.
+
+======================================================================
+23. RIDER EARNINGS
+======================================================================
+
+Do not hard-code the word "salary" into the technical model.
+
+Call it:
+
+RIDER EARNINGS
+DELIVERY EARNINGS
+PAYOUTS
+
+Each completed delivery creates an earning entry.
+
+Suggested:
+
+RIDER_EARNINGS
+- id
+- rider_id
+- delivery_id
+- base_amount
+- distance_amount
+- bonus_amount
+- tip_amount
+- adjustment_amount
+- gross_amount
+- status
+- created_at
+
+Possible states:
+
+PENDING
+AVAILABLE
+PAID
+REVERSED
+DISPUTED
+
+Create a wallet-style ledger:
+
+RIDER_WALLET_TRANSACTIONS
+- earning
+- bonus
+- tip
+- adjustment
+- payout
+- reversal
+
+Do not simply store one editable "balance".
+
+Balance should be derived from ledger transactions.
+
+======================================================================
+24. DELIVERY PRICING
+======================================================================
+
+Pricing must be admin configurable.
+
+Do not assume fixed amounts now.
+
+Create a delivery pricing configuration capable of supporting:
+
+- base fee
+- zone fee
+- distance fee
+- minimum rider earning
+- peak bonus
+- waiting fee
+- heavy-order surcharge
+- platform share
+- rider share
+
+At checkout:
+
+customer_delivery_fee
+
+At rider offer:
+
+rider_earnings
+
+These do not need to be exactly equal.
+
+The business may subsidise/promote deliveries or retain a platform margin.
+
+All calculations must be transparent in admin records.
+
+======================================================================
+25. TIPS
+======================================================================
+
+Allow architecture for customer tips.
+
+Tips should be separately recorded.
+
+If enabled, clearly show:
+
+Delivery fee
+Tip
+Order total
+
+Rider wallet should display tip separately.
+
+Do not silently treat tips as platform revenue.
+
+======================================================================
+26. RIDER PERFORMANCE / GOVERNANCE
+======================================================================
+
+Track useful operational metrics:
+
+- completed deliveries
+- accepted deliveries
+- cancellations after acceptance
+- failed deliveries
+- on-time performance
+- customer ratings
+- complaints
+- proof-of-delivery exceptions
+
+Do not create an opaque "AI score".
+
+Use understandable metrics.
+
+Important distinction:
+
+BEFORE ACCEPTANCE:
+rider may decline a job.
+
+AFTER ACCEPTANCE:
+rider is expected to complete the job or provide a valid cancellation/problem reason.
+
+Create incident categories:
+
+CUSTOMER_UNREACHABLE
+VEHICLE_BREAKDOWN
+ACCIDENT
+WEATHER
+ADDRESS_PROBLEM
+STORE_DELAY
+RIDER_CANCELLATION
+CUSTOMER_CANCELLATION
+SECURITY_CONCERN
+OTHER
+
+======================================================================
+27. RIDER RATING SYSTEM
+======================================================================
+
+After delivery customers may rate:
+
+1–5 stars
+
+Optional tags:
+
+Professional
+Fast delivery
+Friendly
+Good communication
+Careful handling
+
+Negative tags:
+
+Late
+Poor communication
+Damaged goods
+Unprofessional
+
+Do not expose raw complaint details publicly.
+
+Allow admins to investigate disputes.
+
+======================================================================
+28. RIDER LEVELS — OPTIONAL
+======================================================================
+
+Architecture can support:
+
+NEW
+VERIFIED
+TRUSTED
+PRO
+
+Do not make this the priority.
+
+Possible future eligibility rules can use:
+
+- completed deliveries
+- rating
+- low serious-complaint count
+- valid documents
+
+Benefits could be operational:
+- access to higher-value deliveries
+- priority offers
+- bonus programmes
+
+Do not implement discriminatory or opaque ranking.
+
+======================================================================
+29. CASH ON DELIVERY
+======================================================================
+
+COD may be supported later but is high-risk.
+
+Build the order model with payment_method and payment_status fields.
+
+Potential payment methods:
+
+ONLINE
+CASH_ON_DELIVERY
+BANK_TRANSFER
+ECOCASH
+OTHER
+
+If COD is enabled:
+
+- rider must confirm cash collection
+- system records amount collected
+- rider cash liability must be tracked
+- admin reconciliation required
+- limits can be assigned to riders
+
+Suggested ledger:
+
+RIDER_CASH_LEDGER
+
+Do NOT treat COD cash as rider earnings.
+
+Keep:
+
+customer payment
+rider earnings
+cash liability
+
+as separate accounting concepts.
+
+======================================================================
+30. PAYMENTS
+======================================================================
+
+Do not integrate a live payment gateway until the actual Zimbabwe/business payment provider is selected.
+
+Build an abstraction.
+
+PAYMENTS
+- id
+- order_id
+- provider
+- provider_reference
+- method
+- amount
+- currency
+- status
+- paid_at
+- metadata
+
+Statuses:
+
+PENDING
+PROCESSING
+PAID
+FAILED
+REFUNDED
+PARTIAL_REFUND
+
+Use environment variables for provider credentials.
+
+Never commit credentials to Git.
+
+======================================================================
+31. NOTIFICATIONS
+======================================================================
+
+Create a notification service abstraction.
+
+Potential channels:
+
+- in-app
+- email
+- SMS
+- WhatsApp
+
+Do not tightly couple order logic to one messaging provider.
+
+Events that can trigger notifications:
+
+ORDER_CONFIRMED
+ORDER_ACCEPTED
+SUBSTITUTION_REQUIRED
+ORDER_PACKED
+RIDER_ASSIGNED
+ORDER_COLLECTED
+RIDER_NEARBY
+DELIVERED
+DELIVERY_FAILED
+REFUND_PROCESSED
+
+Version 1 can start with in-app + whichever practical messaging channel becomes available.
+
+======================================================================
+32. CUSTOMER ORDER TRACKING
+======================================================================
+
+Create a clean order-tracking page.
+
+Example:
+
+MM-000124
+
+✓ Order received
+✓ Preparing
+✓ Packed
+✓ Driver assigned
+● On the way
+○ Delivered
+
+When rider assigned, customer may see:
+
+Your Muroora is on the way.
+
+Rider:
+Tawanda M.
+[profile image]
+Verified Rider
+Motorcycle
+Rating
+
+Do not expose private rider data.
+
+======================================================================
+33. DATABASE — FUTURE-PROOF STRUCTURE
+======================================================================
+
+Use proper relational design where appropriate.
+
+Recommended major entities:
+
+USERS
+CUSTOMER_PROFILES
+ADDRESSES
+RECIPIENTS
+
+BUSINESSES
+STORES
+
+CATEGORIES
+PRODUCTS
+PRODUCT_IMAGES
+
+INVENTORY
+INVENTORY_TRANSACTIONS
+
+CARTS
+CART_ITEMS
+
+ORDERS
+ORDER_ITEMS
+ORDER_EVENTS
+ORDER_SUBSTITUTIONS
+
+PAYMENTS
+REFUNDS
+
+DELIVERY_ZONES
+DELIVERY_PRICING_RULES
+
+RIDERS
+RIDER_DOCUMENTS
+RIDER_VEHICLES
+RIDER_AVAILABILITY
+RIDER_LOCATIONS
+
+DELIVERIES
+DELIVERY_EVENTS
+DELIVERY_PROOFS
+
+RIDER_EARNINGS
+RIDER_WALLET_TRANSACTIONS
+RIDER_PAYOUTS
+
+REVIEWS
+COMPLAINTS
+INCIDENTS
+
+NOTIFICATIONS
+
+AUDIT_LOGS
+
+SYSTEM_SETTINGS
+
+IMPORTANT:
+
+Although Version 1 only has Muroora Mart as the merchant, include:
+
+business_id
+store_id
+
+where appropriate.
+
+Seed:
+
+BUSINESS:
+Muroora Mart
+
+STORE:
+Current physical branch
+
+This avoids a painful database rewrite if third-party merchants are added later.
+
+======================================================================
+34. THIRD-PARTY MERCHANTS — DO NOT ACTIVATE YET
+======================================================================
+
+Do not build a public merchant registration marketplace in Version 1.
+
+Only prepare the architecture.
+
+Future capability:
+
+BUSINESS
+  -> STORE
+  -> PRODUCTS
+  -> ORDERS
+  -> DELIVERY REQUEST
+  -> MUROORA DELIVERY
+
+Future merchants may have:
+
+- their own catalogue
+- their own stock
+- order dashboard
+- settlement ledger
+- merchant fees
+- delivery-only requests
+
+Do not implement unless the core Muroora Mart flow is stable.
+
+======================================================================
+35. SECURITY
+======================================================================
+
+Minimum security requirements:
+
+- secure authentication
+- role-based access control
+- server-side authorization checks
+- private document storage
+- signed/temporary URLs for sensitive files
+- input validation
+- rate limiting where appropriate
+- CSRF protection where relevant
+- XSS prevention
+- secure cookies/session handling
+- no secrets in frontend bundle
+- no credentials committed to repository
+- audit logs for admin-sensitive actions
+- proper database constraints
+- error logging without leaking private data
+
+Protect sensitive rider/customer information.
+
+======================================================================
+36. PRIVACY BY DESIGN
+======================================================================
+
+Collect only information needed for operations.
+
+Examples:
+
+Rider should see recipient information only for their assigned active delivery.
+
+After completion:
+minimise continued direct access to sensitive customer information.
+
+Customer should see only appropriate rider profile information.
+
+Shop staff should not automatically see rider banking details.
+
+Only finance/admin roles should see payout data if necessary.
+
+Use clear data-retention settings in architecture.
+
+Do not create permanent public links for ID documents.
+
+======================================================================
+37. AUDIT LOG
+======================================================================
+
+Create immutable-style audit records for important actions.
+
+Examples:
+
+- product price changed
+- inventory manually adjusted
+- rider approved
+- rider suspended
+- rider document verified
+- order cancelled
+- refund approved
+- delivery reassigned
+- earnings manually adjusted
+- payout approved
+
+AUDIT_LOG:
+- actor
+- action
+- entity type
+- entity id
+- before snapshot where appropriate
+- after snapshot where appropriate
+- timestamp
+- IP/device metadata where reasonable
+
+======================================================================
+38. ADMIN DASHBOARD
+======================================================================
+
+Core admin navigation:
+
+Dashboard
+Orders
+Products
+Inventory
+Customers
+Riders
+Deliveries
+Dispatch
+Delivery Zones
+Earnings/Payouts
+Reports
+Settings
+Audit Log
+
+Dashboard summary can show:
+
+Today's orders
+Orders awaiting picking
+Orders ready for delivery
+Active deliveries
+Completed deliveries
+Sales today
+Low-stock products
+Available riders
+Rider applications awaiting review
+
+Do not overload the dashboard.
+
+======================================================================
+39. ANALYTICS
+======================================================================
+
+Capture useful operational data from day one.
+
+Track:
+
+- orders per day
+- revenue
+- average order value
+- products sold
+- stock-outs
+- delivery count
+- average delivery time
+- picking time
+- store-to-customer time
+- failed delivery rate
+- delivery-zone demand
+- rider utilization
+- rider earnings
+- repeat customers
+- diaspora vs local order indicator if legally/privacy appropriate
+
+These metrics will eventually help determine whether expanding to third-party merchants makes sense.
+
+======================================================================
+40. SEARCH
+======================================================================
+
+Implement practical product search.
+
+Search by:
+
+- product name
+- brand
+- category
+- common terms
+
+Support filters:
+
+- category
+- price
+- in stock
+- promotions
+
+Avoid building complex search infrastructure until catalogue size requires it.
+
+======================================================================
+41. PRODUCT BUNDLES
+======================================================================
+
+Architecture should support bundles such as:
+
+Family Grocery Box
+Monthly Essentials
+Student Pack
+New Mum Pack
+Cleaning Bundle
+Christmas Hamper
+
+Bundle should contain component products and quantities.
+
+Stock availability should derive from component products where feasible.
+
+======================================================================
+42. ERROR STATES
+======================================================================
+
+Design proper user-facing errors.
+
+Examples:
+
+Product became unavailable
+Delivery area unsupported
+Payment failed
+Rider unavailable
+Order cannot be cancelled
+Document upload failed
+
+Never show raw stack traces or database errors.
+
+======================================================================
+43. DEMO / DEVELOPMENT MODE
+======================================================================
+
+Because some real operational data is not yet available, create safe configuration and seed data.
+
+Use:
+
+- placeholder store contact
+- placeholder delivery zones
+- sample rider accounts
+- sample products if necessary
+- test orders
+
+Clearly mark demo data.
+
+Do NOT use fake production contact numbers.
+
+For WhatsApp:
+
+WHATSAPP_BUSINESS_NUMBER=""
+
+UI should remain functional when blank.
+
+======================================================================
+44. LEGAL/COMPLIANCE PLACEHOLDERS
+======================================================================
+
+Do NOT invent final legal wording.
+
+Create pages/routes or document placeholders for:
+
+- Terms and Conditions
+- Privacy Policy
+- Delivery Terms
+- Returns and Refund Policy
+- Rider Agreement
+- Rider Code of Conduct
+- Customer Terms
+- Merchant Agreement (future)
+
+Mark any generated draft legal text:
+
+"DRAFT — REQUIRES ZIMBABWEAN LEGAL REVIEW"
+
+Do not present generated legal text as final legal advice.
+
+======================================================================
+45. DOCUMENTATION TO CREATE
+======================================================================
+
+Maintain a /docs directory.
+
+Generate:
+
+/docs/00_CODEBASE_AUDIT.md
+/docs/01_SYSTEM_OVERVIEW.md
+/docs/02_ARCHITECTURE.md
+/docs/03_DATABASE_SCHEMA.md
+/docs/04_USER_ROLES_PERMISSIONS.md
+/docs/05_CUSTOMER_ORDER_FLOW.md
+/docs/06_SHOP_FULFILMENT_FLOW.md
+/docs/07_RIDER_ONBOARDING.md
+/docs/08_DELIVERY_LIFECYCLE.md
+/docs/09_RIDER_EARNINGS.md
+/docs/10_ADMIN_OPERATIONS.md
+/docs/11_SECURITY_PRIVACY.md
+/docs/12_ENVIRONMENT_VARIABLES.md
+/docs/13_DEPLOYMENT.md
+/docs/14_TESTING.md
+/docs/15_BACKUP_RECOVERY.md
+/docs/16_FUTURE_MULTI_MERCHANT.md
+/docs/17_CHANGELOG.md
+/docs/18_DECISIONS.md
+/docs/19_LAUNCH_CHECKLIST.md
+
+Also maintain:
+
+README.md
+CHANGELOG.md
+
+Do not let documentation become stale.
+
+Update relevant documentation whenever architecture changes.
+
+======================================================================
+46. DECISION LOG
+======================================================================
+
+Create /docs/18_DECISIONS.md.
+
+For important architecture decisions record:
+
+Date
+Decision
+Reason
+Alternatives considered
+Consequences
+
+Examples:
+
+- Why manual dispatch was chosen first
+- Why business_id exists before marketplace launch
+- Why WhatsApp number is configuration-based
+- Why rider documents are stored privately
+- Why rider wallet uses a ledger
+- Why buyer and recipient are separate entities
+
+======================================================================
+47. TESTING REQUIREMENTS
+======================================================================
+
+Create automated tests appropriate to the stack.
+
+Critical test scenarios:
+
+1. Customer adds in-stock product to cart.
+2. Stock cannot become negative.
+3. Customer can order for another recipient.
+4. Unsupported delivery zone is rejected.
+5. Order total calculation is correct.
+6. Delivery fee calculation is correct.
+7. Payment callback cannot duplicate payment.
+8. Staff can progress order.
+9. Unauthorized users cannot access admin.
+10. Rider cannot access another rider's private account.
+11. Customer cannot access another customer's order.
+12. Rider cannot see unrelated customer addresses.
+13. Unapproved rider cannot go online.
+14. Rider with expired mandatory document cannot go online.
+15. Delivery cannot complete without configured proof/exception process.
+16. Completed delivery generates rider earnings exactly once.
+17. Repeated API calls do not duplicate rider earnings.
+18. Payout cannot exceed available balance.
+19. Sensitive files are not public.
+20. Audit log created for sensitive admin changes.
+
+======================================================================
+48. IDEMPOTENCY
+======================================================================
+
+Anything involving money, status changes or external callbacks must be designed to avoid duplication.
+
+Examples:
+
+- payment callbacks
+- rider earnings creation
+- refunds
+- payout processing
+- delivery completion
+
+Use idempotency keys or database constraints where appropriate.
+
+======================================================================
+49. PERFORMANCE
+======================================================================
+
+Do not prematurely optimize.
+
+However:
+
+- paginate admin tables
+- optimize images
+- lazy-load where appropriate
+- index frequently queried database fields
+- avoid N+1 database queries
+- cache non-sensitive catalogue data where appropriate
+
+======================================================================
+50. BACKUPS
+======================================================================
+
+Document:
+
+- database backup approach
+- file/document backup approach
+- restore procedure
+- frequency
+- who is responsible
+
+No production launch without a recovery plan.
+
+======================================================================
+51. DEPLOYMENT
+======================================================================
+
+Preserve the existing deployment if practical.
+
+Use separate environments:
+
+development
+staging
+production
+
+Never use the production database for testing.
+
+Environment variables must be documented but secrets must not be committed.
+
+Create:
+
+.env.example
+
+with blank/example-safe values.
+
+======================================================================
+52. FEATURE FLAGS
+======================================================================
+
+Use feature flags/configuration for incomplete features.
+
+Suggested flags:
+
+ENABLE_WHATSAPP=false
+ENABLE_COD=false
+ENABLE_RIDER_LIVE_TRACKING=false
+ENABLE_TIPS=false
+ENABLE_BUNDLES=false
+ENABLE_EXTERNAL_MERCHANTS=false
+ENABLE_AUTOMATIC_DISPATCH=false
+
+This allows code to be built progressively without exposing unfinished functionality.
+
+======================================================================
+53. DEVELOPMENT PHASES
+======================================================================
+
+PHASE 0 — AUDIT
+- inspect existing code
+- document stack
+- identify technical debt
+- preserve design
+- prepare database migration plan
+
+PHASE 1 — CORE STORE
+- database
+- products
+- categories
+- inventory
+- customer accounts
+- cart
+- buyer/recipient checkout
+- basic order creation
+- admin products
+- staff order queue
+
+PHASE 2 — FULFILMENT
+- picking
+- packing
+- substitution handling
+- order events
+- delivery zones
+- delivery fee calculation
+- customer tracking page
+
+PHASE 3 — RIDERS
+- rider registration
+- photo/document uploads
+- admin verification
+- rider profile
+- rider availability
+- rider dashboard
+
+PHASE 4 — DISPATCH
+- create delivery from ready order
+- available rider list
+- manual assignment
+- rider accept/decline
+- pickup flow
+- delivery flow
+- proof of delivery
+
+PHASE 5 — EARNINGS
+- per-delivery earnings
+- wallet ledger
+- earnings history
+- payout requests
+- admin payout approval
+- reconciliation
+
+PHASE 6 — NOTIFICATIONS
+- notification abstraction
+- order notifications
+- rider notifications
+- WhatsApp once number/provider is confirmed
+- SMS/email where applicable
+
+PHASE 7 — ANALYTICS
+- operations dashboard
+- delivery metrics
+- rider metrics
+- inventory insights
+
+PHASE 8 — HARDENING
+- testing
+- security review
+- privacy review
+- backup testing
+- performance
+- production launch checklist
+
+PHASE 9 — FUTURE
+- automatic dispatch
+- live map tracking
+- multi-order routing
+- merchant onboarding
+- third-party business integration
+- merchant settlements
+- wider geographic expansion
+
+======================================================================
+54. DO NOT BUILD THESE YET
+======================================================================
+
+Do NOT prioritize:
+
+- complex AI dispatch
+- nationwide logistics
+- open merchant marketplace
+- native iOS app
+- native Android app
+- advanced loyalty ecosystem
+- advertising platform
+- food-delivery-specific restaurant workflows
+- complex route batching
+- surge pricing
+- cryptocurrency payments
+- microservices
+- Kubernetes
+- unnecessarily complex infrastructure
+
+A well-designed monolith/modular application is acceptable for the early stage.
+
+======================================================================
+55. PWA / MOBILE
+======================================================================
+
+If compatible with the current stack, make the customer and rider interfaces installable as PWAs.
+
+Rider experience especially must work well on inexpensive Android phones.
+
+Consider:
+
+- low bandwidth
+- intermittent connectivity
+- large tap targets
+- offline-safe status retry where possible
+- compressed images
+- simple navigation
+
+Do not assume every rider has a high-end device.
+
+======================================================================
+56. FUTURE API DESIGN
+======================================================================
+
+Keep business logic out of UI components.
+
+Create proper service/API boundaries for:
+
+- products
+- inventory
+- carts
+- orders
+- payments
+- riders
+- dispatch
+- deliveries
+- earnings
+- notifications
+
+This will allow a future native app to use the same backend.
+
+======================================================================
+57. DATA OWNERSHIP
+======================================================================
+
+Keep clean ownership rules.
+
+Muroora Mart owns:
+
+- product catalogue
+- stock
+- operational order records
+- platform delivery records
+- platform-generated business data
+
+Customer/rider personal data must be handled according to privacy/legal requirements.
+
+Do not sell or expose personal data.
+
+======================================================================
+58. SOURCE CONTROL
+======================================================================
+
+Use Git carefully.
+
+Before major changes:
+
+- create a working branch
+- commit current stable state
+- use meaningful commits
+
+Suggested branch approach:
+
+main
+develop
+feature/*
+fix/*
+
+Do not rewrite large portions without commits/checkpoints.
+
+Never commit:
+
+.env
+private keys
+production credentials
+uploaded ID documents
+police clearance documents
+real customer exports
+
+======================================================================
+59. COLLABORATION BETWEEN CLAUDE AND CODEX
+======================================================================
+
+When two coding agents are working on the project:
+
+1. One agent should NOT blindly rewrite files the other agent just changed.
+2. Inspect Git diff before each major change.
+3. Maintain TASKS.md.
+4. Claim tasks before working on them.
+5. Update task state after completion.
+6. Commit logical units.
+7. Run tests after merging changes.
+8. Update documentation with architecture changes.
+
+Create TASKS.md with:
+
+BACKLOG
+IN PROGRESS
+BLOCKED
+REVIEW
+DONE
+
+Each task should include:
+
+ID
+description
+owner/agent
+dependencies
+files likely affected
+acceptance criteria
+
+======================================================================
+60. CODING AGENT WORKING RULES
+======================================================================
+
+For every feature:
+
+1. Explain briefly what will be changed.
+2. Inspect relevant existing files.
+3. Implement.
+4. Run lint/typecheck/tests.
+5. Fix failures.
+6. Summarize changed files.
+7. Update documentation.
+8. Do not claim completion if tests fail.
+9. Do not hide warnings that materially affect production.
+10. Avoid TODO placeholders for critical security/payment logic.
+
+======================================================================
+61. INITIAL USER EXPERIENCE
+======================================================================
+
+A customer should eventually be able to complete this exact journey:
+
+1. Open Muroora Mart.
+2. Browse groceries.
+3. Add products.
+4. Open cart.
+5. Checkout.
+6. Choose:
+   "This order is for me"
+   OR
+   "Send to someone else"
+7. Enter recipient.
+8. Select delivery address.
+9. System confirms service zone.
+10. Customer chooses payment.
+11. Order created.
+12. Shop accepts.
+13. Shop picks and packs.
+14. Order ready.
+15. Admin assigns verified rider.
+16. Rider accepts.
+17. Rider collects.
+18. Customer sees rider.
+19. Rider delivers.
+20. Proof of delivery recorded.
+21. Rider earning posted.
+22. Customer receives completion confirmation.
+
+If the system cannot support this reliably, do not expand to external merchants.
+
+======================================================================
+62. INITIAL RIDER EXPERIENCE
+======================================================================
+
+Rider journey:
+
+1. Apply.
+2. Create account.
+3. Upload profile photo.
+4. Upload identity and required verification documents.
+5. Upload police clearance.
+6. Upload licence.
+7. Upload vehicle/insurance documents.
+8. Submit.
+9. Admin reviews.
+10. Rider approved.
+11. Rider goes online.
+12. Rider receives delivery offer.
+13. Sees earnings before accepting.
+14. Accepts.
+15. Travels to shop.
+16. Marks arrived.
+17. Collects order.
+18. Marks collected.
+19. Travels to customer.
+20. Marks arrived.
+21. Completes OTP/photo proof.
+22. Delivery completes.
+23. Earnings appear in wallet.
+24. Rider can see payout history.
+
+======================================================================
+63. INITIAL ADMIN EXPERIENCE
+======================================================================
+
+Admin journey:
+
+1. Log in.
+2. View orders.
+3. View inventory.
+4. Manage products.
+5. See pending rider applications.
+6. Review documents.
+7. Approve/reject rider.
+8. See ready deliveries.
+9. See available riders.
+10. Assign delivery.
+11. Monitor order status.
+12. Handle delivery incidents.
+13. Review rider earnings.
+14. Process/record payout.
+15. Review reports.
+
+======================================================================
+64. DOCUMENTATION FOR BUSINESS OPERATIONS
+======================================================================
+
+In addition to technical docs, create editable drafts for business operations:
+
+/docs/business/RIDER_ONBOARDING_CHECKLIST.md
+/docs/business/RIDER_CODE_OF_CONDUCT_DRAFT.md
+/docs/business/DELIVERY_INCIDENT_PROCESS.md
+/docs/business/ORDER_PICKING_SOP.md
+/docs/business/ORDER_PACKING_SOP.md
+/docs/business/DELIVERY_HANDOVER_SOP.md
+/docs/business/CUSTOMER_COMPLAINT_PROCESS.md
+/docs/business/RIDER_SUSPENSION_REVIEW_PROCESS.md
+/docs/business/CASH_RECONCILIATION_DRAFT.md
+/docs/business/DAILY_OPENING_CHECKLIST.md
+/docs/business/DAILY_CLOSING_CHECKLIST.md
+
+Any legal/contractual sections must say:
+
+DRAFT — REQUIRES ZIMBABWEAN LEGAL REVIEW
+
+======================================================================
+65. BUSINESS/IDEA PROTECTION DURING DEVELOPMENT
+======================================================================
+
+Do not make the repository public.
+
+Do not expose:
+- architecture documents
+- pricing formulas
+- rider governance logic
+- financial assumptions
+- internal dashboards
+- expansion roadmap
+- merchant strategy
+- API keys
+- operational documentation
+
+Public marketing should explain the customer benefit, not the internal mechanics.
+
+Influencers do NOT need access to:
+- source code
+- admin dashboards
+- rider economics
+- delivery algorithms
+- future merchant roadmap
+- ownership information unless deliberately disclosed
+- confidential business documents
+
+A future influencer brief should contain only:
+- brand
+- service
+- customer benefit
+- service area
+- ordering process
+- launch promotion
+- approved screenshots/assets
+
+Keep the technical/business playbook private.
+
+======================================================================
+66. PLACEHOLDER CONTACT STRATEGY
+======================================================================
+
+Until the shop team provides the final phone/WhatsApp number:
+
+Create centralized settings:
+
+BUSINESS_NAME=Muroora Mart
+BUSINESS_PHONE=
+WHATSAPP_BUSINESS_NUMBER=
+SUPPORT_EMAIL=
+STORE_ADDRESS=
+STORE_LAT=
+STORE_LNG=
+
+The UI must never display broken placeholders.
+
+If a value is blank:
+hide the corresponding contact method.
+
+This allows development to continue now.
+
+======================================================================
+67. CURRENT PRIORITY
+======================================================================
+
+START WITH IMPLEMENTATION, NOT MARKETING.
+
+Do not contact influencers yet as part of this coding task.
+
+Current priority:
+
+1. audit existing site
+2. stabilize project
+3. database architecture
+4. products/inventory
+5. checkout
+6. buyer/recipient
+7. orders
+8. staff dashboard
+9. delivery zones
+10. rider system
+11. dispatch
+12. earnings
+13. documentation
+14. testing
+15. staging deployment
+
+Marketing/influencer rollout comes after there is a reliable order flow.
+
+======================================================================
+68. DEFINITION OF VERSION 1 SUCCESS
+======================================================================
+
+Version 1 is successful if:
+
+- real Muroora products can be managed
+- stock is accurately tracked
+- a customer can place an order
+- customer can send groceries to another person
+- staff can process that order
+- delivery fee is calculated
+- verified rider can be assigned
+- rider can complete delivery
+- customer can track status
+- proof of delivery exists
+- rider earnings are recorded
+- admin has auditability
+- sensitive documents are protected
+- system works well on mobile
+- documentation is complete
+- no fake contact/payment details are required
+- architecture can support future merchants without immediate rewrite
+
+======================================================================
+69. OUTPUT EXPECTED FROM THE CODING AGENTS
+======================================================================
+
+Do not immediately code everything in one giant change.
+
+First output:
+
+A. Existing codebase audit
+B. Proposed architecture
+C. Database schema
+D. Migration plan
+E. Phase-by-phase implementation plan
+F. Identified risks/blockers
+G. Files/components expected to change
+
+Then begin Phase 1.
+
+At the end of every phase provide:
+
+1. What was implemented
+2. What files changed
+3. Database migrations
+4. Environment variables added
+5. Tests added
+6. Tests passed/failed
+7. Screens/routes added
+8. Known limitations
+9. Documentation updated
+10. Recommended next task
+
+======================================================================
+70. FINAL PRINCIPLE
+======================================================================
+
+Do not build Muroora as a pretty prototype.
+
+Build it as a small, real operational commerce system that happens to have the architecture to become something much larger.
+
+Muroora Mart is the first merchant and the proving ground.
+
+The first target is not "become Meituan."
+
+The first target is:
+
+A customer places a real order.
+The shop fulfils it.
+A verified rider delivers it.
+The customer knows what is happening.
+The rider gets credited correctly.
+The business can account for everything.
+
+Once that works reliably, expansion becomes a business decision rather than a software fantasy.

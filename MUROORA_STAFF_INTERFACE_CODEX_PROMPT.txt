@@ -1,0 +1,1016 @@
+MUROORA STAFF INTERFACE — COMPLETE CODEX IMPLEMENTATION PROMPT
+
+ROLE
+
+You are implementing the staff-facing operational interface for Muroora.
+
+This is NOT a customer shopping interface.
+This is NOT the rider interface.
+This is NOT a separate application/backend.
+
+The staff interface must be built into the EXISTING Muroora platform and reuse the existing backend, database, authentication, products, inventory, orders, deliveries, riders, permissions, audit logs and visual design system wherever possible.
+
+The main objective is simple:
+
+A shop employee should open Muroora on their phone and immediately understand what work needs to be done.
+
+The interface must be:
+- fast
+- mobile-first
+- simple
+- operational
+- secure
+- low-bandwidth friendly
+- easy for non-technical staff
+- consistent with Muroora branding
+
+DO NOT overbuild this into enterprise software.
+
+============================================================
+1. FIRST ACTION — AUDIT WHAT ALREADY EXISTS
+============================================================
+
+Before writing code, inspect the existing Muroora repository and identify:
+
+- current staff routes/pages
+- current staff authentication
+- current role-based permissions
+- employee/profile model
+- current order model
+- order statuses
+- inventory model
+- product model
+- delivery/rider handover model
+- audit-log architecture
+- existing owner/admin dashboard
+- existing design tokens/components
+- existing Supabase configuration
+- existing responsive/mobile patterns
+
+Report each relevant staff feature as:
+
+IMPLEMENTED
+PARTIALLY IMPLEMENTED
+NOT IMPLEMENTED
+NEEDS REVIEW
+
+Do not rebuild working functionality unnecessarily.
+
+============================================================
+2. MAIN STAFF PURPOSE
+============================================================
+
+The staff interface should help shop employees:
+
+1. see new orders
+2. accept an order
+3. pick products
+4. report unavailable/damaged/missing items
+5. pack orders
+6. mark orders ready for delivery
+7. hand orders to riders
+8. check stock
+9. report stock issues
+10. later process counter sales
+11. view their own activity
+12. report operational issues
+
+The interface should answer:
+
+WHAT NEEDS MY ATTENTION RIGHT NOW?
+
+============================================================
+3. STAFF NAVIGATION
+============================================================
+
+Create a simple mobile-first navigation.
+
+Recommended structure:
+
+HOME
+ORDERS
+SCAN
+ISSUES
+ME
+
+If SCAN functionality is not implemented yet, keep the screen/button prepared but do not build unnecessary complex scanning during this phase.
+
+Desktop/tablet layouts may use a side navigation where appropriate.
+
+Do not create excessive navigation items.
+
+============================================================
+4. STAFF HOME SCREEN
+============================================================
+
+Design the staff home screen as an operational queue.
+
+Suggested structure:
+
+MUROORA STAFF
+
+Good morning, [Employee First Name]
+
+Status:
+ON DUTY / OFF DUTY if duty status already exists or can be added cleanly
+
+TODAY
+
+NEW ORDERS
+PICKING
+READY
+ISSUES
+
+ACTION REQUIRED
+
+Show important orders/tasks first.
+
+Example:
+
+Order #MUR-1042
+6 items
+Dangamvura
+Received 4 minutes ago
+
+[VIEW ORDER]
+
+Another example:
+
+Order #MUR-1041
+Packed
+Waiting for rider
+
+[VIEW]
+
+The home screen should not contain vanity graphs.
+
+============================================================
+5. ORDER QUEUE
+============================================================
+
+Create a clean Orders page.
+
+Allow filtering by:
+
+- New
+- Accepted
+- Picking
+- Packed
+- Ready for Delivery
+- Rider Assigned
+- Completed
+- Issues
+
+Each order card should show only useful information:
+
+- order reference
+- status
+- item count
+- recipient area/suburb
+- order time
+- payment state where staff genuinely needs it
+- assigned employee
+- rider state where relevant
+
+Do not expose unnecessary customer financial or account information.
+
+============================================================
+6. ORDER DETAILS
+============================================================
+
+When staff opens an order, show:
+
+ORDER #MUR-1042
+
+Status
+Payment state where operationally relevant
+Recipient name
+Recipient phone/contact method where needed
+Delivery area
+Address/landmark
+Delivery instructions
+
+ITEMS
+
+For each item:
+
+- product image where available
+- product name
+- required quantity
+- optional shelf/location field if supported later
+- picked state
+- unavailable state
+
+Example:
+
+2 × Cooking Oil 2L
+
+[MARK PICKED]
+[UNAVAILABLE]
+
+============================================================
+7. ACCEPT ORDER
+============================================================
+
+A new order should be explicitly accepted by a staff member.
+
+Workflow:
+
+NEW ORDER
+→ ACCEPT ORDER
+→ employee ID recorded
+→ timestamp recorded
+→ order assigned to employee
+→ status becomes ACCEPTED / PREPARING according to existing state model
+
+Do not silently assign an order without a clear record.
+
+If multiple staff members are viewing the same order, prevent accidental double acceptance.
+
+Use appropriate server/database-side checks.
+
+============================================================
+8. PICKING WORKFLOW
+============================================================
+
+Once order picking starts:
+
+Show progress such as:
+
+4 / 6 items picked
+
+The employee should be able to:
+
+- mark item picked
+- adjust to correct required quantity where the workflow allows
+- mark item unavailable
+- report item issue
+
+Example:
+
+PICKING ORDER #MUR-1042
+
+✓ Cooking Oil ×2
+✓ Sugar ×1
+✓ Mazoe ×1
+□ Bread ×2
+
+4 / 6 items
+
+[ITEM UNAVAILABLE]
+[COMPLETE PICKING]
+
+Do not allow staff to mark picking complete when mandatory item states remain unresolved.
+
+============================================================
+9. ITEM UNAVAILABLE / STOCK ISSUE FLOW
+============================================================
+
+This needs to be easy because it will happen in a real shop.
+
+When employee taps UNAVAILABLE, ask:
+
+WHAT HAPPENED?
+
+- Out of stock
+- Stock count incorrect
+- Damaged
+- Cannot locate item
+- Wrong product data
+- Other
+
+Then:
+
+WHAT SHOULD HAPPEN?
+
+- Remove item from order
+- Suggest substitute
+- Ask supervisor/admin
+- Hold order for review
+
+Only offer actions supported by the existing backend/order/refund rules.
+
+Do not let ordinary staff arbitrarily change customer charges unless authorized.
+
+Record:
+- employee
+- product
+- reason
+- timestamp
+- order
+- resolution
+
+============================================================
+10. SUBSTITUTIONS
+============================================================
+
+If substitution already exists in the backend, design a clean staff workflow around it.
+
+If it does not exist, do NOT invent complex substitution payment logic without explaining the required backend changes first.
+
+Possible flow:
+
+Original item unavailable
+→ staff suggests alternative
+→ customer/admin approval where required
+→ substitution recorded
+→ pricing difference handled by existing approved rules
+
+All substitutions must be auditable.
+
+============================================================
+11. PACKING
+============================================================
+
+Once all items are resolved:
+
+[COMPLETE PICKING]
+
+Then allow:
+
+PACK ORDER
+
+Show:
+
+Order reference
+Number of items
+Number of packages if applicable
+Employee handling the order
+
+When packed:
+
+- record employee
+- record timestamp
+- update order status
+- mark READY FOR DELIVERY when appropriate
+
+Do not let staff skip required order states without authorized override.
+
+============================================================
+12. READY FOR DELIVERY
+============================================================
+
+Once packed, show:
+
+ORDER PACKED
+
+#MUR-1042
+
+6 items
+1 package
+Value: $18.40 if appropriate for staff
+Packed by:
+EMP-002
+
+Ready since:
+13:14
+
+RIDER:
+Not assigned
+
+[REQUEST RIDER] or [WAITING FOR DISPATCH]
+
+Use whatever fits the existing dispatch architecture.
+
+Do not build automatic dispatch unless already supported.
+
+============================================================
+13. RIDER HANDOVER
+============================================================
+
+Integrate with the rider custody/trust system already being implemented.
+
+When a rider arrives, staff should see:
+
+RIDER ARRIVED
+
+Photo
+Rider display name
+Public Rider ID
+Vehicle type
+Verified indicator where appropriate
+
+Order:
+#MUR-1042
+
+Confirm that the package is being handed to this rider.
+
+[CONFIRM HANDOVER]
+
+The handover must:
+
+- record the staff employee
+- record the rider
+- record timestamp
+- transfer custody according to the existing rider module
+- update rider merchandise exposure where applicable
+- update order/delivery state
+
+Do not expose private rider verification documents to ordinary staff.
+
+============================================================
+14. CHAIN OF CUSTODY
+============================================================
+
+Staff UI should integrate with the existing custody model.
+
+Relevant shop-side states may include:
+
+SHOP CUSTODY
+→ RIDER ASSIGNED
+→ HANDOVER STARTED
+→ HANDED TO RIDER
+→ RIDER CUSTODY
+
+Staff should clearly understand when the order is no longer physically the shop's responsibility.
+
+Do not duplicate custody logic in frontend code.
+
+Use the authoritative backend state.
+
+============================================================
+15. STAFF ISSUES
+============================================================
+
+Create an Issues page.
+
+Allow staff to report operational problems such as:
+
+- product missing
+- incorrect stock
+- damaged stock
+- customer/order issue
+- packing issue
+- rider did not arrive
+- system problem
+- other
+
+Issue record should contain:
+
+- employee
+- timestamp
+- category
+- note
+- relevant order/product if applicable
+- status
+- optional photo where appropriate
+
+Do not require large text reports.
+
+============================================================
+16. STOCK CHECK
+============================================================
+
+Staff should be able to search/check inventory.
+
+Show:
+
+Product
+Current available stock
+Reserved stock where relevant
+Low-stock status
+
+Do not expose cost price to ordinary staff unless explicitly authorized by existing roles.
+
+The stock screen should initially be READ-HEAVY.
+
+If staff is allowed to adjust stock, use controlled workflows.
+
+============================================================
+17. STOCK ADJUSTMENTS
+============================================================
+
+Do not give ordinary employees unrestricted stock editing.
+
+Recommended model:
+
+Staff requests adjustment:
+
+Product:
+Cooking Oil 2L
+
+Current:
+14
+
+Requested change:
+-1
+
+Reason:
+Damaged
+
+Optional photo
+
+[SUBMIT]
+
+Then either:
+
+- apply automatically if the employee role explicitly permits small adjustments, OR
+- require supervisor/admin approval
+
+Always record:
+
+- previous quantity
+- adjustment quantity
+- resulting quantity
+- employee
+- reason
+- timestamp
+- approval where applicable
+
+No silent inventory edits.
+
+============================================================
+18. SCAN SCREEN — PREPARE FOR FUTURE
+============================================================
+
+Create/prepare a central SCAN section if appropriate.
+
+Future scanner uses may include:
+
+- product lookup
+- order picking confirmation
+- stocktaking
+- counter sale
+- stock receiving
+- rider handover/order QR
+- internal barcode scanning
+
+Do not build all scanner modes now if barcode functionality is intentionally postponed.
+
+If barcode scanning is already implemented elsewhere, reuse the same scanner infrastructure.
+
+============================================================
+19. COUNTER SALE / POCKET POS — OPTIONAL LATER
+============================================================
+
+Do not make a full POS system a blocker for the staff interface.
+
+Prepare navigation/data architecture so a future NEW SALE workflow can be added.
+
+Future concept:
+
+Scan/Search Product
+→ Add Quantity
+→ Payment Method
+→ Confirm Sale
+→ Receipt
+→ Same inventory decreases
+
+NON-NEGOTIABLE future rule:
+
+Physical counter sales and online orders must use the same inventory system.
+
+Do not create a second shop-stock database.
+
+============================================================
+20. STAFF PROFILE
+============================================================
+
+Create a simple "Me" profile.
+
+Show:
+
+Profile photo
+Full/display name
+Generated Staff ID
+
+Example:
+MUR-STF-0002
+
+Role
+Status
+Joined date
+
+My activity today:
+- orders accepted
+- orders packed
+- issues reported
+
+Do not turn this into full HR software.
+
+============================================================
+21. STAFF ID
+============================================================
+
+Ensure staff can have a generated public/internal operational Staff ID.
+
+Example:
+
+MUR-STF-0002
+
+This should be safe to show on future staff cards/badges.
+
+Do not expose internal database primary keys.
+
+Future business-card/QR functionality may use the staff ID, but do not build that now.
+
+============================================================
+22. STAFF ACCOUNT CREATION / ACTIVATION
+============================================================
+
+Public users must never be able to register and choose SHOP_STAFF.
+
+Preferred current flow:
+
+Employee creates normal account
+→ admin identifies account
+→ admin assigns SHOP_STAFF role
+→ staff access becomes active
+
+or use the existing secure invitation flow if already implemented.
+
+There should be no shared staff login.
+
+Each employee gets an individual account.
+
+============================================================
+23. ROLE-BASED PERMISSIONS
+============================================================
+
+At minimum support appropriate distinctions between:
+
+SHOP_STAFF
+SUPERVISOR / MANAGER where already planned
+ADMIN / OWNER
+
+SHOP_STAFF may perform operational functions such as:
+
+- view assigned/relevant orders
+- accept orders
+- pick
+- pack
+- report issues
+- confirm rider handover
+- check stock
+- request permitted stock changes
+
+SHOP_STAFF must NOT automatically be able to:
+
+- change their own role
+- create admins
+- modify merchant commission
+- change rider trust limits
+- view sensitive rider verification documents
+- delete historical sales/orders
+- erase audit logs
+- change backend/payment credentials
+- arbitrarily edit completed orders
+- approve high-risk refunds
+- access sensitive financial reports unless explicitly allowed
+
+Enforce permissions server-side/database-side, not merely by hiding buttons.
+
+============================================================
+24. AUDIT LOG
+============================================================
+
+Audit important staff actions.
+
+Examples:
+
+- staff logged in
+- order accepted
+- picking started
+- item picked
+- item unavailable
+- substitution suggested
+- picking completed
+- order packed
+- order ready
+- rider handover confirmed
+- stock issue reported
+- stock adjustment requested
+- issue submitted
+- staff role/status changed
+
+Record:
+
+WHO
+WHAT
+WHEN
+WHICH ORDER/PRODUCT/RIDER was affected
+WHY where required
+
+Ordinary staff must not be able to edit audit history.
+
+============================================================
+25. OWNER / ADMIN VISIBILITY
+============================================================
+
+The owner/admin side should be able to see staff activity without turning the system into employee surveillance.
+
+Useful operational information:
+
+Today:
+- orders handled
+- orders packed
+- issues reported
+- unresolved tasks
+
+Employee:
+- Staff ID
+- role
+- status
+- assigned/current order
+- completed work
+
+Focus on accountability and workflow, not meaningless monitoring.
+
+============================================================
+26. END-OF-DAY OPERATIONAL VIEW
+============================================================
+
+Prepare a simple owner/admin daily summary if it fits the existing dashboard.
+
+Possible fields:
+
+TODAY
+
+Sales
+Online sales
+Counter sales later
+
+Orders
+New
+Completed
+Cancelled
+
+Deliveries
+Delivered
+In progress
+
+Stock issues
+Out of stock
+Damaged
+
+Staff activity
+Orders handled per staff member
+
+This is management information, not necessarily visible to all shop staff.
+
+============================================================
+27. LOW-BANDWIDTH / MOBILE REQUIREMENTS
+============================================================
+
+Employees may use their own phones.
+
+Design for:
+
+- Android mobile browsers
+- lower-cost phones
+- slow/intermittent connections
+- one-handed use
+- large buttons
+- readable text
+- minimal typing
+- clear loading states
+- retry states
+- no unnecessary large images
+- no autoplay video
+- no heavy animation
+
+Critical actions should be resilient to accidental refreshes/retries.
+
+============================================================
+28. OFFLINE / CONNECTION FAILURE BEHAVIOUR
+============================================================
+
+Do not pretend the network will always work.
+
+At minimum:
+
+- show connection status clearly when actions fail
+- do not silently lose work
+- prevent duplicate order acceptance/packing actions caused by retries
+- use idempotent backend operations where appropriate
+- allow safe retry
+- clearly distinguish "saved" vs "not saved"
+
+Do not build a complex full offline-first system unless genuinely needed.
+
+============================================================
+29. ERROR STATES
+============================================================
+
+Design proper states for:
+
+- no orders
+- failed to load orders
+- order already accepted by another employee
+- product unavailable
+- stock mismatch
+- rider not assigned
+- rider handover failed
+- permission denied
+- session expired
+- server error
+- poor network
+
+Never show raw technical stack traces to staff.
+
+============================================================
+30. SECURITY
+============================================================
+
+Never expose:
+
+- Supabase service-role key
+- backend secrets
+- payment credentials
+- private customer data unrelated to the active order
+- private rider verification documents
+- merchant financial information
+- admin-only configuration
+
+Use existing RLS/server authorization.
+
+Do not trust role checks performed only in the browser.
+
+============================================================
+31. DATABASE CHANGES
+============================================================
+
+Before making database changes:
+
+1. inspect existing tables
+2. reuse current order/inventory/staff tables
+3. avoid duplicates
+4. explain proposed migration
+5. preserve existing data
+6. ensure constraints prevent impossible workflow states
+
+Possible missing concepts may include:
+
+- staff profile
+- staff public ID
+- employee assignment on orders
+- order item fulfilment states
+- staff operational issue reports
+- stock adjustment requests
+- audit events
+
+These names are conceptual only.
+
+Use existing naming conventions.
+
+============================================================
+32. DESIGN LANGUAGE
+============================================================
+
+Use the existing Muroora design system.
+
+Visual direction:
+
+- dark Muroora green
+- orange action accents
+- cream/light backgrounds
+- warm, clean cards
+- clear status badges
+- minimal clutter
+- large action buttons
+
+Customer UI can be visually inviting.
+
+Staff UI must prioritize operational clarity.
+
+Do not make it look like a generic corporate admin dashboard.
+
+============================================================
+33. TESTING
+============================================================
+
+Add tests for critical staff workflows.
+
+At minimum:
+
+1. customer cannot access /staff
+2. rider cannot access /staff
+3. unapproved employee cannot access staff operations
+4. staff can see allowed orders
+5. two employees cannot both accept the same order incorrectly
+6. employee identity is recorded when accepting
+7. picking progress is saved
+8. unresolved items block completion where required
+9. unavailable item reason is recorded
+10. order packing records staff/time
+11. rider handover records staff/rider/time
+12. handover integrates with custody system
+13. staff cannot access sensitive rider docs
+14. staff cannot change their own role
+15. staff cannot erase audit logs
+16. stock adjustments follow permissions
+17. network retries do not duplicate critical actions
+18. existing customer/rider/admin workflows still work
+
+============================================================
+34. IMPLEMENTATION ORDER
+============================================================
+
+Implement in this order unless the existing codebase requires a safer sequence.
+
+STEP 1
+Audit existing staff functionality and report what exists.
+
+STEP 2
+Complete staff authentication/profile/Staff ID and permissions.
+
+STEP 3
+Build staff Home operational queue.
+
+STEP 4
+Build Orders list and Order Details.
+
+STEP 5
+Build Accept + Picking workflow.
+
+STEP 6
+Build unavailable-item / stock-issue workflow.
+
+STEP 7
+Build Packing + Ready for Delivery.
+
+STEP 8
+Integrate rider handover/custody.
+
+STEP 9
+Build Issues section.
+
+STEP 10
+Build stock lookup and controlled adjustments.
+
+STEP 11
+Build staff profile/activity.
+
+STEP 12
+Add audit logging.
+
+STEP 13
+Add responsive/mobile polish.
+
+STEP 14
+Add tests and regression checks.
+
+Do not build POS/barcode functionality unless it already exists and can be reused cleanly.
+
+============================================================
+35. WHAT NOT TO BUILD YET
+============================================================
+
+Do not unnecessarily build:
+
+- advanced HR/payroll
+- employee salary system
+- biometric attendance
+- facial recognition
+- GPS employee tracking
+- complex barcode/POS suite
+- large analytics suite
+- employee social features
+- separate native staff app
+- expensive notification services
+- advanced offline sync engine
+
+Prepare extension points instead.
+
+============================================================
+36. REQUIRED FIRST RESPONSE
+============================================================
+
+Before implementation, respond with:
+
+1. What staff functionality already exists.
+2. What is missing.
+3. Which existing backend components can be reused.
+4. Whether order states need changes.
+5. Whether database migration is required.
+6. Whether rider handover/custody is already compatible.
+7. What staff permissions currently exist.
+8. What you will build first.
+9. What you will deliberately leave for later.
+10. Any security concerns.
+11. Confirmation that no paid service is being introduced.
+12. Whether any action requires owner permission.
+
+Then continue incrementally.
+
+============================================================
+37. FINAL PRINCIPLE
+============================================================
+
+The staff interface should feel like a tool employees use to complete real work quickly.
+
+The employee should be able to open Muroora and immediately answer:
+
+WHAT ORDER DO I NEED TO HANDLE?
+WHAT DO I PICK?
+WHAT IS MISSING?
+IS IT PACKED?
+WHO AM I HANDING IT TO?
+HAS MY ACTION BEEN RECORDED?
+
+Keep the experience simple.
+
+CUSTOMER MUROORA = SHOPPING
+RIDER MUROORA = DELIVERY
+STAFF MUROORA = GET THE WORK DONE
+OWNER MUROORA = CONTROL AND UNDERSTAND THE BUSINESS
