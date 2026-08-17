@@ -37,9 +37,10 @@ export default async function ResetPasswordPage({
     token_hash?: string
     type?: string
     error_description?: string
+    email?: string
   }>
 }) {
-  const { code, token_hash, type, error_description } = await searchParams
+  const { code, token_hash, type, error_description, email } = await searchParams
 
   let ready = false
   let problem = error_description ?? null
@@ -75,5 +76,8 @@ export default async function ResetPasswordPage({
     problem = null
   }
 
-  return <ResetPasswordForm ready={ready} problem={problem} />
+  // The address is a convenience only, to save typing it twice. It is never
+  // trusted: `resetPasswordWithCode` verifies the code against whatever
+  // address is submitted, so a tampered value simply fails to verify.
+  return <ResetPasswordForm ready={ready} problem={problem} email={email ?? ''} />
 }

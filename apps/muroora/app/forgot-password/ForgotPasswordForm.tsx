@@ -15,7 +15,7 @@ function Submit() {
       disabled={pending}
       className="w-full bg-support px-8 py-4 font-mono text-small font-bold uppercase tracking-label text-white transition-colors hover:bg-ink disabled:opacity-60"
     >
-      {pending ? 'Sending…' : 'Send me a link'}
+      {pending ? 'Sending…' : 'Send me a code'}
     </button>
   )
 }
@@ -39,8 +39,8 @@ export function ForgotPasswordForm({
         </p>
         <h1 className="mt-3 text-h1">Forgotten it?</h1>
         <p className="mt-4 text-ink-soft">
-          Put in the email address you signed up with and we will send you a
-          link to set a new password.
+          Put in the email address you signed up with and we will send you an
+          eight-digit code to set a new password.
         </p>
 
         {expired && (
@@ -48,7 +48,7 @@ export function ForgotPasswordForm({
             role="status"
             className="mt-6 border-l-4 border-accent bg-accent-wash px-4 py-3 text-small"
           >
-            That link had already been used, or it was more than an hour old.
+            That code had already been used, or it was more than an hour old.
             Ask for another below and it will work.
           </p>
         )}
@@ -82,12 +82,20 @@ export function ForgotPasswordForm({
             </p>
           )}
           {state.message && (
-            <p
+            <div
               role="status"
               className="border-l-4 border-support bg-paper-sunk px-4 py-3 text-small"
             >
-              {state.message}
-            </p>
+              <p>{state.message}</p>
+              {/* The code has to be typed somewhere. Without this the person
+                  is left holding six digits and no way back in. */}
+              <Link
+                href="/reset-password"
+                className="mt-3 inline-block font-mono text-micro uppercase tracking-label text-support hover:text-accent"
+              >
+                Enter my code
+              </Link>
+            </div>
           )}
 
           <Submit />

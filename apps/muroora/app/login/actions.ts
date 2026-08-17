@@ -210,12 +210,15 @@ const emailOnly = z.object({
 })
 
 /**
- * Send a reset link.
+ * Send a reset code.
  *
  * ALWAYS reports success, even when there is no such account. Saying "no
  * account with that email" turns this form into a way of discovering who
  * shops here - and for a staff login, who works here. The person who owns the
  * address learns everything they need from the email itself.
+ *
+ * The email now carries a six-digit code rather than a link. See
+ * `resetPasswordWithCode` below for why.
  */
 export async function requestPasswordReset(
   _prev: AuthState,
@@ -241,9 +244,108 @@ export async function requestPasswordReset(
 
   return {
     message:
-      'If there is an account with that address, a link is on its way. It ' +
-      'lasts one hour. Check your spam folder if it does not arrive.',
+      'If there is an account with that address, an eight-digit code is on ' +
+      'its way. It lasts one hour. Check your spam folder if it does not ' +
+      'arrive.',
   }
+}
+
+const codeReset = z
+  .object({
+    email: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .email('That does not look like an email address.'),
+    // EIGHT digits, because the project's `mailer_otp_length` is 8, not the
+    // Supabase default of 6. Checked against the live config rather than
+    // assumed - a six-digit rule here rejects every genuine code.
+    //
+    // Spaces are stripped first: people paste "1234 5678" straight out of the
+    // email, and refusing that would be pedantry.
+    code: z
+      .string()
+      .trim()
+      .transform((v) => v.replace(/\s+/g, ''))
+      .pipe(z.string().regex(/^\d{8}$/, 'The code is eight digits.')),
+    password: z
+      .string()
+      .min(10, 'Use at least 10 characters - length beats punctuation.')
+      .max(200),
+    confirm: z.string(),
+  })
+  .refine((v) => v.password === v.confirm, {
+    message: 'Those two do not match.',
+    path: ['confirm'],
+  })
+
+/**
+ * Set a new password from an emailed eight-digit code.
+ *
+ * WHY A CODE AND NOT A LINK, since every previous attempt was a link:
+ *
+ * Gmail scans links in incoming mail, and the scan OPENS them. Supabase
+ * recovery tokens are single use, so the scanner spent the token before the
+ * person ever saw the email, and the tap that followed was always answered
+ * with otp_expired. Nothing in this repository could fix that, because
+ * whoever opens the URL first consumes it and we do not control who that is.
+ *
+ * A code cannot be consumed by being looked at. A scanner cannot type it into
+ * a form. That is the whole reason this exists.
+ *
+ * It also happens to fix the device problem for free. `verifyOtp` needs only
+ * the address and the digits, so asking on a laptop and finishing on a phone
+ * works, which the PKCE flow never could.
+ *
+ * The wrong-code message is deliberately the same whether the address is
+ * unknown, the code is wrong, or the code has expired. Distinguishing them
+ * would turn this into an oracle for which addresses have accounts.
+ */
+export async function resetPasswordWithCode(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const parsed = codeReset.safeParse(Object.fromEntries(formData))
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message }
+  }
+
+  const supabase = await supabaseServer()
+
+  const { error: verifyError } = await supabase.auth.verifyOtp({
+    email: parsed.data.email,
+    token: parsed.data.code,
+    type: 'recovery',
+  })
+
+  if (verifyError) {
+    console.warn('[resetPasswordWithCode] verify:', verifyError.message)
+    return {
+      error:
+        'That code is wrong, has expired, or has already been used. Ask for ' +
+        'a new one.',
+    }
+  }
+
+  let failed: string | null = null
+  try {
+    const { error } = await supabase.auth.updateUser({
+      password: parsed.data.password,
+    })
+    if (error) failed = error.message
+  } catch (error) {
+    // supabase-js throws rather than returns when the session it just
+    // established has already lapsed.
+    failed = 'That code is no longer valid. Ask for a new one.'
+    console.warn('[resetPasswordWithCode] update:', (error as Error).message)
+  }
+
+  if (failed) return { error: failed }
+
+  // Outside the try on purpose. Next implements redirect() by throwing, so
+  // catching around it would swallow the navigation.
+  revalidatePath('/', 'layout')
+  redirect('/account?reset=1')
 }
 
 const newPassword = z
