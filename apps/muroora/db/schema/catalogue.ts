@@ -6,6 +6,7 @@ import {
   integer,
   pgTable,
   text,
+  timestamp,
   unique,
   uuid,
 } from 'drizzle-orm/pg-core'
@@ -89,6 +90,26 @@ export const products = pgTable(
     lowStockThreshold: integer('low_stock_threshold').notNull().default(5),
     isFeatured: boolean('is_featured').notNull().default(false),
     isActive: boolean('is_active').notNull().default(true),
+
+    /**
+     * Consent to appear on the Musuwo marketplace. DEFAULT FALSE, and it stays
+     * false until somebody deliberately turns it on.
+     *
+     * `isActive` above means "on sale in this merchant's own shop". It does
+     * NOT mean "may be published to a marketplace". Treating the two as the
+     * same thing would publish every existing product retroactively, on behalf
+     * of people who were never asked.
+     *
+     * A database constraint requires the two audit columns whenever this is
+     * true, so consent always carries who gave it and when.
+     */
+    publishToMusuwo: boolean('publish_to_musuwo').notNull().default(false),
+    publishedToMusuwoAt: timestamp('published_to_musuwo_at', {
+      withTimezone: true,
+    }),
+    publishedToMusuwoBy: uuid('published_to_musuwo_by').references(
+      () => users.id,
+    ),
 
     createdBy: uuid('created_by').references(() => users.id),
     ...timestamps(),
