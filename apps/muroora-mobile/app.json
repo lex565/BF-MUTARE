@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "Musuwo Beta",
-    "slug": "musuwo",
+    "//slug": "MUST stay muroora-beta. It is the slug of the EXISTING EAS project 1da99634-840e-4cf1-8e23-60e6cb560d68, and EAS refuses to build when the slug and the projectId disagree. Renaming it here does not rename the project; it only breaks the link, and the handoff forbids running eas init or accepting a new project ID. Rename the project on expo.dev first if this should ever read musuwo - the projectId and the update URL survive that.",
+    "slug": "muroora-beta",
     "version": "0.2.0",
     "runtimeVersion": {
       "policy": "appVersion"
