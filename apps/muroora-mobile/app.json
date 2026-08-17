@@ -8,7 +8,7 @@
       "policy": "appVersion"
     },
     "scheme": "musuwo",
-    "description": "Musuwo Beta — private test release. Discover local businesses, products, food, accommodation and services.",
+    "description": "Musuwo Beta - private test release. Discover local businesses, products, food, accommodation and services.",
     "orientation": "portrait",
     "icon": "./assets/musuwo-app-icon.png",
     "userInterfaceStyle": "light",

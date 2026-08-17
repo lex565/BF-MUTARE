@@ -4,9 +4,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { MusuwoLogo } from '@/app/components/MusuwoLogo'
+import { Logo } from '@/app/components/Logo'
 import { CartLink } from '@/app/components/shop/CartLink'
+import { brand, isMuroora } from '@/lib/brand'
 
-const LINKS = [
+/**
+ * The marketplace's navigation: browse across every business.
+ */
+const MUSUWO_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/stores/muroora-mart', label: 'Shop' },
   { href: '/marketplace?category=food', label: 'Food' },
@@ -15,9 +20,27 @@ const LINKS = [
   { href: '/riders', label: 'Delivery' },
 ]
 
+/**
+ * Muroora Mart's own navigation: one shop, not a directory.
+ *
+ * Deliberately does NOT offer Food, Accommodation or Services. Those are other
+ * businesses' categories, and a grocer's website advertising other people's
+ * lodges is how a shop stops looking like a shop. The Musuwo link is the one
+ * way across, and it points outward rather than pretending to be part of this
+ * site.
+ */
+const MUROORA_LINKS = [
+  { href: '/', label: 'Home' },
+  { href: '/shop', label: 'Shop' },
+  { href: '/diaspora', label: 'Diaspora' },
+  { href: '/contact', label: 'Contact' },
+]
+
 export function Nav() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+
+  const LINKS = isMuroora ? MUROORA_LINKS : MUSUWO_LINKS
 
   const isActive = (href: string) => pathname.startsWith(href)
 
@@ -27,8 +50,10 @@ export function Nav() {
         aria-label="Primary"
         className="mx-auto flex max-w-[86rem] items-center justify-between px-gutter py-4"
       >
-        <Link href="/" aria-label="Musuwo - home">
-          <MusuwoLogo />
+        {/* Each site wears its own mark. Muroora Mart showing the Musuwo logo
+            was the thing that made one page look like two brands at once. */}
+        <Link href="/" aria-label={`${brand.name} - home`}>
+          {isMuroora ? <Logo className="h-10" /> : <MusuwoLogo />}
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex">

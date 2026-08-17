@@ -1,7 +1,7 @@
 ﻿/**
  * Money layer checks. Run with tsx.
  *
- * Not a substitute for a real test suite (Phase 1 should add one) â€” this is to
+ * Not a substitute for a real test suite (Phase 1 should add one) — this is to
  * verify the arithmetic before anything is built on top of it, because a
  * rounding bug here would be silently wrong in every order total.
  */
@@ -38,7 +38,7 @@ function throws(label: string, fn: () => unknown) {
   try {
     fn()
     failed += 1
-    console.log(`  FAIL  ${label} â€” expected a throw, got none`)
+    console.log(`  FAIL  ${label} — expected a throw, got none`)
   } catch {
     passed += 1
     console.log(`  PASS  ${label}`)

@@ -1,17 +1,18 @@
+import { HomeShell } from '@/app/components/shop/HomeShell'
 import { MusuwoHomeShell } from '@/app/components/marketplace/MusuwoHomeShell'
+import { isMuroora } from '@/lib/brand'
 
 /**
- * The homepage.
+ * The homepage, whichever site this is.
  *
- * Was rendering `DesignPreview` with `preview={false}`, which only hid the
- * "design preview" banner - the catalogue, cart, login and order confirmation
- * underneath were all simulated, so the live site looked like a working shop
- * and nothing reached the database.
+ * Musuwo and Muroora Mart are separate websites served by the same
+ * application, so `/` has to be whichever brand this deployment is. See
+ * lib/brand.ts for why it is one codebase rather than two.
  *
- * `HomeShell` keeps that approved design and points every action at the real
- * route. DesignPreview stays at /design-preview, where sample data is the
- * point and the banner says so.
+ * Muroora Mart's storefront also stays reachable at /stores/muroora-mart on
+ * both deployments. Musuwo links there when it lists the merchant, and the old
+ * path keeps working rather than breaking every link that already points at it.
  */
 export default function HomePage() {
-  return <MusuwoHomeShell />
+  return isMuroora ? <HomeShell /> : <MusuwoHomeShell />
 }

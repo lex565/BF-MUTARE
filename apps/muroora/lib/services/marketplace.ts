@@ -362,6 +362,94 @@ export async function setProductPublication(
     entityId: params.productId,
     changes: { businessId: params.businessId, publishToMusuwo: params.publish },
   })
+
+  // Drop the public catalogue so the change is visible on the next request.
+  // Without this a merchant publishes a product, sees nothing happen, and
+  // publishes it again. Imported lazily because this service is also called
+  // from verification scripts running outside a Next request, where
+  // revalidateTag has no context and throws.
+  await invalidatePublicFeeds('products')
+}
+
+/**
+ * Drop the cached public feeds, tolerating the case where there is no cache.
+ *
+ * `revalidateTag` only works inside a Next request. The verification scripts
+ * call these services directly from a plain node process, where it throws -
+ * and a cache that cannot be dropped is not a reason to fail the write that
+ * has already committed.
+ */
+async function invalidatePublicFeeds(
+  scope: 'businesses' | 'products' | 'all',
+): Promise<void> {
+  try {
+    const { revalidateMarketplace } = await import('./marketplace-cache')
+    revalidateMarketplace(scope)
+  } catch {
+    // Outside a request context. The 300-second backstop covers it.
+  }
+}
+
+/**
+ * Move a business through its lifecycle.
+ *
+ * PLATFORM AUTHORITY, NOT BUSINESS AUTHORITY. A business owner cannot approve
+ * their own business, which is why this takes no membership and must be called
+ * only from a platform-admin route.
+ *
+ * Approving drops both public feeds, so a newly approved business and its
+ * products appear on the website and in the app on their next fetch, with no
+ * redeploy of either. Suspending does the same in reverse.
+ */
+export async function setBusinessStatus(params: {
+  businessId: string
+  status:
+    | 'UNDER_REVIEW'
+    | 'NEEDS_INFORMATION'
+    | 'APPROVED'
+    | 'PILOT'
+    | 'ACTIVE'
+    | 'PAUSED'
+    | 'SUSPENDED'
+    | 'REJECTED'
+    | 'INACTIVE'
+  reviewerId: string
+  note?: string
+}): Promise<void> {
+  const [existing] = await db
+    .select({ id: businesses.id, storeId: businesses.storeId })
+    .from(businesses)
+    .where(and(eq(businesses.id, params.businessId), isNull(businesses.deletedAt)))
+
+  if (!existing) throw new MarketplaceError('NOT_FOUND', 'No such business.')
+
+  await db
+    .update(businesses)
+    .set({
+      status: params.status,
+      // The database CHECK refuses APPROVED, PILOT or ACTIVE without a
+      // reviewer, so this is recorded on every transition rather than only
+      // the approving ones.
+      reviewedBy: params.reviewerId,
+      reviewedAt: new Date(),
+      reviewNote: params.note ?? null,
+      updatedAt: new Date(),
+    })
+    .where(eq(businesses.id, params.businessId))
+
+  if (existing.storeId) {
+    await db.insert(auditLog).values({
+      storeId: existing.storeId,
+      actorId: params.reviewerId,
+      actorRole: 'ADMIN',
+      action: 'BUSINESS_STATUS_CHANGED',
+      entityType: 'business',
+      entityId: params.businessId,
+      changes: { status: params.status, note: params.note ?? null },
+    })
+  }
+
+  await invalidatePublicFeeds('all')
 }
 
 /**

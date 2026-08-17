@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { listMarketplaceProducts } from '@/lib/services/marketplace'
-
-export const dynamic = 'force-dynamic'
+import { getMarketplaceProducts } from '@/lib/services/marketplace-cache'
 
 /**
  * The public Musuwo catalogue.
@@ -15,10 +13,14 @@ export const dynamic = 'force-dynamic'
  * has been consented into the marketplace yet. Web and mobile both drop their
  * "nothing to show" state as soon as this returns rows, so nothing needs
  * redeploying when the first merchant publishes.
+ *
+ * Cached and invalidated by tag rather than by a clock. Publishing a product,
+ * withdrawing one, or suspending a business drops this immediately - see
+ * lib/services/marketplace-cache.ts.
  */
 export async function GET() {
   try {
-    return NextResponse.json({ data: await listMarketplaceProducts() })
+    return NextResponse.json({ data: await getMarketplaceProducts() })
   } catch (error) {
     console.error('[api/marketplace/products]', error)
     return NextResponse.json(

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Figtree, IBM_Plex_Mono } from 'next/font/google'
 import { siteUrl } from '@pineberry/ui'
+import { brand } from '@/lib/brand'
 import { Nav } from '@/app/components/Nav'
 import { Footer } from '@/app/components/Footer'
 import { StaffBar } from '@/app/components/StaffBar'
@@ -25,16 +26,24 @@ const plexMono = IBM_Plex_Mono({
   display: 'swap',
 })
 
+/* Musuwo and Muroora Mart are separate websites from one codebase, so the
+   title, description and site name follow whichever this deployment is. Two
+   sites sharing one set of Open Graph tags would have every Muroora link
+   preview as Musuwo when shared on WhatsApp, which is where most of these
+   links are actually sent. See lib/brand.ts. */
 export const metadata: Metadata = {
   title: {
-    default: 'Musuwo - local businesses, products and services',
-    template: '%s - Musuwo',
+    default: `${brand.name} - ${brand.tagline}`,
+    template: `%s - ${brand.name}`,
   },
-  description:
-    'Discover local businesses, products, food, accommodation and services through Musuwo. Muroora Mart is the founding merchant.',
+  description: brand.description,
   /* Without this, Next resolves Open Graph and canonical URLs against
-     localhost at build time. Read from the shared brand record. */
-  metadataBase: new URL(siteUrl('muroora-mart')),
+     localhost at build time. NEXT_PUBLIC_SITE_URL is set per deployment so
+     each site canonicalises to its own domain; the group record is the
+     fallback. */
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? siteUrl('muroora-mart'),
+  ),
   keywords: [
     'groceries Mutare',
     'grocery delivery Zimbabwe',
@@ -44,10 +53,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_ZW',
-    siteName: 'Musuwo',
-    title: 'Musuwo - your gateway to local businesses',
-    description:
-      'Groceries and household goods in Mutare, with same-day delivery and a diaspora shopping service.',
+    siteName: brand.name,
+    title: `${brand.name} - ${brand.tagline}`,
+    description: brand.description,
   },
   robots: { index: true, follow: true },
 }

@@ -1,5 +1,16 @@
 import Link from 'next/link'
 import { MusuwoLogo } from '@/app/components/MusuwoLogo'
+import { Logo } from '@/app/components/Logo'
+import { brand, isMuroora } from '@/lib/brand'
+
+/**
+ * Where the other site lives.
+ *
+ * Absent rather than guessed: if the variable is not set the link simply does
+ * not render, which is better than shipping a link to a domain that may not
+ * exist yet.
+ */
+const MUSUWO_URL = process.env.NEXT_PUBLIC_MUSUWO_URL
 
 export function Footer() {
   return (
@@ -7,9 +18,22 @@ export function Footer() {
       <div className="mx-auto grid max-w-[86rem] gap-12 px-gutter py-16 md:grid-cols-12">
         <div className="md:col-span-5">
           <Link href="/">
-            <MusuwoLogo />
+            {isMuroora ? <Logo className="h-11" /> : <MusuwoLogo />}
           </Link>
-          <p className="mt-5 max-w-[38ch] text-ink-soft">Your gateway to local businesses, products, food, accommodation and services. Muroora Mart is the founding merchant.</p>
+          <p className="mt-5 max-w-[38ch] text-ink-soft">{brand.description}</p>
+
+          {/* The one link between the two sites, and it goes in the footer
+              rather than the navigation. Muroora Mart is a shop; a customer
+              buying mealie meal does not need the marketplace put in front of
+              them, but a merchant looking for it should be able to find it. */}
+          {isMuroora && MUSUWO_URL && (
+            <a
+              href={MUSUWO_URL}
+              className="mt-6 inline-block font-mono text-micro uppercase tracking-label text-support transition-colors hover:text-accent"
+            >
+              Part of Musuwo &rarr;
+            </a>
+          )}
         </div>
 
         <div className="md:col-span-3">
@@ -31,14 +55,18 @@ export function Footer() {
             packages/ui/src/GroupBar.tsx. */}
         <div className="md:col-span-4 md:text-right">
           <p className="font-mono text-micro uppercase tracking-label text-ink-faint">
-            Independent Zimbabwean marketplace
+            {isMuroora
+              ? 'Musuwo founding merchant · Business #001'
+              : 'Independent Zimbabwean marketplace'}
           </p>
           <p className="mt-3 text-small text-ink-soft">
-            Built for local businesses and customers across Zimbabwe.
+            {isMuroora
+              ? 'Serving Mutare since 2025.'
+              : 'Built for local businesses and customers across Zimbabwe.'}
           </p>
 
           <p className="mt-8 font-mono text-micro text-ink-faint">
-            © {new Date().getFullYear()} Musuwo
+            © {new Date().getFullYear()} {brand.name}
           </p>
           <Link
             href="/team-access"

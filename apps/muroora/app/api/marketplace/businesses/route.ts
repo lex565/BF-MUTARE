@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { listPublicBusinesses } from '@/lib/services/marketplace'
-
-export const dynamic = 'force-dynamic'
+import { getPublicBusinesses } from '@/lib/services/marketplace-cache'
 
 /**
  * The public business directory, shared by the web carousel and the app.
@@ -18,7 +16,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET() {
   try {
-    return NextResponse.json({ data: await listPublicBusinesses() })
+    return NextResponse.json({ data: await getPublicBusinesses() })
   } catch (error) {
     console.error('[api/marketplace/businesses]', error)
     return NextResponse.json(
