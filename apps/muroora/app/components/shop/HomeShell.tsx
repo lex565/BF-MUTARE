@@ -57,8 +57,8 @@ export function HomeShell() {
     event.preventDefault()
     const term = query.trim()
     window.location.href = term
-      ? `/shop?q=${encodeURIComponent(term)}`
-      : '/shop'
+      ? `/stores/muroora-mart/shop?q=${encodeURIComponent(term)}`
+      : '/stores/muroora-mart/shop'
   }
 
   return (
@@ -71,7 +71,7 @@ export function HomeShell() {
           </Link>
 
           <div className="ml-auto hidden items-center gap-7 lg:flex">
-            <Link href="/shop" className="text-small font-medium text-support hover:text-accent">Shop</Link>
+            <Link href="/stores/muroora-mart/shop" className="text-small font-medium text-support hover:text-accent">Shop</Link>
             <Link href="/about" className="text-small font-medium text-support hover:text-accent">How It Works</Link>
             <Link href="/diaspora" className="text-small font-medium text-support hover:text-accent">Diaspora</Link>
             <Link href="/about" className="text-small font-medium text-support hover:text-accent">About</Link>
@@ -146,7 +146,7 @@ export function HomeShell() {
                 <h1 className="max-w-[12ch] text-mega leading-[1.02] text-white [text-shadow:0_2px_18px_rgb(0_0_0/0.45)]">The shopping gets <span className="text-[#ffb37a]">done</span>, wherever you are.</h1>
                 <p className="mt-6 max-w-[48ch] text-lead text-white/90 [text-shadow:0_1px_10px_rgb(0_0_0/0.5)]">Shop quality products from Muroora Mart in Mutare. We&rsquo;ll prepare and deliver to your door or to someone you care about.</p>
                 <div className="mt-8 flex flex-wrap gap-4">
-                  <Link href="/shop" className="bg-accent px-9 py-4 font-mono text-micro font-bold uppercase tracking-label text-white hover:bg-accent-deep">Shop now</Link>
+                  <Link href="/stores/muroora-mart/shop" className="bg-accent px-9 py-4 font-mono text-micro font-bold uppercase tracking-label text-white hover:bg-accent-deep">Shop now</Link>
                   <Link href="/login" className="border border-white/80 bg-white/10 px-9 py-4 font-mono text-micro font-bold uppercase tracking-label text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-support">Log in</Link>
                 </div>
               </div>

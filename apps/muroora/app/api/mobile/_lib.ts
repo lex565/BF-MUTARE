@@ -5,7 +5,7 @@ import { currentUserFromAccessToken, hasRole, type CurrentUser } from '@/lib/aut
 const headers = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, content-type',
-  'Access-Control-Allow-Methods': 'GET, PATCH, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
 }
 
 export const mobileOk = <T>(data: T, init?: ResponseInit) =>

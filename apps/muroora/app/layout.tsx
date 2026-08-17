@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Figtree, IBM_Plex_Mono } from 'next/font/google'
-import { GroupBar, siteUrl } from '@pineberry/ui'
+import { siteUrl } from '@pineberry/ui'
 import { Nav } from '@/app/components/Nav'
 import { Footer } from '@/app/components/Footer'
 import { StaffBar } from '@/app/components/StaffBar'
@@ -27,11 +27,11 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Muroora Mart - groceries and household goods, Mutare',
-    template: '%s - Muroora Mart',
+    default: 'Musuwo - local businesses, products and services',
+    template: '%s - Musuwo',
   },
   description:
-    'Groceries and household goods in Mutare, with same-day local delivery and a diaspora shopping service that lets family abroad buy the goods directly.',
+    'Discover local businesses, products, food, accommodation and services through Musuwo. Muroora Mart is the founding merchant.',
   /* Without this, Next resolves Open Graph and canonical URLs against
      localhost at build time. Read from the shared brand record. */
   metadataBase: new URL(siteUrl('muroora-mart')),
@@ -44,8 +44,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_ZW',
-    siteName: 'Muroora Mart',
-    title: 'Muroora Mart - quality goods, great value',
+    siteName: 'Musuwo',
+    title: 'Musuwo - your gateway to local businesses',
     description:
       'Groceries and household goods in Mutare, with same-day delivery and a diaspora shopping service.',
   },
@@ -61,9 +61,6 @@ export default function RootLayout({
       className={`${figtree.variable} ${plexMono.variable}`}
     >
       <body className="flex min-h-dvh flex-col">
-        {/* One link back to the parent, above this site's own nav on every
-            page. It deliberately does not list the sister companies - see
-            packages/ui/src/GroupBar.tsx for why. */}
         {/* Renders nothing at all unless a staff member is signed in, so the
             customer-facing design is unaffected. */}
         <StaffBar />
@@ -71,7 +68,6 @@ export default function RootLayout({
         <IdleGuard />
         {/* Carries a password-reset fragment to the page that reads it. */}
         <RecoveryRedirect />
-        <GroupBar />
         <Nav />
         <div className="flex-1">{children}</div>
         <Footer />

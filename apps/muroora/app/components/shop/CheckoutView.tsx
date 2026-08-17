@@ -90,6 +90,7 @@ const fieldClass =
 const labelClass = 'block text-small font-bold text-ink'
 
 export function CheckoutView() {
+  const [shoppingContext, setShoppingContext] = useState<'LOCAL' | 'DIASPORA_SELF' | 'DIASPORA_TO_LOCAL'>('LOCAL')
   const [cart, setCart] = useState<CartData | null>(null)
   const [zones, setZones] = useState<DeliveryZone[]>([])
   const [form, setForm] = useState<CheckoutForm>(initialForm)
@@ -294,6 +295,24 @@ export function CheckoutView() {
           <p className="border border-red-300 bg-red-50 p-4 text-red-800" role="alert">{error}</p>
         )}
 
+        <fieldset className="border border-rule bg-support p-6 text-white md:p-8">
+          <legend className="px-2 font-mono text-micro font-bold uppercase tracking-label text-[#ffb37a]">Before checkout</legend>
+          <h2 className="text-h3 text-white">Where are you shopping from?</h2>
+          <p className="mt-2 text-small text-white/70">Choose once so we show the right recipient and delivery questions.</p>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {[
+              ['LOCAL', 'I am local', 'Shopping and receiving in Zimbabwe.'],
+              ['DIASPORA_SELF', 'I am diaspora', 'Shopping abroad for my own Zimbabwe delivery.'],
+              ['DIASPORA_TO_LOCAL', 'Diaspora to local', 'Sending this order to someone in Zimbabwe.'],
+            ].map(([value, title, note]) => (
+              <label key={value} className="cursor-pointer rounded-lg border border-white/25 p-4 has-[:checked]:border-[#ffb37a] has-[:checked]:bg-white/10">
+                <input type="radio" name="shopping-context" value={value} checked={shoppingContext === value} onChange={() => { setShoppingContext(value as typeof shoppingContext); update('sameRecipient', value !== 'DIASPORA_TO_LOCAL') }} className="mr-2 accent-[#ffb37a]" />
+                <strong>{title}</strong><span className="mt-2 block text-small text-white/65">{note}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
         <fieldset className="border border-rule bg-paper p-6 md:p-8">
           <legend className="px-2 font-mono text-micro font-bold uppercase tracking-label text-accent">1 · Who is buying?</legend>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -303,10 +322,10 @@ export function CheckoutView() {
             <label className={labelClass}>Country code<select value={form.buyerCountry} onChange={(e) => update('buyerCountry', e.target.value)} className={fieldClass}><option value="+263">Zimbabwe (+263)</option><option value="+27">South Africa (+27)</option><option value="+44">United Kingdom (+44)</option><option value="+1">United States / Canada (+1)</option><option value="+61">Australia (+61)</option><option value="other">Other</option></select></label>
           </div>
 
-          <label className="mt-7 flex cursor-pointer items-start gap-3 border border-rule bg-paper-sunk p-4">
+          {shoppingContext !== 'DIASPORA_TO_LOCAL' && <label className="mt-7 flex cursor-pointer items-start gap-3 border border-rule bg-paper-sunk p-4">
             <input type="checkbox" checked={form.sameRecipient} onChange={(e) => update('sameRecipient', e.target.checked)} className="mt-1 size-5 accent-support" />
             <span><strong className="block">I am receiving this order</strong><span className="mt-1 block text-small text-ink-soft">Untick this when shopping for somebody else.</span></span>
-          </label>
+          </label>}
 
           {!form.sameRecipient && (
             <div className="mt-6 grid gap-5 border-l-4 border-support pl-5 sm:grid-cols-2">

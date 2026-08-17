@@ -1,7 +1,5 @@
 import Link from 'next/link'
-import { PARENT, parentHref } from '@pineberry/ui'
-import { SITE } from '@/app/data/site'
-import { Logo } from '@/app/components/Logo'
+import { MusuwoLogo } from '@/app/components/MusuwoLogo'
 
 export function Footer() {
   return (
@@ -9,9 +7,9 @@ export function Footer() {
       <div className="mx-auto grid max-w-[86rem] gap-12 px-gutter py-16 md:grid-cols-12">
         <div className="md:col-span-5">
           <Link href="/">
-            <Logo className="h-10" />
+            <MusuwoLogo />
           </Link>
-          <p className="mt-5 max-w-[38ch] text-ink-soft">{SITE.nameMeaning}</p>
+          <p className="mt-5 max-w-[38ch] text-ink-soft">Your gateway to local businesses, products, food, accommodation and services. Muroora Mart is the founding merchant.</p>
         </div>
 
         <div className="md:col-span-3">
@@ -19,7 +17,7 @@ export function Footer() {
             Find us
           </p>
           <p className="mt-4 text-ink-soft">
-            {SITE.city}, {SITE.country}
+            Mutare, Zimbabwe
           </p>
           {/* Contact details are genuinely unknown - the company profile gives
               the city and nothing more. Saying so beats inventing a number. */}
@@ -33,17 +31,14 @@ export function Footer() {
             packages/ui/src/GroupBar.tsx. */}
         <div className="md:col-span-4 md:text-right">
           <p className="font-mono text-micro uppercase tracking-label text-ink-faint">
-            Part of {PARENT.name}
+            Independent Zimbabwean marketplace
           </p>
-          <a
-            href={parentHref()}
-            className="mt-3 block font-mono text-micro uppercase tracking-label text-support transition-colors hover:text-accent"
-          >
-            {PARENT.name} ↗
-          </a>
+          <p className="mt-3 text-small text-ink-soft">
+            Built for local businesses and customers across Zimbabwe.
+          </p>
 
           <p className="mt-8 font-mono text-micro text-ink-faint">
-            © {new Date().getFullYear()} {SITE.name}
+            © {new Date().getFullYear()} Musuwo
           </p>
           <Link
             href="/team-access"

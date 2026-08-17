@@ -3,14 +3,16 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Logo } from '@/app/components/Logo'
+import { MusuwoLogo } from '@/app/components/MusuwoLogo'
 import { CartLink } from '@/app/components/shop/CartLink'
 
 const LINKS = [
-  { href: '/shop', label: 'Shop' },
-  { href: '/diaspora', label: 'Diaspora shopping' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/', label: 'Home' },
+  { href: '/stores/muroora-mart', label: 'Shop' },
+  { href: '/marketplace?category=food', label: 'Food' },
+  { href: '/marketplace?category=accommodation', label: 'Accommodation' },
+  { href: '/marketplace?category=services', label: 'Services' },
+  { href: '/riders', label: 'Delivery' },
 ]
 
 export function Nav() {
@@ -25,8 +27,8 @@ export function Nav() {
         aria-label="Primary"
         className="mx-auto flex max-w-[86rem] items-center justify-between px-gutter py-4"
       >
-        <Link href="/" aria-label="Muroora Mart - home">
-          <Logo />
+        <Link href="/" aria-label="Musuwo - home">
+          <MusuwoLogo />
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex">

@@ -1,4 +1,4 @@
-import { HomeShell } from '@/app/components/shop/HomeShell'
+import { MusuwoHomeShell } from '@/app/components/marketplace/MusuwoHomeShell'
 
 /**
  * The homepage.
@@ -13,5 +13,5 @@ import { HomeShell } from '@/app/components/shop/HomeShell'
  * point and the banner says so.
  */
 export default function HomePage() {
-  return <HomeShell />
+  return <MusuwoHomeShell />
 }

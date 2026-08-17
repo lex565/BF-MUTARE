@@ -2,12 +2,17 @@ import { z } from 'zod'
 
 import { applyStockMove } from '@/lib/inventory'
 import { setProductActive } from '@/lib/services/products'
+import { db } from '@/db/client'
+import { auditLog,products } from '@/db/schema'
+import { fromDecimal } from '@/lib/money'
+import { and,eq } from 'drizzle-orm'
 import { mobileAdmin, mobileFail, mobileOk, mobileOptions } from '../../../_lib'
 
 export const OPTIONS = mobileOptions
 
 const inputSchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('SET_ACTIVE'), isActive: z.boolean() }).strict(),
+  z.object({ action:z.literal('SET_PRICE'),price:z.string().regex(/^\d+(\.\d{1,2})?$/) }).strict(),
   z.object({
     action: z.literal('ADJUST_STOCK'),
     change: z.number().int().refine((value) => value !== 0),
@@ -28,6 +33,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (parsed.data.action === 'SET_ACTIVE') {
       await setProductActive(id, parsed.data.isActive, admin.id)
       return mobileOk({ isActive: parsed.data.isActive })
+    }
+    if(parsed.data.action==='SET_PRICE'){
+      const price=fromDecimal(parsed.data.price,'USD')
+      const [updated]=await db.update(products).set({priceAmount:price.amount,updatedAt:new Date()}).where(and(eq(products.id,id),eq(products.storeId,process.env.NEXT_PUBLIC_STORE_ID!))).returning({name:products.name})
+      if(!updated)return mobileFail('NOT_FOUND','No such product.',404)
+      await db.insert(auditLog).values({storeId:process.env.NEXT_PUBLIC_STORE_ID!,actorId:admin.id,actorRole:'ADMIN',action:'PRODUCT_PRICE_UPDATED',entityType:'product',entityId:id,changes:{name:updated.name,price:parsed.data.price}})
+      return mobileOk({price:parsed.data.price})
     }
     const stock = await applyStockMove({
       storeId: process.env.NEXT_PUBLIC_STORE_ID!, productId: id,
