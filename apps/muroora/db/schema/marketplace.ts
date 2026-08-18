@@ -113,6 +113,27 @@ export const businesses = pgTable(
     isFounding: boolean('is_founding').notNull().default(false),
     foundedAt: timestamp('founded_at', { withTimezone: true }),
 
+    /**
+     * Verification: somebody at Musuwo saw this business's licence.
+     *
+     * THAT IS ALL IT MEANS. Not a quality rating, not a recommendation, not a
+     * measure of service. A customer reads the badge as "this business is real
+     * and can be found again if something goes wrong", and it must stay
+     * exactly that size.
+     *
+     * A database CHECK requires verifiedAt, verifiedBy and licenceNumber
+     * together, so no code path can produce a badge by setting one field and
+     * forgetting the others.
+     *
+     * `licenceNumber` is shown to REVIEWERS ONLY. The public badge says
+     * "checked"; it does not republish somebody's registration details.
+     * `licenceDocumentPath` is a path in a private bucket, never a URL.
+     */
+    licenceNumber: text('licence_number'),
+    licenceDocumentPath: text('licence_document_path'),
+    verifiedAt: timestamp('verified_at', { withTimezone: true }),
+    verifiedBy: uuid('verified_by').references(() => users.id),
+
     reviewedBy: uuid('reviewed_by').references(() => users.id),
     reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
     reviewNote: text('review_note'),

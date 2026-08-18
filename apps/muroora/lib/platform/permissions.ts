@@ -31,6 +31,14 @@ export const PLATFORM_PERMISSIONS = {
   'businesses.pause': 'Temporarily take a business out of public view.',
   'businesses.suspend':
     'Suspend a business. Higher consequence than pausing and separately granted.',
+  /**
+   * Separate from approving. Approving says "you may trade here"; verifying
+   * says "we have seen your licence", and a customer relies on the second in a
+   * way they do not on the first. It should be possible to let somebody
+   * onboard businesses without letting them vouch for one.
+   */
+  'businesses.verify':
+    'Record that a business licence has been seen, which shows customers a Verified badge.',
 
   /* --------------------------------------------------------- accommodation */
   'accommodation.review': 'Review accommodation operators and properties.',
@@ -110,7 +118,12 @@ export const PERMISSION_GROUPS: {
   },
   {
     label: 'Businesses',
-    permissions: ['businesses.view', 'businesses.pause', 'businesses.suspend'],
+    permissions: [
+      'businesses.view',
+      'businesses.verify',
+      'businesses.pause',
+      'businesses.suspend',
+    ],
   },
   {
     label: 'Accommodation',

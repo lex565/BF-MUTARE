@@ -1,18 +1,20 @@
 import Link from 'next/link'
 
 import { listAllBusinesses } from '@/lib/platform/applications'
-import { requirePermission } from '@/lib/platform/auth'
+import { can, requirePermission } from '@/lib/platform/auth'
 import { StatusChip, humanise } from '@/app/super-admin/StatusChip'
+import { VerifyPanel } from '@/app/super-admin/businesses/VerifyPanel'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Businesses' }
 
 /** Every business on the platform, whatever its state. */
 export default async function BusinessesPage() {
-  await requirePermission('businesses.view')
+  const admin = await requirePermission('businesses.view')
   const rows = await listAllBusinesses()
 
   const live = rows.filter((r) => r.status === 'ACTIVE' || r.status === 'PILOT')
+  const mayVerify = can(admin, 'businesses.verify')
 
   return (
     <>
@@ -22,7 +24,7 @@ export default async function BusinessesPage() {
         <p className="cc-sub">
           {rows.length === 0
             ? 'None yet.'
-            : `${rows.length} in total, ${live.length} visible to the public.`}
+            : `${rows.length} in total, ${live.length} visible to the public, ${rows.filter((r) => r.verifiedAt).length} with a licence on file.`}
         </p>
       </header>
 
@@ -44,6 +46,7 @@ export default async function BusinessesPage() {
                   <th>Type</th>
                   <th>City</th>
                   <th>Status</th>
+                  <th>Licence</th>
                   <th>Joined</th>
                   <th />
                 </tr>
@@ -64,6 +67,27 @@ export default async function BusinessesPage() {
                     <td>{humanise(b.kind)}</td>
                     <td>{b.city}</td>
                     <td><StatusChip status={b.status} /></td>
+                    <td>
+                      {b.verifiedAt ? (
+                        <>
+                          <span className="cc-chip cc-chip-ok">Verified</span>
+                          <br />
+                          <span className="cc-mono">{b.licenceNumber}</span>
+                        </>
+                      ) : (
+                        <span className="cc-mono">Not checked</span>
+                      )}
+                      {mayVerify && (
+                        <div style={{ marginTop: '.5rem' }}>
+                          <VerifyPanel
+                            businessId={b.id}
+                            name={b.name}
+                            licenceNumber={b.licenceNumber}
+                            verified={b.verifiedAt !== null}
+                          />
+                        </div>
+                      )}
+                    </td>
                     <td className="cc-mono">
                       {b.createdAt.toISOString().slice(0, 10)}
                     </td>

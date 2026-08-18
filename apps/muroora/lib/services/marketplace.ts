@@ -168,6 +168,14 @@ export interface PublicBusiness {
   logoPath: string | null
   isFounding: boolean
   storefrontUrl: string | null
+  /**
+   * A licence has been seen by a person at Musuwo.
+   *
+   * A BOOLEAN, deliberately. The licence number and the document stay on the
+   * server: the badge tells a customer the check happened, it does not
+   * republish a business owner's registration details to every visitor.
+   */
+  verified: boolean
 }
 
 /**
@@ -192,6 +200,7 @@ export async function listPublicBusinesses(): Promise<PublicBusiness[]> {
       city: businesses.city,
       logoPath: businesses.logoPath,
       isFounding: businesses.isFounding,
+      verifiedAt: businesses.verifiedAt,
       storeSlug: stores.slug,
     })
     .from(businesses)
@@ -204,8 +213,9 @@ export async function listPublicBusinesses(): Promise<PublicBusiness[]> {
     )
     .orderBy(desc(businesses.isFounding), asc(businesses.name))
 
-  return rows.map(({ storeSlug, ...b }) => ({
+  return rows.map(({ storeSlug, verifiedAt, ...b }) => ({
     ...b,
+    verified: verifiedAt !== null,
     storefrontUrl: storeSlug ? `/stores/${storeSlug}` : null,
   }))
 }
@@ -223,6 +233,8 @@ export interface MarketplaceProduct {
     slug: string
     logoPath: string | null
     storefrontUrl: string | null
+    /** Whether Musuwo has seen this merchant's licence. See PublicBusiness. */
+    verified: boolean
   }
 }
 
@@ -263,6 +275,7 @@ export async function listMarketplaceProducts(): Promise<MarketplaceProduct[]> {
       merchantName: businesses.name,
       merchantSlug: businesses.slug,
       merchantLogo: businesses.logoPath,
+      merchantVerifiedAt: businesses.verifiedAt,
       storeSlug: stores.slug,
     })
     .from(products)
@@ -300,6 +313,8 @@ export async function listMarketplaceProducts(): Promise<MarketplaceProduct[]> {
         slug: r.merchantSlug,
         logoPath: r.merchantLogo,
         storefrontUrl: r.storeSlug ? `/stores/${r.storeSlug}` : null,
+        // A boolean only. The licence number and document stay server-side.
+        verified: r.merchantVerifiedAt !== null,
       },
     }
   })

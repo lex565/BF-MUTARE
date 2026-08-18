@@ -717,8 +717,102 @@ export async function listAllBusinesses() {
       city: businesses.city,
       isFounding: businesses.isFounding,
       createdAt: businesses.createdAt,
+      licenceNumber: businesses.licenceNumber,
+      verifiedAt: businesses.verifiedAt,
     })
     .from(businesses)
     .where(isNull(businesses.deletedAt))
     .orderBy(businesses.publicId)
+}
+
+/**
+ * Record that a business licence has been seen, or withdraw that record.
+ *
+ * WHAT THIS IS SAYING, AND THE CARE IT DESERVES. A customer reads the Verified
+ * badge as "this business is real and can be traced if something goes wrong".
+ * That is a promise Musuwo is making on a stranger's behalf, so it takes its
+ * own permission - separate from approving, because letting somebody onboard
+ * businesses is a smaller decision than letting them vouch for one - and it
+ * requires a licence number rather than a tick box.
+ *
+ * A database CHECK enforces that verifiedAt, verifiedBy and licenceNumber
+ * arrive together, so there is no path to a badge with nothing behind it.
+ *
+ * Withdrawing clears all three. It is not a soft flag: if the licence turns
+ * out to be false, the claim has to disappear completely, and the audit log is
+ * where the history of it lives.
+ */
+export async function setBusinessVerification(params: {
+  businessId: string
+  /** null withdraws verification. */
+  licenceNumber: string | null
+  documentPath?: string | null
+  reason?: string
+}): Promise<void> {
+  const admin = await assertPermission('businesses.verify')
+
+  const [existing] = await db
+    .select({
+      id: businesses.id,
+      name: businesses.name,
+      verifiedAt: businesses.verifiedAt,
+      licenceNumber: businesses.licenceNumber,
+    })
+    .from(businesses)
+    .where(and(eq(businesses.id, params.businessId), isNull(businesses.deletedAt)))
+
+  if (!existing) throw new ApplicationError('NOT_FOUND', 'No such business.')
+
+  const licence = params.licenceNumber?.trim() || null
+
+  if (licence !== null && licence.length < 3) {
+    throw new ApplicationError(
+      'NEEDS_REASON',
+      'Put in the licence or registration number as it appears on the document. A badge with nothing behind it is worse than no badge.',
+    )
+  }
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(businesses)
+      .set(
+        licence
+          ? {
+              licenceNumber: licence,
+              licenceDocumentPath: params.documentPath ?? null,
+              verifiedAt: new Date(),
+              verifiedBy: admin.user.id,
+              updatedAt: new Date(),
+            }
+          : {
+              // All three together. A stale licence number left behind a
+              // withdrawn badge is how the next reviewer re-verifies on the
+              // strength of a document nobody has actually seen.
+              licenceNumber: null,
+              licenceDocumentPath: null,
+              verifiedAt: null,
+              verifiedBy: null,
+              updatedAt: new Date(),
+            },
+      )
+      .where(eq(businesses.id, params.businessId))
+
+    await tx.insert(platformAuditLog).values({
+      actorId: admin.user.id,
+      actorRole: admin.role,
+      action: licence ? 'BUSINESS_VERIFIED' : 'BUSINESS_VERIFICATION_WITHDRAWN',
+      entityType: 'business',
+      entityId: params.businessId,
+      changes: {
+        business: existing.name,
+        from: existing.verifiedAt ? 'verified' : 'unverified',
+        to: licence ? 'verified' : 'unverified',
+        licenceNumber: licence,
+      },
+      reason: params.reason ?? null,
+    })
+  })
+
+  // The badge is on the public directory, so drop the cached feeds.
+  await invalidatePublicFeeds('all')
 }

@@ -28,7 +28,7 @@ export default function AccessPage() {
             <strong className="mt-7 inline-block text-[#ffb37a]">Continue as business →</strong>
           </Link>
         </div>
-        <p className="mt-8 text-center text-small text-ink-faint">Want to register a business? <Link href="/marketplace" className="font-bold text-support underline">Start a Musuwo business application</Link>.</p>
+        <p className="mt-8 text-center text-small text-ink-faint">Want to register a business? <Link href="/marketplace/apply" className="font-bold text-support underline">Start a Musuwo business application</Link>.</p>
       </div>
     </main>
   )

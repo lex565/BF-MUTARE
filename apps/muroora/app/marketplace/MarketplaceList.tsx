@@ -1,0 +1,300 @@
+'use client'
+
+import Link from 'next/link'
+import Image from 'next/image'
+import { useMemo, useState } from 'react'
+
+import type { PublicBusiness, MarketplaceProduct } from '@/lib/services/marketplace'
+
+/**
+ * The Musuwo directory: every approved business, and what they are selling.
+ *
+ * THIS REPLACED A PREVIEW. What was here rendered nine invented businesses from
+ * an array at the top of the file - a bookshop, a boarding house, a tutor -
+ * with prices and areas, none of which existed. It looked exactly like a
+ * working marketplace, which is the problem: a customer could have searched it,
+ * found "Mutare Book Centre", and gone looking for a shop that was never real.
+ *
+ * Everything below comes from the database and nothing is drawn unless a
+ * person approved it. When there is nothing, it says so.
+ *
+ * Filtering is in the browser rather than the server because the whole
+ * directory is small enough to send at once and will be for a long while. When
+ * it stops being small this becomes a server query with a URL parameter, and
+ * the change is contained here.
+ */
+
+const KINDS = [
+  ['ALL', 'Everything'],
+  ['RETAIL', 'Shops'],
+  ['FOOD', 'Food'],
+  ['ACCOMMODATION', 'Accommodation'],
+  ['SERVICE', 'Services'],
+  ['EDUCATION', 'Tutors'],
+  ['BEAUTY', 'Beauty'],
+  ['AUTOMOTIVE', 'Motoring'],
+  ['HOME_SERVICES', 'Home'],
+  ['OTHER', 'Other'],
+] as const
+
+/**
+ * The verification mark.
+ *
+ * The wording is doing real work. "Verified" alone invites a customer to read
+ * it as "good", so the title attribute and the legend under the list both say
+ * what was actually checked: a licence was seen. It is a statement about
+ * identity, not about quality, and the badge should never grow into a rating.
+ */
+function VerifiedMark() {
+  return (
+    <span
+      title="Musuwo has seen this business's trading licence. It says the business is registered, not that it is good."
+      className="inline-flex items-center gap-1 rounded-pill bg-support/10 px-2 py-0.5 font-mono text-micro font-bold uppercase tracking-label text-support"
+    >
+      <svg viewBox="0 0 16 16" aria-hidden className="size-3 fill-current">
+        <path d="M8 0 9.9 1.4 12.2 1.1 13 3.3 15 4.4 14.6 6.7 16 8.5 14.6 10.3 15 12.6 13 13.7 12.2 15.9 9.9 15.6 8 17 6.1 15.6 3.8 15.9 3 13.7 1 12.6 1.4 10.3 0 8.5 1.4 6.7 1 4.4 3 3.3 3.8 1.1 6.1 1.4Z" />
+        <path d="m6.9 11.4-3-3 1.3-1.3 1.7 1.7 4-4L12.2 6Z" className="fill-paper" />
+      </svg>
+      Verified
+    </span>
+  )
+}
+
+function BusinessCard({ business }: { business: PublicBusiness }) {
+  const href = business.storefrontUrl ?? `/stores/${business.slug}`
+  return (
+    <Link
+      href={href}
+      className="group flex flex-col border border-rule bg-paper p-6 transition-colors hover:border-support"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex size-14 shrink-0 items-center justify-center bg-paper-sunk">
+          {business.logoPath ? (
+            <Image
+              src={business.logoPath}
+              alt=""
+              width={56}
+              height={56}
+              className="size-14 object-contain"
+            />
+          ) : (
+            <span aria-hidden className="text-h3 text-ink-faint">
+              {business.name.charAt(0)}
+            </span>
+          )}
+        </div>
+        {business.isFounding && (
+          <span className="chip chip-live h-fit">Founding</span>
+        )}
+      </div>
+
+      <h3 className="mt-5 text-h3 group-hover:text-support">{business.name}</h3>
+
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        {business.verified && <VerifiedMark />}
+        <span className="font-mono text-micro uppercase tracking-label text-ink-faint">
+          {business.city}
+        </span>
+      </div>
+
+      {business.summary && (
+        <p className="mt-3 text-small text-ink-soft">{business.summary}</p>
+      )}
+
+      <span className="mt-auto pt-5 font-mono text-micro uppercase tracking-label text-support">
+        Visit →
+      </span>
+    </Link>
+  )
+}
+
+function ProductCard({ product }: { product: MarketplaceProduct }) {
+  return (
+    <Link
+      href={`/product/${product.slug}`}
+      className="group flex flex-col border border-rule bg-paper p-5 transition-colors hover:border-support"
+    >
+      <h3 className="text-body font-bold group-hover:text-support">
+        {product.name}
+      </h3>
+      {product.unitSize && (
+        <p className="mt-1 text-small text-ink-faint">{product.unitSize}</p>
+      )}
+
+      {/* WHO IS SELLING IT. A marketplace listing without a named seller is
+          how a customer ends up not knowing who they bought from. */}
+      <p className="mt-3 flex flex-wrap items-center gap-2 text-small">
+        <span className="text-ink-soft">{product.merchant.name}</span>
+        {product.merchant.verified && <VerifiedMark />}
+      </p>
+
+      <p className="mt-4 text-h3 text-support">
+        ${product.price.decimal}
+      </p>
+    </Link>
+  )
+}
+
+export function MarketplaceList({
+  businesses,
+  products,
+  initialQuery = '',
+}: {
+  businesses: PublicBusiness[]
+  products: MarketplaceProduct[]
+  initialQuery?: string
+}) {
+  const [query, setQuery] = useState(initialQuery)
+  const [kind, setKind] = useState<string>('ALL')
+
+  const term = query.trim().toLowerCase()
+
+  const shownBusinesses = useMemo(
+    () =>
+      businesses.filter(
+        (b) =>
+          (kind === 'ALL' || b.kind === kind) &&
+          (term === '' ||
+            b.name.toLowerCase().includes(term) ||
+            (b.summary ?? '').toLowerCase().includes(term) ||
+            b.city.toLowerCase().includes(term)),
+      ),
+    [businesses, kind, term],
+  )
+
+  const shownProducts = useMemo(
+    () =>
+      term === ''
+        ? products
+        : products.filter(
+            (p) =>
+              p.name.toLowerCase().includes(term) ||
+              p.merchant.name.toLowerCase().includes(term),
+          ),
+    [products, term],
+  )
+
+  // Only the categories somebody actually trades in. Nine tabs of which seven
+  // are permanently empty tells a customer the marketplace is empty.
+  const availableKinds = KINDS.filter(
+    ([value]) => value === 'ALL' || businesses.some((b) => b.kind === value),
+  )
+
+  return (
+    <main>
+      <section className="border-b border-rule bg-paper-sunk">
+        <div className="mx-auto max-w-[86rem] px-gutter py-14">
+          <p className="font-mono text-micro uppercase tracking-label text-accent">
+            Musuwo directory
+          </p>
+          <h1 className="mt-4 max-w-[16ch] text-mega leading-[.95]">
+            Local businesses you can find again.
+          </h1>
+          <p className="mt-6 max-w-2xl text-lead text-ink-soft">
+            Every business here applied and was reviewed by a person before it
+            appeared.
+          </p>
+
+          <label className="mt-10 block">
+            <span className="sr-only">Search businesses and products</span>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="min-h-16 w-full border border-rule bg-paper px-6 text-lead focus:border-accent focus:outline-none"
+              placeholder="Search by name, product or area"
+              type="search"
+            />
+          </label>
+
+          {availableKinds.length > 1 && (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {availableKinds.map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setKind(value)}
+                  aria-pressed={kind === value}
+                  className={`chip transition-colors ${
+                    kind === value ? 'border-support bg-support text-white' : ''
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[86rem] px-gutter py-section">
+        {businesses.length === 0 ? (
+          <div className="max-w-measure border-l-4 border-accent bg-paper-sunk px-6 py-8">
+            <h2 className="text-h3">No businesses are listed yet.</h2>
+            <p className="mt-3 text-ink-soft">
+              Musuwo is new. Businesses appear here once they have applied and a
+              person has reviewed them, so this page shows nothing rather than
+              showing examples that do not exist.
+            </p>
+            <Link
+              href="/marketplace/apply"
+              className="mt-6 inline-block bg-accent px-7 py-4 font-mono text-small font-bold uppercase tracking-label text-white transition-colors hover:bg-accent-deep"
+            >
+              Apply to list your business
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-baseline justify-between gap-4">
+              <h2 className="text-h2">
+                {shownBusinesses.length}{' '}
+                {shownBusinesses.length === 1 ? 'business' : 'businesses'}
+              </h2>
+              <Link
+                href="/marketplace/apply"
+                className="font-mono text-micro uppercase tracking-label text-support transition-colors hover:text-accent"
+              >
+                Apply to list yours →
+              </Link>
+            </div>
+
+            {shownBusinesses.length === 0 ? (
+              <p className="mt-8 text-ink-soft">
+                Nothing matches that. Try a different word.
+              </p>
+            ) : (
+              <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {shownBusinesses.map((b) => (
+                  <BusinessCard key={b.publicId} business={b} />
+                ))}
+              </div>
+            )}
+
+            {/* What "Verified" means, said once, in words, near the badges. */}
+            <p className="mt-8 max-w-measure text-small text-ink-faint">
+              <strong className="text-ink-soft">Verified</strong> means Musuwo
+              has seen that business&rsquo;s trading licence. It tells you the
+              business is registered and can be traced. It is not a review, and
+              it is not a judgement about how good they are.
+            </p>
+          </>
+        )}
+
+        {shownProducts.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-h2">
+              {term ? 'Matching products' : 'Products across Musuwo'}
+            </h2>
+            <p className="mt-2 text-ink-soft">
+              Each one shows the business selling it.
+            </p>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {shownProducts.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+    </main>
+  )
+}
