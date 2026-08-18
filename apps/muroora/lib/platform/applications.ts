@@ -9,6 +9,7 @@ import {
   businesses,
 } from '@/db/schema/marketplace'
 import { users } from '@/db/schema/identity'
+import { orders } from '@/db/schema/orders'
 import { platformAuditLog } from '@/db/schema/platform'
 import { assertPermission, type PlatformAdmin } from '@/lib/platform/auth'
 
@@ -815,4 +816,58 @@ export async function setBusinessVerification(params: {
 
   // The badge is on the public directory, so drop the cached feeds.
   await invalidatePublicFeeds('all')
+}
+
+export interface PlatformOrder {
+  id: string
+  orderNumber: string
+  status: string
+  placedAt: Date | null
+  recipientName: string
+  deliverySuburb: string
+  totalAmount: bigint
+  currency: string
+  merchantName: string | null
+  merchantPublicId: string | null
+}
+
+/**
+ * Every order on Musuwo, whichever merchant took it.
+ *
+ * THIS IS THE OTHER HALF OF THE ARRANGEMENT, and it is worth naming because it
+ * is easy to get backwards. A customer on muroora-mart.vercel.app buys from
+ * MUROORA MART: that is the name over the door, on the receipt and on the
+ * delivery message, and Musuwo is not put in front of them while they shop.
+ *
+ * Underneath, the order belongs to the platform. It appears here the moment it
+ * is placed, and Musuwo is what coordinates getting it to the customer. The
+ * merchant packs; Musuwo delivers.
+ *
+ * So this deliberately does NOT filter by store, unlike `listOrdersForStaff`,
+ * which is Muroora Mart's own screen and is scoped to Muroora Mart. The join
+ * runs through `stores` to `businesses`, so an order shows the merchant that
+ * took it rather than a store id nobody can read. A merchant with no business
+ * row yields nulls rather than vanishing - an order that exists must never
+ * disappear from the platform view because of a missing join.
+ */
+export async function listPlatformOrders(limit = 100): Promise<PlatformOrder[]> {
+  const rows = await db
+    .select({
+      id: orders.id,
+      orderNumber: orders.orderNumber,
+      status: orders.status,
+      placedAt: orders.placedAt,
+      recipientName: orders.recipientName,
+      deliverySuburb: orders.deliverySuburb,
+      totalAmount: orders.totalAmount,
+      currency: orders.currency,
+      merchantName: businesses.name,
+      merchantPublicId: businesses.publicId,
+    })
+    .from(orders)
+    .leftJoin(businesses, eq(businesses.storeId, orders.storeId))
+    .orderBy(desc(orders.placedAt))
+    .limit(limit)
+
+  return rows
 }

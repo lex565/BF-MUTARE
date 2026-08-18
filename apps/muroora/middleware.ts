@@ -19,7 +19,41 @@ import { NextResponse, type NextRequest } from 'next/server'
  *    A server action can be invoked directly without ever passing through
  *    this file, so anything that trusts middleware alone is open.
  */
+/**
+ * Routes that belong to Musuwo and have no business on Muroora Mart's website.
+ *
+ * The page components redirect too, but a `redirect()` inside a server
+ * component is answered by Next with a 200 and a client-side navigation - so
+ * the visitor briefly receives a document whose <title> reads "Businesses on
+ * Musuwo - Muroora Mart", which is precisely the mixing of the two brands this
+ * is meant to prevent. Doing it here means a real 307 from the edge and no
+ * renderer involved.
+ *
+ * The page-level redirects stay as the backstop. Middleware does not run on
+ * every path shape forever, and a rule that exists in one place only is a rule
+ * that quietly stops applying.
+ */
+const MUSUWO_ONLY = ['/marketplace', '/riders']
+
+/** Where the marketplace lives, for a Muroora deployment sending people to it. */
+const MUSUWO_ORIGIN =
+  process.env.NEXT_PUBLIC_MUSUWO_URL ?? 'https://musuwo.vercel.app'
+
 export async function middleware(request: NextRequest) {
+  const brandIsMuroora = process.env.NEXT_PUBLIC_SITE_BRAND === 'muroora'
+  const pathname = request.nextUrl.pathname
+
+  if (
+    brandIsMuroora &&
+    MUSUWO_ONLY.some((p) => pathname === p || pathname.startsWith(`${p}/`))
+  ) {
+    // /marketplace/apply goes with it: applying to join Musuwo is a Musuwo
+    // errand, and the form names Musuwo throughout.
+    return NextResponse.redirect(
+      new URL(pathname + request.nextUrl.search, MUSUWO_ORIGIN),
+    )
+  }
+
   let response = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -45,7 +79,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const path = request.nextUrl.pathname
+  const path = pathname
   const isPrivate =
     path.startsWith('/admin') ||
     path.startsWith('/staff') ||

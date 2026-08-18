@@ -532,6 +532,21 @@ export interface OrderSummary {
 export function customerFacingStatus(status: string): {
   label: string
   blurb: string
+  /**
+   * Who is carrying it, said quietly and only once it is moving.
+   *
+   * THE ARRANGEMENT, AND WHY THE WORDING MATTERS. A customer bought from the
+   * merchant - Muroora Mart, or whoever - and that is the name they should see
+   * throughout: on the site, on the receipt, at the top of this screen.
+   * Musuwo is the layer underneath that collects the order and gets it to
+   * them.
+   *
+   * So the merchant's name leads and this is secondary, and it appears only
+   * while the order is actually in transit. Putting "Musuwo" beside "Being
+   * packed" would be telling somebody about a company they did not buy from,
+   * at a moment it makes no difference to them.
+   */
+  carrier?: string
 } {
   switch (status) {
     case 'DRAFT':
@@ -563,6 +578,7 @@ export function customerFacingStatus(status: string): {
       return {
         label: 'On the way',
         blurb: 'Your order has left the shop.',
+        carrier: 'Delivery coordinated by Musuwo',
       }
     case 'DELIVERED':
       return { label: 'Delivered', blurb: 'Delivered. Thank you.' }
@@ -570,6 +586,7 @@ export function customerFacingStatus(status: string): {
       return {
         label: 'Could not deliver',
         blurb: 'We could not complete the delivery. The shop will be in touch.',
+        carrier: 'Delivery coordinated by Musuwo',
       }
     case 'CANCELLED':
       return { label: 'Cancelled', blurb: 'This order was cancelled.' }

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 
+import { redirect } from 'next/navigation'
+
 import { getPublicBusinesses, getMarketplaceProducts } from '@/lib/services/marketplace-cache'
 import { MarketplaceList } from '@/app/marketplace/MarketplaceList'
+import { isMuroora, BRAND } from '@/lib/brand'
 
 /**
  * The Musuwo directory.
@@ -27,6 +30,16 @@ export default async function MarketplacePage({
   // search from the front page lands on results rather than on an unfiltered
   // list the person then has to search again.
   const { q } = await searchParams
+
+  /**
+   * The directory belongs to Musuwo.
+   *
+   * On Muroora Mart's website it would be a grocer showing customers a list of
+   * other businesses, which is not what that site is for. Sending them to
+   * Musuwo means the link keeps working - anybody who has one bookmarked still
+   * arrives at the directory - without the directory living inside the shop.
+   */
+  if (isMuroora) redirect(`${BRAND.musuwo.url}/marketplace`)
   // Through the cache, same as the homepage, so the two cannot disagree about
   // who is listed. Both are dropped by tag the moment a business is approved,
   // suspended or verified.

@@ -40,6 +40,13 @@ export const PLATFORM_PERMISSIONS = {
   'businesses.verify':
     'Record that a business licence has been seen, which shows customers a Verified badge.',
 
+  /**
+   * Orders across every merchant. Separate from the delivery monitor: an order
+   * carries the customer's name, address and what they bought, which is more
+   * than somebody watching handovers needs to see.
+   */
+  'orders.view': 'See orders placed with any business on Musuwo.',
+
   /* --------------------------------------------------------- accommodation */
   'accommodation.review': 'Review accommodation operators and properties.',
   'accommodation.verify': 'Mark an accommodation property as verified.',
@@ -123,6 +130,7 @@ export const PERMISSION_GROUPS: {
       'businesses.verify',
       'businesses.pause',
       'businesses.suspend',
+      'orders.view',
     ],
   },
   {

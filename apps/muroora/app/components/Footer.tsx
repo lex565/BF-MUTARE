@@ -55,8 +55,12 @@ export function Footer() {
             packages/ui/src/GroupBar.tsx. */}
         <div className="md:col-span-4 md:text-right">
           <p className="font-mono text-micro uppercase tracking-label text-ink-faint">
+            {/* Musuwo is named ONCE on this site, in the "Part of Musuwo"
+                link on the left. Saying it twice in one footer starts to make
+                a grocer's website look like somebody else's shopfront, which
+                is the thing being avoided. */}
             {isMuroora
-              ? 'Musuwo founding merchant · Business #001'
+              ? 'Groceries and household goods · Mutare'
               : 'Independent Zimbabwean marketplace'}
           </p>
           <p className="mt-3 text-small text-ink-soft">
