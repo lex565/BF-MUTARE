@@ -49,7 +49,23 @@ export async function middleware(request: NextRequest) {
   const isPrivate =
     path.startsWith('/admin') ||
     path.startsWith('/staff') ||
-    path.startsWith('/account')
+    path.startsWith('/account') ||
+    /**
+     * The Musuwo Control Center.
+     *
+     * Added after checking the live site: without it, an anonymous request to
+     * /super-admin returned 200 and the public shell, then redirected in the
+     * browser. No Control Center data was ever served - the layout's
+     * `requirePlatformAdmin` saw to that - but the page TITLE reached the
+     * visitor, so "Control Center - Musuwo" sat in the tab and in any share
+     * preview of a URL somebody was only guessing at.
+     *
+     * Bouncing here means the reply is a redirect from the edge and the
+     * request never reaches a renderer. It does NOT replace the checks inside:
+     * middleware deliberately does not query roles, so a signed-in customer
+     * passes this and is refused by the layout, and every action checks again.
+     */
+    path.startsWith('/super-admin')
 
   if (isPrivate && !user) {
     const url = request.nextUrl.clone()
@@ -70,6 +86,7 @@ export const config = {
      *
      * The shop, product pages and cart are deliberately NOT gated - the brief
      * is explicit that customers browse and build a cart without an account.
+     * /super-admin IS gated, above.
      */
     '/((?!_next/static|_next/image|favicon.ico|logo.png|hero|.*\\.(?:svg|png|jpg|jpeg|webp|mp4)$).*)',
   ],
