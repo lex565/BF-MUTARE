@@ -9,6 +9,8 @@ import { z } from 'zod'
 import { CART_COOKIE_NAME } from '@/app/api/_lib/cart-owner'
 import { db } from '@/db/client'
 import { userRoles, users } from '@/db/schema'
+import { siteOrigin } from '@/lib/brand'
+import { checkSignUpEmail } from '@/lib/email-policy'
 import { mergeGuestCart } from '@/lib/services/cart'
 import { supabaseServer } from '@/lib/supabase/server'
 
@@ -32,7 +34,23 @@ const credentials = z.object({
   next: z.string().optional(),
 })
 
-export type AuthState = { error?: string; message?: string }
+/**
+ * What a sign-in or sign-up attempt sends back to the form.
+ *
+ * `typed` carries the name and email back so a refused attempt does not wipe
+ * them. A server action re-renders the form, and an uncontrolled input starts
+ * empty again, so before this every rejection cost the person their whole
+ * address - on a phone, where addresses are slow and unpleasant to type, and
+ * now with a rule about disposable domains that people will hit by accident.
+ *
+ * THE PASSWORD IS NEVER IN HERE. Echoing it back would put it in the server's
+ * response body, in the React payload, and in anything that logs either.
+ */
+export type AuthState = {
+  error?: string
+  message?: string
+  typed?: { fullName?: string; email?: string }
+}
 
 /** Only allow same-site redirects. An open redirect is a phishing vector. */
 function safeNext(next: string | undefined): string {
@@ -80,8 +98,10 @@ export async function signIn(
     next: formData.get('next') ?? undefined,
   })
 
+  const typed = { email: String(formData.get('email') ?? '') }
+
   if (!parsed.success) {
-    return { error: parsed.error.issues[0].message }
+    return { error: parsed.error.issues[0].message, typed }
   }
 
   const supabase = await supabaseServer()
@@ -93,7 +113,7 @@ export async function signIn(
   if (error) {
     // Deliberately not "no account with that email" - that tells an attacker
     // which addresses are registered.
-    return { error: 'That email and password do not match.' }
+    return { error: 'That email and password do not match.', typed }
   }
 
   if (data.user) await carryCartOver(data.user.id)
@@ -113,8 +133,24 @@ export async function signUp(
     next: formData.get('next') ?? undefined,
   })
 
+  const typed = {
+    fullName: String(formData.get('fullName') ?? ''),
+    email: String(formData.get('email') ?? ''),
+  }
+
   if (!parsed.success) {
-    return { error: parsed.error.issues[0].message }
+    return { error: parsed.error.issues[0].message, typed }
+  }
+
+  /**
+   * Refuse throwaway addresses, but only here, where the account is being
+   * created. Signing in and resetting a password both stay open to every
+   * address - see the note at the top of lib/email-policy.ts for why doing
+   * this in either of those places would cause more harm than it prevents.
+   */
+  const verdict = await checkSignUpEmail(parsed.data.email)
+  if (!verdict.ok) {
+    return { error: verdict.reason, typed }
   }
 
   const supabase = await supabaseServer()
@@ -125,7 +161,7 @@ export async function signUp(
   })
 
   if (error) {
-    return { error: error.message }
+    return { error: error.message, typed }
   }
   if (!data.user) {
     return { message: 'Check your email to confirm your account.' }
@@ -230,12 +266,13 @@ export async function requestPasswordReset(
   }
 
   const supabase = await supabaseServer()
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://muroora-mart.vercel.app'
 
+  // Whichever site the person is actually standing on. This used to fall back
+  // to muroora-mart.vercel.app unconditionally, so a Musuwo customer who asked
+  // for a reset was sent to another company's website to finish it.
   const { error } = await supabase.auth.resetPasswordForEmail(
     parsed.data.email,
-    { redirectTo: `${origin}/reset-password` },
+    { redirectTo: `${siteOrigin()}/reset-password` },
   )
 
   // Logged, not shown. A provider outage is our problem, not a hint to hand

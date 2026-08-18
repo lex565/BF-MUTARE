@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useActionState, useEffect, useState } from 'react'
 import { useFormStatus } from 'react-dom'
 
-import { Logo } from '@/app/components/Logo'
+import { SiteLogo } from '@/app/components/SiteLogo'
+import { brand } from '@/lib/brand'
 import { resetPasswordWithCode, type AuthState } from '@/app/login/actions'
 import { supabaseBrowser } from '@/lib/supabase/client'
 
@@ -172,7 +173,7 @@ export function ResetPasswordForm({
   return (
     <main className="flex min-h-[80vh] items-center bg-paper-sunk px-gutter py-section">
       <section className="mx-auto w-full max-w-md border border-rule bg-paper p-7 shadow-sm sm:p-10">
-        <Logo className="h-11" />
+        <SiteLogo className="h-11" />
         <p className="mt-9 font-mono text-micro uppercase tracking-label text-accent">
           Password
         </p>
@@ -181,7 +182,8 @@ export function ResetPasswordForm({
         {done ? (
           <>
             <p className="mt-4 text-ink-soft">
-              Your password has been changed. Use it the next time you sign in.
+              Your {brand.name} password has been changed. Use it the next time
+              you sign in.
             </p>
             <Link
               href="/login"
@@ -247,8 +249,8 @@ export function ResetPasswordForm({
         ) : (
           <>
             <p className="mt-4 text-ink-soft">
-              Check your email for an eight-digit code, then put it in below
-              along with the password you want.
+              Check your email for an eight-digit code from {brand.name}, then
+              put it in below along with the password you want.
             </p>
 
             {problem && (

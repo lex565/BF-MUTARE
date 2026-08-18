@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 
-import { Logo } from '@/app/components/Logo'
+import { SiteLogo } from '@/app/components/SiteLogo'
+import { brand } from '@/lib/brand'
 import { requestPasswordReset, type AuthState } from '@/app/login/actions'
 
 function Submit() {
@@ -33,14 +34,14 @@ export function ForgotPasswordForm({
   return (
     <main className="flex min-h-[80vh] items-center bg-paper-sunk px-gutter py-section">
       <section className="mx-auto w-full max-w-md border border-rule bg-paper p-7 shadow-sm sm:p-10">
-        <Logo className="h-11" />
+        <SiteLogo className="h-11" />
         <p className="mt-9 font-mono text-micro uppercase tracking-label text-accent">
           Password
         </p>
         <h1 className="mt-3 text-h1">Forgotten it?</h1>
         <p className="mt-4 text-ink-soft">
           Put in the email address you signed up with and we will send you an
-          eight-digit code to set a new password.
+          eight-digit code to set a new {brand.name} password.
         </p>
 
         {expired && (
@@ -100,6 +101,16 @@ export function ForgotPasswordForm({
 
           <Submit />
         </form>
+
+        {/* Always here, not only after a code has just been sent. Somebody
+            who closed the tab, or asked from a laptop and is finishing on a
+            phone, arrives at this page holding a code with nowhere to put it. */}
+        <Link
+          href="/reset-password"
+          className="mt-6 block w-full border border-rule bg-paper-sunk px-6 py-3.5 text-center font-mono text-micro uppercase tracking-label text-support transition-colors hover:border-accent hover:text-accent"
+        >
+          I already have a code
+        </Link>
 
         <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 border-t border-rule pt-6">
           <Link

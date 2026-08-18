@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 
 import { AccessLoginForm } from '@/app/components/auth/AccessLoginForm'
 import { currentUser } from '@/lib/auth'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
   title: 'Team access',
@@ -16,7 +17,7 @@ export default async function TeamAccessPage() {
     <AccessLoginForm
       next="/staff"
       label="Team access"
-      description="For authorised Muroora Mart staff. Use the account issued to you by management."
+      description={`For authorised ${brand.name} staff. Use the account issued to you by management.`}
       allowCreateAccount
       managementLink
     />

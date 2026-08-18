@@ -76,6 +76,9 @@ export function LoginForm({ next }: { next?: string }) {
               name="fullName"
               type="text"
               autoComplete="name"
+              /* Put back what was typed. A refused attempt re-renders the
+                 form, and an uncontrolled input comes back empty. */
+              defaultValue={state.typed?.fullName ?? ''}
               className="mt-2 w-full border border-rule bg-paper px-4 py-3 text-body focus:border-accent focus:outline-none"
             />
           </div>
@@ -94,6 +97,7 @@ export function LoginForm({ next }: { next?: string }) {
             type="email"
             required
             autoComplete="email"
+            defaultValue={state.typed?.email ?? ''}
             /* inputMode/autoCapitalize matter here: most customers are on a
                phone, and a capitalised first letter breaks the address. */
             inputMode="email"
@@ -143,12 +147,23 @@ export function LoginForm({ next }: { next?: string }) {
       </form>
 
       {mode === 'in' && (
-        <a
-          href="/forgot-password"
-          className="mt-5 inline-block font-mono text-micro uppercase tracking-label text-support transition-colors hover:text-accent"
-        >
-          Forgotten your password?
-        </a>
+        <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
+          <a
+            href="/forgot-password"
+            className="font-mono text-micro uppercase tracking-label text-support transition-colors hover:text-accent"
+          >
+            Forgotten your password?
+          </a>
+          {/* The reset email sends a code rather than a link, so there has to
+              be a visible way in for somebody already holding one - they may
+              have asked on a different device, or closed the tab. */}
+          <a
+            href="/reset-password"
+            className="font-mono text-micro uppercase tracking-label text-ink-faint transition-colors hover:text-ink"
+          >
+            I have a reset code
+          </a>
+        </div>
       )}
 
       <p className="mt-8 max-w-[42ch] text-small text-ink-faint">

@@ -43,6 +43,13 @@ interface BrandCopy {
   description: string
   /** Where the logo in the navigation points. */
   home: string
+  /**
+   * This deployment's public origin, used where an absolute URL is needed and
+   * NEXT_PUBLIC_SITE_URL has not been set - password-reset redirects, mainly.
+   * Hard-coding one of the two here is how a Musuwo customer used to be sent
+   * to Muroora Mart to finish resetting their password.
+   */
+  url: string
 }
 
 export const BRAND: Record<SiteBrand, BrandCopy> = {
@@ -52,6 +59,7 @@ export const BRAND: Record<SiteBrand, BrandCopy> = {
     description:
       'Discover local businesses, products, food, accommodation and services through Musuwo. Muroora Mart is the founding merchant.',
     home: '/',
+    url: 'https://musuwo.vercel.app',
   },
   muroora: {
     name: 'Muroora Mart',
@@ -59,7 +67,19 @@ export const BRAND: Record<SiteBrand, BrandCopy> = {
     description:
       'Groceries and household goods in Mutare, with same-day delivery and a diaspora shopping service for families abroad.',
     home: '/',
+    url: 'https://muroora-mart.vercel.app',
   },
 }
 
 export const brand = BRAND[SITE_BRAND]
+
+/**
+ * This deployment's origin.
+ *
+ * NEXT_PUBLIC_SITE_URL wins where it is set, because a preview deployment has
+ * a URL nobody can predict. The brand record is the fallback so a deployment
+ * that forgets the variable still sends people to its own site rather than to
+ * the other brand's.
+ */
+export const siteOrigin = (): string =>
+  process.env.NEXT_PUBLIC_SITE_URL ?? brand.url

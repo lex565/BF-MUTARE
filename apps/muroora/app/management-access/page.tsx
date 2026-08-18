@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 
 import { AccessLoginForm } from '@/app/components/auth/AccessLoginForm'
 import { currentUser } from '@/lib/auth'
+import { brand } from '@/lib/brand'
 
 export const metadata: Metadata = {
   title: 'Management access',
@@ -16,7 +17,7 @@ export default async function ManagementAccessPage() {
     <AccessLoginForm
       next="/admin/products"
       label="Management"
-      description="Restricted Muroora Mart management entrance."
+      description={`Restricted ${brand.name} management entrance.`}
     />
   )
 }

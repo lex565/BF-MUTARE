@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
 import { PageHeader } from '@/app/components/PageHeader'
+import { brand } from '@/lib/brand'
 import { LoginForm } from '@/app/login/LoginForm'
 import { currentUser } from '@/lib/auth'
 
 export const metadata: Metadata = {
   title: 'Sign in',
-  description: 'Sign in to Muroora Mart to track orders and save recipients.',
+  description: `Sign in to ${brand.name} to track orders and save recipients.`,
   robots: { index: false, follow: false },
 }
 
@@ -25,7 +26,9 @@ export default async function LoginPage({
     <main>
       <PageHeader
         eyebrow="Account"
-        title="Sign in"
+        /* Names the site. On a screen that asks for a password, "which
+           website is this" is not decoration. */
+        title={`Sign in to ${brand.name}`}
         intro="You do not need an account to shop. Sign in to see past orders, save the people you send to, and check out faster next time."
       />
 

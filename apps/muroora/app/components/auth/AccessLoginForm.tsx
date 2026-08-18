@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useActionState, useState } from 'react'
 import { useFormStatus } from 'react-dom'
 
-import { Logo } from '@/app/components/Logo'
+import { SiteLogo } from '@/app/components/SiteLogo'
 import { signIn, signUp, type AuthState } from '@/app/login/actions'
 
 function Submit({ label }: { label: string }) {
@@ -41,7 +41,7 @@ export function AccessLoginForm({
   return (
     <main className="flex min-h-[80vh] items-center bg-paper-sunk px-gutter py-section">
       <section className="mx-auto w-full max-w-md border border-rule bg-paper p-7 shadow-sm sm:p-10">
-        <Logo className="h-11" />
+        <SiteLogo className="h-11" />
         <p className="mt-9 font-mono text-micro uppercase tracking-label text-accent">{label}</p>
         <h1 className="mt-3 text-h1">{mode === 'up' ? 'Create staff account' : 'Sign in'}</h1>
         <p className="mt-4 text-ink-soft">{description}</p>
@@ -51,12 +51,12 @@ export function AccessLoginForm({
           {mode === 'up' && (
             <div>
               <label htmlFor="access-name" className="block font-mono text-micro uppercase tracking-label text-ink-faint">Full name</label>
-              <input id="access-name" name="fullName" type="text" required autoComplete="name" className="mt-2 w-full border border-rule bg-paper px-4 py-3 focus:border-accent focus:outline-none" />
+              <input id="access-name" name="fullName" type="text" required autoComplete="name" defaultValue={state.typed?.fullName ?? ''} className="mt-2 w-full border border-rule bg-paper px-4 py-3 focus:border-accent focus:outline-none" />
             </div>
           )}
           <div>
             <label htmlFor="access-email" className="block font-mono text-micro uppercase tracking-label text-ink-faint">Email</label>
-            <input id="access-email" name="email" type="email" required autoComplete="email" inputMode="email" autoCapitalize="none" className="mt-2 w-full border border-rule bg-paper px-4 py-3 focus:border-accent focus:outline-none" />
+            <input id="access-email" name="email" type="email" required autoComplete="email" defaultValue={state.typed?.email ?? ''} inputMode="email" autoCapitalize="none" className="mt-2 w-full border border-rule bg-paper px-4 py-3 focus:border-accent focus:outline-none" />
           </div>
           <div>
             <label htmlFor="access-password" className="block font-mono text-micro uppercase tracking-label text-ink-faint">Password</label>
@@ -73,7 +73,12 @@ export function AccessLoginForm({
         )}
 
         {mode === 'in' && (
-          <Link href="/forgot-password" className="mt-5 block text-center font-mono text-micro uppercase tracking-label text-support hover:text-accent">Forgotten your password?</Link>
+          <div className="mt-5 flex flex-wrap justify-center gap-x-6 gap-y-2">
+            <Link href="/forgot-password" className="font-mono text-micro uppercase tracking-label text-support hover:text-accent">Forgotten your password?</Link>
+            {/* The reset email carries a code, not a link. Somebody holding
+                one needs a box to type it into from wherever they are. */}
+            <Link href="/reset-password" className="font-mono text-micro uppercase tracking-label text-ink-faint hover:text-ink">I have a reset code</Link>
+          </div>
         )}
 
         <p className="mt-7 text-small text-ink-faint">New staff accounts require admin approval before staff tools become available.</p>

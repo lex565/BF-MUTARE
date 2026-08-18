@@ -67,3 +67,58 @@
   border-color: var(--color-support);
   color: var(--color-support);
 }
+
+/* ---------------------------------------------------------------------------
+   Loading skeletons
+   ---------------------------------------------------------------------------
+   Drawn by app/components/Skeleton.tsx. One flat tone with a slow highlight
+   passing over it - enough to read as "not finished" without competing with
+   the page arriving behind it.
+
+   The tone is a shade DARKER than the rule colour, not lighter. The first
+   version sat between paper and paper-sunk and was close to invisible on the
+   sunk-paper bands this site uses for page headers, which is the worst of
+   both: it still occupied the space, but nobody could see that anything was
+   coming. On a warm off-white ground a skeleton has to be darker than the
+   background to read at all.
+
+   Two seconds, not the usual one: this shop is used on mobile data, where a
+   skeleton is on screen long enough that a fast sweep becomes a flicker in
+   the corner of the eye.
+
+   The sweep is a background-position animation on a gradient rather than a
+   moving child element, so there is nothing to lay out, nothing to clip, and
+   no second element in the accessibility tree.
+--------------------------------------------------------------------------- */
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: color-mix(in srgb, var(--color-rule) 82%, var(--color-ink-faint));
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--color-paper) 75%, transparent) 50%,
+    transparent 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 220% 100%;
+  background-position: 180% 0;
+  animation: skeleton-sweep 2s ease-in-out infinite;
+}
+
+@keyframes skeleton-sweep {
+  to {
+    background-position: -80% 0;
+  }
+}
+
+/* Movement is decoration here: the shape alone already says "loading", and
+   the sr-only status text says it in words. So it is removed outright rather
+   than slowed down. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    background-image: none;
+    animation: none;
+  }
+}

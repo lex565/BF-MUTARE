@@ -19,7 +19,9 @@
     "db:verify-access": "tsx --env-file=.env.local db/verify-access.mts",
     "db:verify-riders": "tsx --env-file=.env.local db/verify-riders.mts",
     "db:verify-marketplace": "tsx --env-file=.env.local db/verify-marketplace.mts",
-    "db:grant": "tsx --env-file=.env.local db/grant-role.ts"
+    "db:grant": "tsx --env-file=.env.local db/grant-role.ts",
+    "auth:email": "node --env-file=.env.local db/apply-auth-email.mjs",
+    "db:verify-email": "tsx db/verify-email-policy.mts"
   },
   "dependencies": {
     "@pineberry/ui": "*",
