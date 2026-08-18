@@ -45,14 +45,17 @@ const info = composeMessage({
   applicantName: 'Rudo Moyo',
   message: 'The photo of your ID is too dark to read.',
 })
-check('it uses their first name', info.body.startsWith('Rudo,'))
+check(
+  'it greets them by first name',
+  info.greeting === 'Hi Rudo,' && info.body.startsWith('Hi Rudo,'),
+  info.greeting,
+)
 check('it names the business', info.subject.includes('Sakubva Bakery'))
 check('it carries the reviewer’s actual words', info.body.includes('too dark to read'))
 check('and says where to go', info.body.includes('/marketplace/apply'))
 check(
   'and reassures them nothing is lost',
-  info.body.includes('nothing you have already filled in is lost') ||
-    info.body.toLowerCase().includes('is lost'),
+  info.body.toLowerCase().includes('nothing is lost'),
 )
 
 const approved = composeMessage({
@@ -61,8 +64,15 @@ const approved = composeMessage({
   applicantName: null,
   message: null,
 })
-check('an approval works without a name', approved.body.startsWith('Hello,'))
-check('and tells them what to do next', approved.body.toLowerCase().includes('add your products'))
+check(
+  'an approval still works when we have no name',
+  approved.greeting === 'Good news.' && !approved.greeting.includes('undefined'),
+  approved.greeting,
+)
+check(
+  'and tells them what to do next',
+  approved.action?.label.toLowerCase().includes('add your products') === true,
+)
 
 const rejected = composeMessage({
   kind: 'REJECTED',
@@ -71,17 +81,50 @@ const rejected = composeMessage({
   message: 'We could not confirm the address.',
 })
 check('a rejection gives the reason', rejected.body.includes('could not confirm the address'))
-check('and leaves the door open', rejected.body.toLowerCase().includes('apply'))
+check('and leaves the door open', rejected.body.toLowerCase().includes('apply again'))
 check(
   'and does not say "rejected" at them',
   !rejected.subject.toLowerCase().includes('reject'),
   rejected.subject,
 )
 
+console.log('\n--- both languages, in the same email')
+
+/**
+ * The Shona is not decoration. Somebody running a stall in Sakubva who half
+ * follows an English form letter is somebody who gives up on the second step,
+ * so every message must carry both - and both must survive into the PLAIN TEXT
+ * part, which is what goes to WhatsApp and to mail clients that refuse HTML.
+ */
+for (const [label, m] of [
+  ['request', info],
+  ['approval', approved],
+  ['rejection', rejected],
+] as const) {
+  check(`the ${label} carries English`, m.english.length > 0)
+  check(
+    `the ${label} carries Shona`,
+    m.shona.length > 0 && m.shona.every((p) => p.trim().length > 20),
+  )
+  check(`the ${label} keeps both in plain text`, m.body.includes('ChiShona'))
+  check(`the ${label} has one thing to do`, Boolean(m.action?.url))
+}
+
+check(
+  'the rejection offers a way back',
+  rejected.action?.label.toLowerCase().includes('again') === true,
+  rejected.action?.label,
+)
+check(
+  'and its Shona says it is not a permanent no',
+  rejected.shona.join(' ').includes('haisi'),
+)
+
+
 console.log('\n--- email configuration, stated honestly')
 
-const hasKey = Boolean(process.env.BREVO_API_KEY)
-console.log(`        BREVO_API_KEY set: ${hasKey}`)
+const hasKey = Boolean(process.env.BREVO_SMTP_KEY)
+console.log(`        BREVO_SMTP_KEY set: ${hasKey}`)
 if (!hasKey) {
   console.log('        -> no email will be sent; the WhatsApp button is the fallback.')
 }
