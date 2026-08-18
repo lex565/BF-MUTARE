@@ -1,90 +1,130 @@
 'use server'
 
-import { redirect } from 'next/navigation'
-import { z } from 'zod'
+import { revalidatePath } from 'next/cache'
 
 import { currentUser } from '@/lib/auth'
-import { MarketplaceError, applyForBusiness } from '@/lib/services/marketplace'
-
-/**
- * Apply to list a business on Musuwo.
- *
- * REAL, not a preview. It writes a row to `business_applications` with status
- * SUBMITTED and stops there.
- *
- * IT CANNOT CREATE A BUSINESS AND IT CANNOT GRANT A ROLE. Approval is a
- * separate act by a platform administrator, for the same reason there is no
- * self-service route to staff access: an application that approves itself is
- * not an application. That rule is in the service, not here, so a second entry
- * point cannot bypass it.
- */
+import {
+  RegistrationError,
+  saveDraft,
+  startApplication,
+  submitApplication,
+  type ProviderType,
+} from '@/lib/platform/registration'
+import { DocumentError, uploadDocument, type DocumentKind } from '@/lib/platform/documents'
 
 export type ApplyState = { error?: string; message?: string }
 
-const application = z.object({
-  businessName: z
-    .string()
-    .trim()
-    .min(2, 'What is the business called?')
-    .max(120),
-  kind: z.enum(['RETAIL', 'FOOD', 'ACCOMMODATION', 'SERVICE', 'OTHER']),
-  city: z.string().trim().min(2, 'Which town or city?').max(80),
-  contactPhone: z.string().trim().max(40).optional().or(z.literal('')),
-  contactEmail: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email('That does not look like an email address.')
-    .optional()
-    .or(z.literal('')),
-  note: z.string().trim().max(2000).optional().or(z.literal('')),
-})
+/**
+ * The applicant's own actions.
+ *
+ * Every one of them resolves the signed-in person from the SESSION and never
+ * from the form. A hidden field naming the applicant is a hidden field anybody
+ * can edit, and the whole point of these checks is that the person editing the
+ * page is the threat being defended against.
+ */
 
-export async function submitApplication(
+function explain(error: unknown): ApplyState {
+  if (error instanceof RegistrationError || error instanceof DocumentError) {
+    return { error: error.message }
+  }
+  throw error
+}
+
+async function me() {
+  const user = await currentUser()
+  if (!user) {
+    throw new RegistrationError('NOT_FOUND', 'Sign in first.')
+  }
+  return user
+}
+
+export async function startAction(
   _prev: ApplyState,
   formData: FormData,
 ): Promise<ApplyState> {
-  // Signed in first. An application from nobody cannot be reviewed, replied
-  // to, or turned into a business with an owner.
-  const user = await currentUser()
-  if (!user) {
-    redirect('/login?next=/marketplace/apply')
-  }
-
-  const parsed = application.safeParse({
-    businessName: formData.get('businessName'),
-    kind: formData.get('kind'),
-    city: formData.get('city'),
-    contactPhone: formData.get('contactPhone') ?? '',
-    contactEmail: formData.get('contactEmail') ?? '',
-    note: formData.get('note') ?? '',
-  })
-
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0].message }
-  }
-
   try {
-    await applyForBusiness({
-      applicantId: user.id,
-      businessName: parsed.data.businessName,
-      kind: parsed.data.kind,
-      city: parsed.data.city,
-      contactPhone: parsed.data.contactPhone || undefined,
-      contactEmail: parsed.data.contactEmail || undefined,
-      note: parsed.data.note || undefined,
+    const user = await me()
+    await startApplication({
+      userId: user.id,
+      providerType: String(formData.get('providerType')) as ProviderType,
     })
+    revalidatePath('/marketplace/apply')
+    return { message: 'Started. Fill in what you have - it saves as you go.' }
   } catch (error) {
-    if (error instanceof MarketplaceError) {
-      return { error: error.message }
-    }
-    console.error('[submitApplication]', error)
-    return { error: 'That could not be submitted. Please try again.' }
+    return explain(error)
   }
+}
 
-  return {
-    message:
-      'Application received. Somebody will review it and come back to you. ' +
-      'Nothing is listed on Musuwo until it has been approved.',
+export async function saveAction(
+  _prev: ApplyState,
+  formData: FormData,
+): Promise<ApplyState> {
+  try {
+    const user = await me()
+    const fields: Record<string, string | null> = {}
+    for (const key of [
+      'businessName', 'summary', 'kind', 'city', 'contactPhone', 'contactEmail',
+      'whatsapp', 'legalName', 'idType', 'idNumber', 'residentialAddress',
+      'addressEvidenceType', 'operatingArea', 'registrationNumber', 'note',
+    ]) {
+      const v = formData.get(key)
+      if (v !== null) fields[key] = String(v)
+    }
+
+    await saveDraft({
+      userId: user.id,
+      applicationId: String(formData.get('applicationId')),
+      fields,
+    })
+    revalidatePath('/marketplace/apply')
+    return { message: 'Saved. You can close this and come back.' }
+  } catch (error) {
+    return explain(error)
+  }
+}
+
+export async function uploadAction(
+  _prev: ApplyState,
+  formData: FormData,
+): Promise<ApplyState> {
+  try {
+    const user = await me()
+    const file = formData.get('file')
+    if (!(file instanceof File) || file.size === 0) {
+      return { error: 'Choose a file first.' }
+    }
+
+    await uploadDocument({
+      userId: user.id,
+      applicationId: String(formData.get('applicationId')),
+      kind: String(formData.get('kind')) as DocumentKind,
+      file,
+    })
+    revalidatePath('/marketplace/apply')
+    return { message: 'Uploaded. Only Musuwo reviewers can open it.' }
+  } catch (error) {
+    return explain(error)
+  }
+}
+
+export async function submitAction(
+  _prev: ApplyState,
+  formData: FormData,
+): Promise<ApplyState> {
+  try {
+    const user = await me()
+    // Re-checks completeness on the server whatever the button believed.
+    await submitApplication({
+      userId: user.id,
+      applicationId: String(formData.get('applicationId')),
+    })
+    revalidatePath('/marketplace/apply')
+    revalidatePath('/super-admin/applications')
+    return {
+      message:
+        'Sent to Musuwo. A person reads every application - we will come back to you.',
+    }
+  } catch (error) {
+    return explain(error)
   }
 }

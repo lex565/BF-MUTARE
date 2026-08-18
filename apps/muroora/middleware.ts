@@ -99,7 +99,18 @@ export async function middleware(request: NextRequest) {
      * middleware deliberately does not query roles, so a signed-in customer
      * passes this and is refused by the layout, and every action checks again.
      */
-    path.startsWith('/super-admin')
+    path.startsWith('/super-admin') ||
+    /**
+     * Registering a business.
+     *
+     * An application has to belong to somebody who can be written back to, and
+     * a draft has to survive the browser being closed - so it needs an account.
+     * Gated here rather than only in the page for the same reason as
+     * /super-admin: a `redirect()` inside a server component is answered with a
+     * 200 and a client-side navigation, so the visitor gets a flash of a form
+     * they cannot use before being moved.
+     */
+    path.startsWith('/marketplace/apply')
 
   if (isPrivate && !user) {
     const url = request.nextUrl.clone()

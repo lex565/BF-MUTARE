@@ -6,6 +6,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   unique,
@@ -52,6 +53,8 @@ export const businessKindEnum = pgEnum('business_kind', [
   'BEAUTY',
   'AUTOMOTIVE',
   'HOME_SERVICES',
+  'ELECTRONICS',
+  'BOOKS',
   'OTHER',
 ])
 
@@ -67,6 +70,23 @@ export const businessMemberRoleEnum = pgEnum('business_member_role', [
   'BUSINESS_ADMIN',
   'BUSINESS_STAFF',
   'BUSINESS_VIEWER',
+])
+
+/**
+ * What kind of provider this is, which decides what they must supply.
+ *
+ * SEPARATE FROM `businessKindEnum` ON PURPOSE. A woman selling sadza from her
+ * kitchen and a registered restaurant company are both FOOD, and asking them
+ * for the same documents is either pointless for one or negligent for the
+ * other. The type decides what is REQUIRED; the category decides where they
+ * APPEAR.
+ */
+export const providerTypeEnum = pgEnum('provider_type', [
+  'INDIVIDUAL_SELLER',
+  'INFORMAL_BUSINESS',
+  'REGISTERED_BUSINESS',
+  'SERVICE_PROVIDER',
+  'ACCOMMODATION_PROVIDER',
 ])
 
 /** Statuses the public may see. Everything else stays private. */
@@ -135,6 +155,23 @@ export const businesses = pgTable(
      * "checked"; it does not republish somebody's registration details.
      * `licenceDocumentPath` is a path in a private bucket, never a URL.
      */
+    providerType: providerTypeEnum('provider_type'),
+
+    /**
+     * SIX SEPARATE STATES, NOT ONE BOOLEAN.
+     *
+     * A single "verified" tick cannot tell a customer whether we checked who
+     * somebody is, where they trade, or that the company exists - and cannot
+     * let a reviewer record that they checked one and not the others. Each is
+     * a separate act by a person, copied here when the application is
+     * approved.
+     */
+    identityVerifiedAt: timestamp('identity_verified_at', { withTimezone: true }),
+    addressVerifiedAt: timestamp('address_verified_at', { withTimezone: true }),
+    operatingVerifiedAt: timestamp('operating_verified_at', { withTimezone: true }),
+    registrationVerifiedAt: timestamp('registration_verified_at', { withTimezone: true }),
+    propertyVerifiedAt: timestamp('property_verified_at', { withTimezone: true }),
+
     licenceNumber: text('licence_number'),
     licenceDocumentPath: text('licence_document_path'),
     verifiedAt: timestamp('verified_at', { withTimezone: true }),
@@ -210,6 +247,43 @@ export const businessApplications = pgTable(
     summary: text('summary'),
     address: text('address'),
     whatsapp: text('whatsapp'),
+
+    providerType: providerTypeEnum('provider_type'),
+
+    /**
+     * Identity. The NUMBER is here so a reviewer can check it against the
+     * document; it must never be selected into anything public. The images
+     * live in a private bucket - only paths are stored, in the documents table.
+     */
+    legalName: text('legal_name'),
+    idType: text('id_type'),
+    idNumber: text('id_number'),
+
+    /**
+     * "Address verification", never "proof of residence". The applicant may
+     * rent, live with family or be in student accommodation, and implying
+     * ownership would exclude most of the people this is for.
+     */
+    residentialAddress: text('residential_address'),
+    addressEvidenceType: text('address_evidence_type'),
+
+    /** Where they trade, which is often NOT where they live. */
+    operatingArea: text('operating_area'),
+    registrationNumber: text('registration_number'),
+
+    /** Set on first save. Distinguishes "started and stopped" from "never". */
+    draftStartedAt: timestamp('draft_started_at', { withTimezone: true }),
+
+    identityVerifiedAt: timestamp('identity_verified_at', { withTimezone: true }),
+    identityVerifiedBy: uuid('identity_verified_by'),
+    addressVerifiedAt: timestamp('address_verified_at', { withTimezone: true }),
+    addressVerifiedBy: uuid('address_verified_by'),
+    operatingVerifiedAt: timestamp('operating_verified_at', { withTimezone: true }),
+    operatingVerifiedBy: uuid('operating_verified_by'),
+    registrationVerifiedAt: timestamp('registration_verified_at', { withTimezone: true }),
+    registrationVerifiedBy: uuid('registration_verified_by'),
+    propertyVerifiedAt: timestamp('property_verified_at', { withTimezone: true }),
+    propertyVerifiedBy: uuid('property_verified_by'),
 
     /**
      * The type-specific answers, as asked. A boarding house is asked about
@@ -323,6 +397,44 @@ export const marketplaceProductViews = pgTable(
     index('marketplace_product_views_user_idx').on(t.userId, t.viewedAt),
     index('marketplace_product_views_product_idx').on(t.productId),
   ],
+)
+
+/**
+ * Address evidence Musuwo accepts.
+ *
+ * A table rather than an enum because the Platform Owner must be able to
+ * enable, disable and add methods without a migration.
+ *
+ * NOTE WHAT IS ABSENT: raw EcoCash transaction history. A full transaction
+ * list is a map of somebody's life and almost none of it is our business.
+ */
+export const addressEvidenceTypes = pgTable('address_evidence_types', {
+  code: text('code').primaryKey(),
+  label: text('label').notNull(),
+  note: text('note'),
+  isEnabled: boolean('is_enabled').notNull().default(true),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+/**
+ * What each provider type must supply before submitting.
+ *
+ * DATA, NOT CODE, so the "you will need" screen and the server-side gate read
+ * the SAME rows. Two lists that can disagree is how a form tells somebody they
+ * are ready and the server then refuses them.
+ */
+export const providerRequirements = pgTable(
+  'provider_requirements',
+  {
+    providerType: providerTypeEnum('provider_type').notNull(),
+    requirement: text('requirement').notNull(),
+    label: text('label').notNull(),
+    note: text('note'),
+    isMandatory: boolean('is_mandatory').notNull().default(true),
+    sortOrder: integer('sort_order').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.providerType, t.requirement] })],
 )
 
 export const businessesRelations = relations(businesses, ({ one, many }) => ({
