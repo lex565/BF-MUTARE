@@ -49,6 +49,16 @@ export const DOCUMENT_KINDS = {
   BUSINESS_REGISTRATION: 'Certificate of registration',
   PREMISES_PHOTO: 'Photo of where you trade',
   PROPERTY_PHOTO: 'Photo of the property',
+  /**
+   * The business's own logo. OPTIONAL for every provider type, deliberately:
+   * a woman selling bread from her kitchen does not have a logo, and making
+   * one a condition of trading would exclude exactly the people Musuwo is for.
+   *
+   * It is also the only kind here that is meant to be SEEN by customers, which
+   * is why it does not live in the private bucket with the identity documents.
+   * See uploadLogo below.
+   */
+  LOGO: 'Your logo',
 } as const
 
 export type DocumentKind = keyof typeof DOCUMENT_KINDS

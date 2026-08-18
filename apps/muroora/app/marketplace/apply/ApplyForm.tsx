@@ -564,6 +564,14 @@ export function ApplicationForm({
             <Upload applicationId={application.id} kind="PROPERTY_PHOTO" done={have.has('PROPERTY_PHOTO')}
               title="Photos of the rooms" />
           )}
+          {/* Offered to everybody, required of nobody. A woman selling bread
+              from her kitchen has no logo and is not going to commission one
+              to sell bread. */}
+          {needs.has('logo') && (
+            <Upload applicationId={application.id} kind="LOGO" done={have.has('LOGO')}
+              title="Your logo or a picture (optional)"
+              note="Not required. This is what customers see first in the directory - a clear photo of what you sell works just as well as a designed logo." />
+          )}
         </div>
 
         {/* ---------------------------------------------------- submit */}

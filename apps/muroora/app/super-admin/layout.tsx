@@ -46,6 +46,7 @@ const navSections: {
       { href: '/super-admin/applications', label: 'Applications' },
       { href: '/super-admin/businesses', label: 'Businesses' },
       { href: '/super-admin/orders', label: 'Orders' },
+      { href: '/super-admin/reports', label: 'Reports and safety' },
     ],
   },
   {

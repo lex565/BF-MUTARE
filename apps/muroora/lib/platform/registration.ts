@@ -80,6 +80,7 @@ const DOCUMENT_FOR: Record<string, string> = {
   registration_document: 'BUSINESS_REGISTRATION',
   premises_photo: 'PREMISES_PHOTO',
   property_photos: 'PROPERTY_PHOTO',
+  logo: 'LOGO',
 }
 
 /**
