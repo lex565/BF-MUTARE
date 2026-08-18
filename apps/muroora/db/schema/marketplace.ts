@@ -1,7 +1,9 @@
-import { relations } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import {
   boolean,
   index,
+  integer,
+  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -46,6 +48,10 @@ export const businessKindEnum = pgEnum('business_kind', [
   'FOOD',
   'ACCOMMODATION',
   'SERVICE',
+  'EDUCATION',
+  'BEAUTY',
+  'AUTOMOTIVE',
+  'HOME_SERVICES',
   'OTHER',
 ])
 
@@ -70,8 +76,20 @@ export const businesses = pgTable(
   'businesses',
   {
     id: id(),
-    /** MUR-BIZ-0001. Database default, atomic - never derived by counting. */
-    publicId: text('public_id').notNull().unique(),
+    /**
+     * MUR-BIZ-0001. Issued by a database DEFAULT calling
+     * `next_business_public_id()`, which draws from a sequence - atomic, and
+     * never derived by counting rows.
+     *
+     * `.$defaultFn` is NOT used, and must not be: that would generate the ID
+     * in JavaScript and two simultaneous approvals would race for the same
+     * number. This marks the column as having a default purely so drizzle
+     * treats it as optional on insert and lets Postgres do the work.
+     */
+    publicId: text('public_id')
+      .notNull()
+      .unique()
+      .default(sql`next_business_public_id()`),
     /** The merchant's own shop, when it has one. Null is legitimate. */
     storeId: uuid('store_id').references(() => stores.id),
 
@@ -100,6 +118,17 @@ export const businesses = pgTable(
     reviewNote: text('review_note'),
 
     createdBy: uuid('created_by').references(() => users.id),
+
+    /**
+     * The application this business was created from.
+     *
+     * THIS COLUMN IS WHAT MAKES APPROVAL SAFE TO CLICK TWICE. A unique index
+     * covers it, so a second approval of the same application cannot insert a
+     * second business - the database refuses before the service has to be
+     * clever about it.
+     */
+    applicationId: uuid('application_id'),
+
     ...timestamps(),
     ...softDelete(),
   },
@@ -150,6 +179,28 @@ export const businessApplications = pgTable(
     contactEmail: text('contact_email'),
     note: text('note'),
     status: businessStatusEnum('status').notNull().default('SUBMITTED'),
+
+    summary: text('summary'),
+    address: text('address'),
+    whatsapp: text('whatsapp'),
+
+    /**
+     * The type-specific answers, as asked. A boarding house is asked about
+     * rooms and a tutor about subjects; nine sets of columns would mean a
+     * migration every time a question changes wording.
+     */
+    details: jsonb('details').$type<Record<string, unknown> | null>(),
+
+    /** Who is reviewing it. Soft - see claimApplication for why not a lock. */
+    assignedTo: uuid('assigned_to').references(() => users.id),
+    assignedAt: timestamp('assigned_at', { withTimezone: true }),
+
+    submittedAt: timestamp('submitted_at', { withTimezone: true }),
+
+    /** What the reviewer asked for, and by when. Cleared on resubmission. */
+    infoRequested: text('info_requested'),
+    infoDueAt: timestamp('info_due_at', { withTimezone: true }),
+
     reviewedBy: uuid('reviewed_by').references(() => users.id),
     reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
     reviewNote: text('review_note'),
@@ -159,6 +210,71 @@ export const businessApplications = pgTable(
     index('business_applications_status_idx').on(t.status),
     index('business_applications_applicant_idx').on(t.applicantId),
   ],
+)
+
+/**
+ * Everything that has happened to an application.
+ *
+ * Append only, enforced by DO INSTEAD NOTHING rules in migration 0011. A
+ * status column alone cannot answer "was this rejected before?", which is
+ * precisely what a reviewer needs to know.
+ */
+export const businessApplicationEvents = pgTable(
+  'business_application_events',
+  {
+    id: id(),
+    applicationId: uuid('application_id')
+      .notNull()
+      .references(() => businessApplications.id, { onDelete: 'cascade' }),
+    actorId: uuid('actor_id').references(() => users.id),
+    /** SUBMITTED, CLAIMED, RELEASED, INFO_REQUESTED, RESUBMITTED, APPROVED,
+     *  REJECTED, NOTE. */
+    event: text('event').notNull(),
+    fromStatus: businessStatusEnum('from_status'),
+    toStatus: businessStatusEnum('to_status'),
+    message: text('message'),
+    /**
+     * Reviewer-only. NEVER select this column into anything the applicant
+     * sees - `applicantTimeline` filters it out and is the only function that
+     * should be building an applicant-facing history.
+     */
+    internal: boolean('internal').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('business_application_events_app_idx').on(t.applicationId, t.createdAt),
+  ],
+)
+
+/**
+ * Uploaded verification.
+ *
+ * The row is the permission record. The file is in a PRIVATE bucket and
+ * `path` is a path, never a URL - if a URL turns up in that column, somebody
+ * has made the bucket public.
+ */
+export const businessApplicationDocuments = pgTable(
+  'business_application_documents',
+  {
+    id: id(),
+    applicationId: uuid('application_id')
+      .notNull()
+      .references(() => businessApplications.id, { onDelete: 'cascade' }),
+    uploadedBy: uuid('uploaded_by').references(() => users.id),
+    /** ID_DOCUMENT, BUSINESS_REGISTRATION, PROOF_OF_ADDRESS, LOGO,
+     *  PREMISES_PHOTO. */
+    kind: text('kind').notNull(),
+    path: text('path').notNull(),
+    mimeType: text('mime_type'),
+    sizeBytes: integer('size_bytes'),
+    originalName: text('original_name'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index('business_application_documents_app_idx').on(t.applicationId)],
 )
 
 export const businessesRelations = relations(businesses, ({ one, many }) => ({

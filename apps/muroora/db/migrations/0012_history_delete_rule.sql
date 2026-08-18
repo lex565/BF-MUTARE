@@ -1,0 +1,43 @@
+-- Remove the DELETE rule on business_application_events.
+--
+-- WHAT BROKE, AND IT IS SUBTLE
+--
+-- 0011 gave that table both a DO INSTEAD NOTHING rule on DELETE and a foreign
+-- key declared ON DELETE CASCADE. Those two cannot both be true.
+--
+-- When Postgres deletes a parent application it runs the cascade as an
+-- internal DELETE against the child rows, then verifies that no child rows
+-- remain. The rule swallowed the delete, the check found the rows still there,
+-- and referential integrity aborted the whole statement with:
+--
+--   referential integrity query on "business_applications" ... gave unexpected
+--   result
+--   HINT: This is most likely due to a rule having rewritten the query.
+--
+-- The effect was not "history is protected". The effect was that a business
+-- application row could never be deleted by anybody, by any means, and the
+-- error explaining why named a constraint rather than the rule that caused it.
+-- That is the worst kind of bug: a protection that does not protect, failing
+-- in a way that points at the wrong file.
+--
+-- WHAT IS KEPT, AND WHY IT IS THE HALF THAT MATTERS
+--
+-- The UPDATE rule stays. That is the guarantee with teeth: an event, once
+-- written, cannot be REWRITTEN. Somebody covering their tracks wants to change
+-- "REJECTED, reason: forged documents" into something else, and they cannot -
+-- not through the application, not through SQL, not at all.
+--
+-- Deletion is a different threat and has a different answer. Nothing in the
+-- application deletes an application or its history: §25 of the brief requires
+-- a rejected application be kept, and the service layer has no delete path at
+-- all. The rows are reachable only by somebody with direct database
+-- credentials, and somebody with those can drop the rule as easily as the row.
+-- A rule was never the control there; it only looked like one, at the cost of
+-- breaking the cascade.
+--
+-- platform_audit_log keeps BOTH rules. Nothing cascades into it - its
+-- actor_id reference has no ON DELETE clause - so the same conflict cannot
+-- arise, and there the protection is real.
+
+DROP RULE IF EXISTS "business_application_events_no_delete"
+  ON "business_application_events";

@@ -1,0 +1,434 @@
+/* ---------------------------------------------------------------------------
+   Musuwo Control Center
+   ---------------------------------------------------------------------------
+   A charcoal rail against a warm workspace. The rail is near-black because it
+   is chrome and should recede; the workspace is the same warm paper as the
+   customer sites, so the two brands still feel like one company.
+
+   Deliberately NOT the customer palette applied wholesale. Orange is the shop's
+   "buy this" colour and it would be wrong on a screen where the actions are
+   approve and suspend. Here the accent is a muted gold used only for the
+   owner's own marks, and status carries its own semantic colours which are
+   never used decoratively.
+
+   Scoped under .cc so nothing here can leak into the storefront, which shares
+   this stylesheet's cascade through the root layout.
+--------------------------------------------------------------------------- */
+
+.cc {
+  --cc-rail: #12180f;
+  --cc-rail-soft: #1c241a;
+  --cc-rail-text: #cfd6cb;
+  --cc-rail-faint: #7f8c80;
+
+  --cc-ground: #f4f2ea;
+  --cc-panel: #ffffff;
+  --cc-ink: #12271b;
+  --cc-ink-soft: #4b5c50;
+  --cc-ink-faint: #74827a;
+  --cc-line: #ddd8c9;
+
+  --cc-gold: #a97b1f;
+  --cc-ok: #1d6b3f;
+  --cc-ok-wash: #e3efe7;
+  --cc-wait: #93610a;
+  --cc-wait-wash: #f7edda;
+  --cc-stop: #a3301a;
+  --cc-stop-wash: #f8e3de;
+  --cc-idle: #4d6285;
+  --cc-idle-wash: #e5eaf3;
+
+  display: grid;
+  grid-template-columns: 16.5rem minmax(0, 1fr);
+  min-height: 100dvh;
+  background: var(--cc-ground);
+  color: var(--cc-ink);
+}
+
+@media (max-width: 60rem) {
+  .cc { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ------------------------------------------------------------------ rail */
+
+.cc-rail {
+  background: var(--cc-rail);
+  color: var(--cc-rail-text);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1.75rem 1.25rem;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow-y: auto;
+}
+
+@media (max-width: 60rem) {
+  .cc-rail { position: static; height: auto; }
+}
+
+.cc-brand {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.cc-brand-mark {
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--cc-gold);
+}
+
+.cc-brand strong {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: #fff;
+}
+
+.cc-brand em {
+  display: block;
+  font-style: normal;
+  font-family: var(--font-mono), monospace;
+  font-size: .6rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--cc-rail-faint);
+}
+
+.cc-nav { display: flex; flex-direction: column; gap: 1.5rem; flex: 1; }
+.cc-nav-group { display: flex; flex-direction: column; gap: .15rem; }
+
+.cc-nav-label {
+  font-family: var(--font-mono), monospace;
+  font-size: .58rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--cc-rail-faint);
+  margin: 0 0 .5rem .6rem;
+}
+
+.cc-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: .55rem .6rem;
+  border-radius: 4px;
+  color: var(--cc-rail-text);
+  text-decoration: none;
+  font-size: .93rem;
+  transition: background-color .15s, color .15s;
+}
+
+.cc-nav-link:hover { background: var(--cc-rail-soft); color: #fff; }
+.cc-nav-link:focus-visible { outline: 2px solid var(--cc-gold); outline-offset: 1px; }
+
+.cc-count {
+  background: var(--cc-gold);
+  color: #12180f;
+  font-family: var(--font-mono), monospace;
+  font-size: .68rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: .05rem .45rem;
+}
+
+.cc-who { border-top: 1px solid var(--cc-rail-soft); padding-top: 1.1rem; }
+.cc-who-name { margin: 0 0 .45rem; font-size: .88rem; color: #fff; }
+.cc-who-perms { margin: .45rem 0 0; font-size: .74rem; color: var(--cc-rail-faint); }
+
+.cc-badge {
+  display: inline-block;
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: .58rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--cc-rail-faint);
+  border: 1px solid var(--cc-rail-soft);
+  border-radius: 2px;
+  padding: .18rem .4rem;
+}
+
+/* The owner's mark. The only gold in the interface that is not a count, so it
+   reads as identity rather than as another status. */
+.cc-badge-owner { color: var(--cc-gold); border-color: var(--cc-gold); }
+
+.cc-signout {
+  margin-top: 1rem;
+  width: 100%;
+  background: none;
+  border: 1px solid var(--cc-rail-soft);
+  border-radius: 3px;
+  color: var(--cc-rail-faint);
+  font-family: var(--font-mono), monospace;
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: .5rem;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+
+.cc-signout:hover { color: #fff; border-color: var(--cc-rail-faint); }
+
+/* ------------------------------------------------------------- workspace */
+
+.cc-main { padding: 2.5rem 2.25rem 5rem; min-width: 0; }
+
+@media (max-width: 48rem) { .cc-main { padding: 1.75rem 1.15rem 4rem; } }
+
+.cc-head { margin-bottom: 2.25rem; }
+
+.cc-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: .63rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--cc-ink-faint);
+  margin: 0 0 .6rem;
+}
+
+.cc-title {
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -.028em;
+  line-height: 1.1;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.cc-sub { margin: .6rem 0 0; color: var(--cc-ink-soft); max-width: 62ch; }
+
+/* ------------------------------------------------------------------ tiles */
+
+.cc-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: .9rem;
+  margin-bottom: 2.5rem;
+}
+
+.cc-tile {
+  background: var(--cc-panel);
+  border: 1px solid var(--cc-line);
+  border-radius: 4px;
+  padding: 1.15rem 1.25rem;
+}
+
+.cc-tile-label {
+  font-family: var(--font-mono), monospace;
+  font-size: .61rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--cc-ink-faint);
+  margin: 0 0 .7rem;
+}
+
+.cc-tile-value {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-tile-note { margin: .55rem 0 0; font-size: .78rem; color: var(--cc-ink-faint); }
+.cc-tile-attention .cc-tile-value { color: var(--cc-wait); }
+
+/* ------------------------------------------------------------------ panel */
+
+.cc-panel {
+  background: var(--cc-panel);
+  border: 1px solid var(--cc-line);
+  border-radius: 4px;
+  margin-bottom: 1.75rem;
+  overflow: hidden;
+}
+
+.cc-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--cc-line);
+  background: #fbfaf6;
+}
+
+.cc-panel-head h2 { margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: -.01em; }
+.cc-panel-body { padding: 1.25rem; }
+
+/* ------------------------------------------------------------------ table */
+
+.cc-scroll { overflow-x: auto; }
+
+.cc-table { width: 100%; border-collapse: collapse; font-size: .9rem; min-width: 40rem; }
+
+.cc-table th {
+  font-family: var(--font-mono), monospace;
+  font-size: .61rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--cc-ink-faint);
+  text-align: left;
+  font-weight: 600;
+  padding: .8rem 1rem;
+  border-bottom: 1px solid var(--cc-line);
+  white-space: nowrap;
+}
+
+.cc-table td {
+  padding: .85rem 1rem;
+  border-bottom: 1px solid #efece2;
+  vertical-align: top;
+  color: var(--cc-ink-soft);
+}
+
+.cc-table tr:last-child td { border-bottom: 0; }
+.cc-table tbody tr:hover { background: #fbfaf6; }
+.cc-table td strong { color: var(--cc-ink); font-weight: 600; }
+.cc-table a { color: var(--cc-ok); font-weight: 600; text-decoration: none; }
+.cc-table a:hover { text-decoration: underline; }
+
+.cc-mono { font-family: var(--font-mono), monospace; font-size: .82rem; font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------------ chips */
+
+.cc-chip {
+  display: inline-block;
+  font-family: var(--font-mono), monospace;
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  border-radius: 2px;
+  padding: .22rem .45rem;
+  white-space: nowrap;
+}
+
+.cc-chip-ok   { color: var(--cc-ok);   background: var(--cc-ok-wash); }
+.cc-chip-wait { color: var(--cc-wait); background: var(--cc-wait-wash); }
+.cc-chip-stop { color: var(--cc-stop); background: var(--cc-stop-wash); }
+.cc-chip-idle { color: var(--cc-idle); background: var(--cc-idle-wash); }
+
+/* ------------------------------------------------------------------ empty */
+
+.cc-empty { padding: 2.75rem 1.5rem; text-align: center; }
+.cc-empty p { margin: 0 auto; max-width: 46ch; color: var(--cc-ink-soft); }
+.cc-empty strong { display: block; color: var(--cc-ink); margin-bottom: .35rem; font-size: 1rem; }
+
+/* ------------------------------------------------------------------ forms */
+
+.cc-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.25rem; }
+
+.cc-btn {
+  font-family: var(--font-mono), monospace;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  padding: .7rem 1.15rem;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.cc-btn:disabled { opacity: .55; cursor: not-allowed; }
+.cc-btn-go   { background: var(--cc-ok); color: #fff; }
+.cc-btn-wait { background: var(--cc-panel); color: var(--cc-wait); border-color: var(--cc-wait); }
+.cc-btn-stop { background: var(--cc-panel); color: var(--cc-stop); border-color: var(--cc-stop); }
+.cc-btn-quiet { background: var(--cc-panel); color: var(--cc-ink-soft); border-color: var(--cc-line); }
+.cc-btn:focus-visible { outline: 2px solid var(--cc-gold); outline-offset: 2px; }
+
+.cc-field { display: block; margin-bottom: 1rem; }
+
+.cc-label {
+  display: block;
+  font-family: var(--font-mono), monospace;
+  font-size: .61rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--cc-ink-faint);
+  margin-bottom: .4rem;
+}
+
+.cc-input, .cc-textarea, .cc-select {
+  width: 100%;
+  font: inherit;
+  font-size: .93rem;
+  color: var(--cc-ink);
+  background: var(--cc-panel);
+  border: 1px solid var(--cc-line);
+  border-radius: 3px;
+  padding: .65rem .8rem;
+}
+
+.cc-textarea { min-height: 6rem; resize: vertical; }
+.cc-input:focus, .cc-textarea:focus, .cc-select:focus { outline: 2px solid var(--cc-gold); outline-offset: -1px; border-color: var(--cc-gold); }
+
+.cc-note {
+  border-left: 3px solid var(--cc-wait);
+  background: var(--cc-wait-wash);
+  padding: .85rem 1rem;
+  border-radius: 0 3px 3px 0;
+  margin-bottom: 1.25rem;
+  font-size: .9rem;
+}
+
+.cc-error { border-left-color: var(--cc-stop); background: var(--cc-stop-wash); }
+
+/* --------------------------------------------------------------- timeline */
+
+.cc-timeline { list-style: none; margin: 0; padding: 0; }
+
+.cc-timeline li {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding: .8rem 0;
+  border-bottom: 1px solid #efece2;
+  font-size: .9rem;
+}
+
+.cc-timeline li:last-child { border-bottom: 0; }
+
+.cc-timeline time {
+  font-family: var(--font-mono), monospace;
+  font-size: .72rem;
+  color: var(--cc-ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-timeline p { margin: .3rem 0 0; color: var(--cc-ink-soft); }
+.cc-timeline .cc-internal { color: var(--cc-idle); }
+
+@media (max-width: 40rem) {
+  .cc-timeline li { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
+}
+
+/* ------------------------------------------------------------------- defs */
+
+.cc-defs { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1.15rem 1.75rem; margin: 0; }
+.cc-defs dt {
+  font-family: var(--font-mono), monospace;
+  font-size: .6rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--cc-ink-faint);
+  margin-bottom: .3rem;
+}
+.cc-defs dd { margin: 0; color: var(--cc-ink); font-size: .94rem; word-break: break-word; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cc * { transition: none !important; }
+}

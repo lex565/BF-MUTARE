@@ -23,6 +23,8 @@
     "db:grant": "tsx --env-file=.env.local db/grant-role.ts",
     "auth:email": "node --env-file=.env.local db/apply-auth-email.mjs",
     "platform:whoami": "node --env-file=.env.local db/platform-whoami.mjs",
+    "db:clear-checks": "node --env-file=.env.local db/clear-check-data.mjs",
+    "db:verify-applications": "tsx --env-file=.env.local db/verify-applications.mts",
     "db:verify-platform": "tsx --env-file=.env.local db/verify-platform.mts",
     "db:verify-email": "tsx db/verify-email-policy.mts"
   },
