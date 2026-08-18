@@ -59,6 +59,14 @@ export const metadata: Metadata = {
     description: brand.description,
   },
   robots: { index: true, follow: true },
+  /**
+   * Per brand, because app/icon.png is one file for the whole application and
+   * this application is two websites. See lib/brand.ts.
+   */
+  icons: {
+    icon: [{ url: brand.icon, type: 'image/png' }],
+    apple: [{ url: brand.appleIcon, sizes: '180x180', type: 'image/png' }],
+  },
 }
 
 export default function RootLayout({

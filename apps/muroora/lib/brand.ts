@@ -50,6 +50,20 @@ interface BrandCopy {
    * to Muroora Mart to finish resetting their password.
    */
   url: string
+  /**
+   * The browser-tab icon and the home-screen icon.
+   *
+   * WHY THESE ARE PATHS RATHER THAN app/icon.png. Next's file convention
+   * serves ONE icon.png for the whole application, and this application is two
+   * websites. Both tabs therefore showed Musuwo's doorway - including Muroora
+   * Mart's, which is a grocer wearing the platform's mark in the one place a
+   * person picks their tab out of fifteen.
+   *
+   * The two files that used to sit there were also 881KB and 1.1MB, served on
+   * every single page load, as favicons. These are 44KB and 17KB.
+   */
+  icon: string
+  appleIcon: string
 }
 
 export const BRAND: Record<SiteBrand, BrandCopy> = {
@@ -60,6 +74,8 @@ export const BRAND: Record<SiteBrand, BrandCopy> = {
       'Discover local businesses, products, food, accommodation and services through Musuwo. Muroora Mart is the founding merchant.',
     home: '/',
     url: 'https://musuwo.vercel.app',
+    icon: '/icons/musuwo-icon.png',
+    appleIcon: '/icons/musuwo-apple-icon.png',
   },
   muroora: {
     name: 'Muroora Mart',
@@ -68,6 +84,8 @@ export const BRAND: Record<SiteBrand, BrandCopy> = {
       'Groceries and household goods in Mutare, with same-day delivery and a diaspora shopping service for families abroad.',
     home: '/',
     url: 'https://muroora-mart.vercel.app',
+    icon: '/icons/muroora-icon.png',
+    appleIcon: '/icons/muroora-apple-icon.png',
   },
 }
 
