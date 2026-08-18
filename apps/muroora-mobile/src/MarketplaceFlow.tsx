@@ -1,23 +1,68 @@
-﻿import { useMemo,useState } from 'react';
+﻿import { useEffect,useMemo,useState } from 'react';
 import { Alert,Pressable,SafeAreaView,ScrollView,StyleSheet,Text,TextInput,View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+
+import { BusinessApplication } from './BusinessApplication';
+import { API_BASE } from './mobileApi';
+import { supabase } from './supabase';
 
 const C={ink:'#17372D',forest:'#235643',cream:'#F7F3E9',paper:'#FFFDF8',gold:'#E7A83E',coral:'#D96B4A',sage:'#DDE7D7',muted:'#6E7B74',rule:'#DDE2DB'};
 type Kind='Shop'|'Food'|'Accommodation'|'Services'|'Education';
 type Listing={id:number;kind:Kind;title:string;business:string;area:string;price:string;mode:'BUY'|'ENQUIRE';icon:string;description:string};
-const LISTINGS:Listing[]=[
- {id:1,kind:'Shop',title:'Muroora Mart',business:'Musuwo Founding Business',area:'Mutare Central',price:'Groceries',mode:'ENQUIRE',icon:'🧺',description:'Muroora Mart is registered on Musuwo. Its products will appear in Musuwo Shop after the business chooses to publish them.'},
-];
+/**
+ * THERE IS NO HARD-CODED LIST ANY MORE.
+ *
+ * This file used to carry invented businesses - a bookshop, a boarding house,
+ * a tutor - each with a price and an area, none of which existed. A tester
+ * could tap one and go looking for a shop that was never real. Everything the
+ * Discover screen shows now comes from /api/mobile/marketplace, which returns
+ * only approved businesses.
+ */
 type Screen='discover'|'detail'|'chat'|'apply'|'portal';
 
 export function MarketplaceFlow({close}:{close:()=>void}){
- const [screen,setScreen]=useState<Screen>('discover'),[kind,setKind]=useState<Kind|'All'>('All'),[query,setQuery]=useState(''),[selected,setSelected]=useState<Listing>(LISTINGS[0]),[contact,setContact]=useState(false),[applicationStep,setApplicationStep]=useState(1);
- const results=useMemo(()=>LISTINGS.filter(x=>(kind==='All'||x.kind===kind)&&`${x.title} ${x.business} ${x.area}`.toLowerCase().includes(query.toLowerCase())),[kind,query]);
+ const [token,setToken]=useState<string|null>(null);
+ const [live,setLive]=useState<Listing[]|null>(null);
+
+ /**
+  * The signed-in person's access token, for the application endpoints.
+  * Read from Supabase rather than passed in, so this screen works wherever it
+  * is opened from.
+  */
+ useEffect(()=>{if(!supabase)return;void supabase.auth.getSession().then(({data})=>setToken(data.session?.access_token??null))},[]);
+
+ /**
+  * REAL BUSINESSES, replacing three hard-coded arrays.
+  *
+  * The app shipped with invented listings - a bookshop, a boarding house, a
+  * tutor - each with a price and an area, none of which existed. A tester could
+  * tap one and go looking for a shop that was never real. The same fake data
+  * was deleted from the website; this is the other half.
+  *
+  * On failure it falls back to an EMPTY list, never to the invented one: an
+  * empty marketplace is the truth when nobody has joined yet.
+  */
+ useEffect(()=>{let alive=true;void fetch(`${API_BASE}/api/mobile/marketplace`).then(r=>r.json()).then(body=>{if(!alive)return;const businesses=body?.data?.businesses??[];setLive(businesses.map((b:{publicId:string;name:string;summary:string|null;kind:string;city:string;verified:boolean},i:number)=>({id:i+1,kind:(b.kind==='FOOD'?'Food':b.kind==='ACCOMMODATION'?'Accommodation':b.kind==='SERVICE'?'Services':b.kind==='EDUCATION'?'Education':'Shop') as Kind,title:b.name,business:b.verified?'Verified on Musuwo':'On Musuwo',area:b.city,price:'',mode:'ENQUIRE' as const,icon:'🏪',description:b.summary??''})))}).catch(()=>{if(alive)setLive([])});return()=>{alive=false}},[]);
+
+ const [screen,setScreen]=useState<Screen>('discover'),[kind,setKind]=useState<Kind|'All'>('All'),[query,setQuery]=useState(''),[selected,setSelected]=useState<Listing|null>(null),[contact,setContact]=useState(false),[applicationStep,setApplicationStep]=useState(1);
+ const source=live??[];
+ const results=useMemo(()=>source.filter(x=>(kind==='All'||x.kind===kind)&&`${x.title} ${x.business} ${x.area}`.toLowerCase().includes(query.toLowerCase())),[source,kind,query]);
  const back=()=>screen==='discover'?close():screen==='chat'?setScreen('detail'):setScreen('discover');
- if(screen==='apply')return <Shell title="Musuwo for Business" back={back}><Text style={s.eyebrow}>BUSINESS APPLICATION · {applicationStep} OF 3</Text><Text style={s.title}>{applicationStep===1?'Tell Musuwo about your business':applicationStep===2?'How customers reach you':'Review and submit'}</Text>{applicationStep===1?<><Field label="Business name" placeholder="Your trading name"/><Text style={s.label}>BUSINESS TYPE</Text><Chips values={['Retail','Food','Accommodation','Services','Education']} selected="Retail"/><Field label="Short description" placeholder="What do you offer?"/></>:applicationStep===2?<><Field label="Physical address" placeholder="Street, suburb, city and landmarks"/><Field label="WhatsApp or phone" placeholder="Private until approved release"/><Text style={s.label}>INTERACTION MODE</Text><Chips values={['Sell online','Enquiries','Booking requests']} selected="Enquiries"/><Upload label="Add logo or business photo"/></>:<><Notice title="Human review required" text="Creating an account does not make a business public. Musuwo reviews the application before any portal or listing is activated."/><Review label="Business profile"/><Review label="Location and contact"/><Review label="Verification requirements"/></>}<Pressable style={s.primary} onPress={()=>applicationStep<3?setApplicationStep(applicationStep+1):Alert.alert('Preview submitted','Backend application storage and admin review are listed in the Claude handoff.')}><Text style={s.primaryText}>{applicationStep<3?'Continue':'Submit for review'}</Text></Pressable></Shell>;
+ /**
+  * THE REAL APPLICATION.
+  *
+  * What was here was three screens of inputs that were never read, ending in
+  * Alert.alert('Preview submitted'). Nothing was written anywhere. Somebody who
+  * filled it in believed they had applied, nothing reached the review queue,
+  * and neither side knew.
+  *
+  * BusinessApplication talks to the same server functions the website uses, so
+  * the phone cannot accept an application the website would refuse.
+  */
+ if(screen==='apply')return <Shell title="Musuwo for Business" back={back}>{token?<BusinessApplication token={token} onDone={()=>setScreen('discover')}/>:<Notice title="Sign in first" text="Registering a business needs an account, so we can write back to you and so your draft survives closing the app."/>}</Shell>;
  if(screen==='portal')return <Shell title="Business workspace" back={back}><Text style={s.eyebrow}>PREVIEW MERCHANT PORTAL</Text><Text style={s.title}>What needs attention?</Text><View style={s.metrics}><Metric value="0" label="New orders"/><Metric value="0" label="Enquiries"/><Metric value="0" label="Messages"/><Metric value="80%" label="Profile complete"/></View><Text style={s.section}>YOUR BUSINESS</Text>{['Listings / products / menu','Orders & enquiries','Messages','Availability','Performance','Business profile','Settings'].map(x=><Pressable key={x} style={s.row} onPress={()=>Alert.alert(x,'This preview will use the shared marketplace backend after Claude completes the handoff tasks.')}><Text style={s.rowTitle}>{x}</Text><Text style={s.arrow}>›</Text></Pressable>)}</Shell>;
- if(screen==='chat')return <Shell title="Musuwo Chat" back={back}><Text style={s.eyebrow}>{selected.business.toUpperCase()}</Text><Text style={s.title}>Ask before you connect</Text><Notice title="Your contact stays private" text="Phone and WhatsApp details remain hidden until contact release is approved and recorded."/><View style={s.chat}><Text style={s.chatText}>Start a conversation about availability, pricing or a viewing. No preview messages are pre-filled.</Text></View><TextInput placeholder="Write a message" placeholderTextColor="#89958F" style={s.message}/><Pressable style={s.primary} onPress={()=>Alert.alert('Preview only','Message sending requires the conversation backend.')}><Text style={s.primaryText}>Send message</Text></Pressable><Pressable style={s.secondary} onPress={()=>setContact(true)}><Text style={s.secondaryText}>{contact?'Contact requested':'Request contact details'}</Text></Pressable>{contact&&<Notice title="Request recorded" text="In production the business response and authorized release will be audited before phone or WhatsApp details appear."/>}</Shell>;
- if(screen==='detail')return <Shell title={selected.kind} back={back}><View style={s.detailHero}><Text style={s.detailIcon}>{selected.icon}</Text><Text style={s.badge}>PREVIEW LISTING</Text></View><Text style={s.eyebrow}>{selected.business.toUpperCase()}</Text><Text style={s.title}>{selected.title}</Text><Text style={s.price}>{selected.price}</Text><Text style={s.body}>{selected.description}</Text><View style={s.info}><Text style={s.rowTitle}>ðŸ“ {selected.area}</Text><Text style={s.verified}>Information reviewed · Preview ID</Text></View>{selected.kind==='Accommodation'&&<Notice title="Accommodation safety" text="Do not send deposits solely because someone claims to represent a property. Verify the property and agreement before making off-platform payments."/>}<Pressable style={s.primary} onPress={()=>selected.mode==='BUY'?Alert.alert('Commerce preview','This listing would use the existing cart with one merchant per checkout.'):setScreen('chat')}><Text style={s.primaryText}>{selected.mode==='BUY'?'Add to basket':'Chat with business'}</Text></Pressable><Pressable style={s.secondary} onPress={()=>Alert.alert('Report listing','A production report creates a review case; it does not automatically assign guilt.')}><Text style={s.secondaryText}>Report this listing</Text></Pressable></Shell>;
+ if(screen==='chat'&&selected)return <Shell title="Musuwo Chat" back={back}><Text style={s.eyebrow}>{selected.business.toUpperCase()}</Text><Text style={s.title}>Ask before you connect</Text><Notice title="Your contact stays private" text="Phone and WhatsApp details remain hidden until contact release is approved and recorded."/><View style={s.chat}><Text style={s.chatText}>Start a conversation about availability, pricing or a viewing. No preview messages are pre-filled.</Text></View><TextInput placeholder="Write a message" placeholderTextColor="#89958F" style={s.message}/><Pressable style={s.primary} onPress={()=>Alert.alert('Preview only','Message sending requires the conversation backend.')}><Text style={s.primaryText}>Send message</Text></Pressable><Pressable style={s.secondary} onPress={()=>setContact(true)}><Text style={s.secondaryText}>{contact?'Contact requested':'Request contact details'}</Text></Pressable>{contact&&<Notice title="Request recorded" text="In production the business response and authorized release will be audited before phone or WhatsApp details appear."/>}</Shell>;
+ if(screen==='detail'&&selected)return <Shell title={selected.kind} back={back}><View style={s.detailHero}><Text style={s.detailIcon}>{selected.icon}</Text><Text style={s.badge}>PREVIEW LISTING</Text></View><Text style={s.eyebrow}>{selected.business.toUpperCase()}</Text><Text style={s.title}>{selected.title}</Text><Text style={s.price}>{selected.price}</Text><Text style={s.body}>{selected.description}</Text><View style={s.info}><Text style={s.rowTitle}>ðŸ“ {selected.area}</Text><Text style={s.verified}>Information reviewed · Preview ID</Text></View>{selected.kind==='Accommodation'&&<Notice title="Accommodation safety" text="Do not send deposits solely because someone claims to represent a property. Verify the property and agreement before making off-platform payments."/>}<Pressable style={s.primary} onPress={()=>selected.mode==='BUY'?Alert.alert('Commerce preview','This listing would use the existing cart with one merchant per checkout.'):setScreen('chat')}><Text style={s.primaryText}>{selected.mode==='BUY'?'Add to basket':'Chat with business'}</Text></Pressable><Pressable style={s.secondary} onPress={()=>Alert.alert('Report listing','A production report creates a review case; it does not automatically assign guilt.')}><Text style={s.secondaryText}>Report this listing</Text></Pressable></Shell>;
  return <Shell title="Musuwo" back={back}><Text style={s.eyebrow}>MUSUWO · LOCAL BUSINESS MARKETPLACE</Text><Text style={s.title}>What are you looking for?</Text><View style={s.search}><Text>âŒ•</Text><TextInput value={query} onChangeText={setQuery} placeholder="Shop, food, room, tutor, service…" placeholderTextColor="#89958F" style={s.searchInput}/></View><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips}>{(['All','Shop','Food','Accommodation','Services','Education'] as const).map(x=><Pressable key={x} onPress={()=>setKind(x)} style={[s.chip,kind===x&&s.chipOn]}><Text style={[s.chipText,kind===x&&s.chipTextOn]}>{x}</Text></Pressable>)}</ScrollView><View style={s.actionRow}><Pressable style={s.businessButton} onPress={()=>setScreen('apply')}><Text style={s.businessKicker}>SELL OR LIST</Text><Text style={s.businessTitle}>Musuwo for Business →</Text></Pressable><Pressable style={s.portalButton} onPress={()=>setScreen('portal')}><Text style={s.portalText}>Portal preview</Text></Pressable></View><Text style={s.section}>{kind==='All'?'DISCOVER MUTARE':kind.toUpperCase()}</Text>{results.map(x=><Pressable key={x.id} style={s.listing} onPress={()=>{setSelected(x);setScreen('detail')}}><View style={s.listIcon}><Text style={s.icon}>{x.icon}</Text></View><View style={s.grow}><View style={s.between}><Text style={s.rowTitle}>{x.title}</Text><Text style={s.mode}>{x.mode}</Text></View><Text style={s.meta}>{x.business} · {x.area}</Text><Text style={s.listPrice}>{x.price}</Text></View></Pressable>)}{results.length===0&&<Notice title="No matches" text="Try another word or category."/>}</Shell>;
 }
 function Shell({title,back,children}:{title:string;back:()=>void;children:React.ReactNode}){return <SafeAreaView style={s.safe}><StatusBar style="dark"/><View style={s.phone}><View style={s.header}><Pressable onPress={back} style={s.back}><Text style={s.backText}>‹</Text></Pressable><Text style={s.headerTitle}>{title}</Text><View style={s.back}/></View><ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">{children}</ScrollView></View></SafeAreaView>}

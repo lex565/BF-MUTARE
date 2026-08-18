@@ -4,12 +4,13 @@ import * as Location from 'expo-location';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './src/supabase';
 import { useMyOrders, useProducts } from './src/liveData';
-import { Alert, ImageBackground, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, ImageBackground, Linking, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { CartMap, CustomerFlow, FlowRoute } from './src/CustomerFlow';
 import { RiderFlow } from './src/RiderFlow';
 import { AdminFlow } from './src/AdminFlow';
 import { StaffFlow } from './src/StaffFlow';
 import { MarketplaceFlow } from './src/MarketplaceFlow';
+import { APP_VERSION, checkVersion, type VersionVerdict } from './src/versionCheck';
 import { AccountModePreview } from './src/AccountModePreview';
 
 const C = { ink: '#17372D', forest: '#235643', cream: '#F7F3E9', paper: '#FFFDF8', gold: '#E7A83E', coral: '#D96B4A', sage: '#DDE7D7', muted: '#6E7B74' };
@@ -63,6 +64,20 @@ export default function App() {
   const [adminOpen, setAdminOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
   const [marketplaceOpen,setMarketplaceOpen]=useState(false);
+  /**
+   * Is this build still allowed to run?
+   *
+   * Every APK before 0.2.0 contains an authentication bypass and is still
+   * installed on testers' phones. The Control Center can block a release, but
+   * until this ran that only stopped new downloads - a phone that already had
+   * the build carried on regardless. This is what makes blocking mean anything.
+   *
+   * It fails open: no network, a slow server, a bad response, and the app
+   * carries on. Somebody in Sakubva with two bars must not be locked out of a
+   * marketplace because a version endpoint timed out.
+   */
+  const [verdict, setVerdict] = useState<VersionVerdict | null>(null);
+  useEffect(() => { void checkVersion().then(setVerdict); }, []);
   const [accountModeOpen,setAccountModeOpen]=useState(false);
   const [locationLabel,setLocationLabel]=useState('Set delivery location');
   const [locating,setLocating]=useState(false);
@@ -71,6 +86,20 @@ export default function App() {
   const add = (id: number) => setCart(current => ({ ...current, [id]: (current[id] ?? 0) + 1 }));
   const openProduct = (id: number) => { setSelectedId(id); setFlow('product'); };
   const updateLocation=async()=>{setLocating(true);try{const permission=await Location.requestForegroundPermissionsAsync();if(!permission.granted){Alert.alert('Location not enabled','You can type the complete Zimbabwe address and landmarks during checkout.');return}const point=await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.Balanced});const places=await Location.reverseGeocodeAsync(point.coords);const place=places[0];setLocationLabel(place?.district||place?.subregion||place?.city||`${point.coords.latitude.toFixed(4)}, ${point.coords.longitude.toFixed(4)}`)}catch{Alert.alert('Could not find your area','Please type the full delivery address and landmarks during checkout.')}finally{setLocating(false)}};
+  if (verdict?.updateRequired) return (
+    <SafeAreaView style={{flex:1,backgroundColor:'#F7F3E9',alignItems:'center',justifyContent:'center',padding:28}}>
+      <StatusBar style="dark" />
+      <Text style={{fontSize:26,fontWeight:'800',color:'#17372D',textAlign:'center'}}>Please update Musuwo</Text>
+      <Text style={{fontSize:16,color:'#46584c',textAlign:'center',marginTop:14,lineHeight:23}}>{verdict.message}</Text>
+      <Text style={{fontSize:13,color:'#6E7B74',textAlign:'center',marginTop:18}}>You have {APP_VERSION}{verdict.latestVersion?`, the current one is ${verdict.latestVersion}`:''}.</Text>
+      {/* No "Later". A blocked build is blocked because continuing to use it
+          is the problem - see lib/platform/releases.ts. */}
+      <Pressable onPress={()=>{void Linking.openURL('https://musuwo.vercel.app/beta')}} style={{backgroundColor:'#005029',paddingVertical:16,paddingHorizontal:32,marginTop:26}}>
+        <Text style={{color:'#fff',fontWeight:'800',letterSpacing:1.2}}>GET THE CURRENT VERSION</Text>
+      </Pressable>
+    </SafeAreaView>
+  );
+
   if (riderOpen) return <RiderFlow close={() => setRiderOpen(false)} />;
   if (adminOpen) return <AdminFlow close={() => setAdminOpen(false)} />;
   if (staffOpen) return <StaffFlow close={() => setStaffOpen(false)} />;
