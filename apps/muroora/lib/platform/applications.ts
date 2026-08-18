@@ -8,6 +8,7 @@ import {
   businessMemberships,
   businesses,
 } from '@/db/schema/marketplace'
+import { categories, stores } from '@/db/schema/catalogue'
 import { users } from '@/db/schema/identity'
 import { orders } from '@/db/schema/orders'
 import { platformAuditLog } from '@/db/schema/platform'
@@ -535,6 +536,23 @@ export async function approveApplication(params: {
       slug = `${base}-${n}`
     }
 
+    const [store] = await tx
+      .insert(stores)
+      .values({
+        name: application.businessName,
+        slug,
+        isFirstParty: false,
+        city: application.city,
+      })
+      .returning({ id: stores.id })
+
+    await tx.insert(categories).values({
+      storeId: store.id,
+      name: 'General',
+      slug: 'general',
+      description: 'Products and services from this business.',
+    })
+
     const [business] = await tx
       .insert(businesses)
       .values({
@@ -542,6 +560,7 @@ export async function approveApplication(params: {
         // atomically. Never derived by counting rows here.
         name: application.businessName,
         slug,
+        storeId: store.id,
         summary: application.summary ?? null,
         kind: application.kind,
         status: params.status ?? 'PILOT',

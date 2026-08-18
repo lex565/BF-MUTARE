@@ -6,6 +6,7 @@ import {
   businessApplications,
   businessMemberships,
   businesses,
+  marketplaceProductViews,
   products,
   stores,
 } from '@/db/schema'
@@ -166,6 +167,9 @@ export interface PublicBusiness {
   kind: string
   city: string
   logoPath: string | null
+  websiteUrl: string | null
+  whatsappNumber: string | null
+  faviconPath: string | null
   isFounding: boolean
   storefrontUrl: string | null
   /**
@@ -199,6 +203,9 @@ export async function listPublicBusinesses(): Promise<PublicBusiness[]> {
       kind: businesses.kind,
       city: businesses.city,
       logoPath: businesses.logoPath,
+      websiteUrl: businesses.websiteUrl,
+      whatsappNumber: businesses.whatsappNumber,
+      faviconPath: businesses.faviconPath,
       isFounding: businesses.isFounding,
       verifiedAt: businesses.verifiedAt,
       storeSlug: stores.slug,
@@ -226,12 +233,16 @@ export interface MarketplaceProduct {
   slug: string
   unitSize: string | null
   description: string | null
+  imageUrl: string | null
   price: { amount: string; currency: string; decimal: string }
   merchant: {
     publicId: string
     name: string
     slug: string
     logoPath: string | null
+    websiteUrl: string | null
+    whatsappNumber: string | null
+    faviconPath: string | null
     storefrontUrl: string | null
     /** Whether Musuwo has seen this merchant's licence. See PublicBusiness. */
     verified: boolean
@@ -275,7 +286,15 @@ export async function listMarketplaceProducts(): Promise<MarketplaceProduct[]> {
       merchantName: businesses.name,
       merchantSlug: businesses.slug,
       merchantLogo: businesses.logoPath,
+      merchantWebsite: businesses.websiteUrl,
+      merchantWhatsapp: businesses.whatsappNumber,
+      merchantFavicon: businesses.faviconPath,
       merchantVerifiedAt: businesses.verifiedAt,
+      imagePath: sql<string | null>`(
+        select pi.path from product_images pi
+        where pi.product_id = ${products.id}
+        order by pi.sort_order asc, pi.created_at asc limit 1
+      )`,
       storeSlug: stores.slug,
     })
     .from(products)
@@ -302,6 +321,9 @@ export async function listMarketplaceProducts(): Promise<MarketplaceProduct[]> {
       slug: r.slug,
       unitSize: r.unitSize,
       description: r.description,
+      imageUrl: r.imagePath
+        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-photos/${r.imagePath}`
+        : null,
       price: {
         amount: amount.toString(),
         currency: r.priceCurrency,
@@ -312,12 +334,52 @@ export async function listMarketplaceProducts(): Promise<MarketplaceProduct[]> {
         name: r.merchantName,
         slug: r.merchantSlug,
         logoPath: r.merchantLogo,
+        websiteUrl: r.merchantWebsite,
+        whatsappNumber: r.merchantWhatsapp,
+        faviconPath: r.merchantFavicon,
         storefrontUrl: r.storeSlug ? `/stores/${r.storeSlug}` : null,
         // A boolean only. The licence number and document stay server-side.
         verified: r.merchantVerifiedAt !== null,
       },
     }
   })
+}
+
+/** Record a view only for an authenticated customer. Anonymous browsing never
+ * creates a shadow profile. */
+export async function recordMarketplaceProductView(userId: string, productId: string) {
+  await db.insert(marketplaceProductViews).values({ userId, productId })
+}
+
+export async function getMarketplaceProduct(merchantSlug: string, productSlug: string) {
+  const all = await listMarketplaceProducts()
+  return all.find((product) => product.merchant.slug === merchantSlug && product.slug === productSlug) ?? null
+}
+
+export async function getPublicBusiness(slug: string): Promise<PublicBusiness | null> {
+  const all = await listPublicBusinesses()
+  return all.find((business) => business.slug === slug) ?? null
+}
+
+/** Recommendations require actual history. A new account receives an empty
+ * list rather than the founding merchant being presented as personalised. */
+export async function listRecommendedProducts(userId: string): Promise<MarketplaceProduct[]> {
+  const viewed = await db
+    .select({ productId: marketplaceProductViews.productId })
+    .from(marketplaceProductViews)
+    .where(eq(marketplaceProductViews.userId, userId))
+    .orderBy(desc(marketplaceProductViews.viewedAt))
+    .limit(50)
+  if (viewed.length === 0) return []
+
+  const viewedIds = new Set(viewed.map((row) => row.productId))
+  const all = await listMarketplaceProducts()
+  const merchantSlugs = new Set(
+    all.filter((product) => viewedIds.has(product.id)).map((product) => product.merchant.slug),
+  )
+  return all
+    .filter((product) => merchantSlugs.has(product.merchant.slug) && !viewedIds.has(product.id))
+    .slice(0, 24)
 }
 
 /* ---------------------------------------------------------------- writes */

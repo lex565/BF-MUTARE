@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 
 import { MusuwoShopCatalogue } from '@/app/shop/MusuwoShopCatalogue'
-import { MurooraShop } from '@/app/shop/MurooraShop'
 import { getMarketplaceProducts } from '@/lib/services/marketplace-cache'
-import { isMuroora } from '@/lib/brand'
+import { currentUser } from '@/lib/auth'
+import { listRecommendedProducts } from '@/lib/services/marketplace'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,17 +31,10 @@ export const dynamic = 'force-dynamic'
  * The Musuwo half now reads the real marketplace feed rather than `[]`.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  return isMuroora
-    ? {
-        title: 'Shop',
-        description:
-          'Groceries and household essentials from Muroora Mart in Mutare.',
-      }
-    : {
-        title: 'Shop across Musuwo',
-        description:
-          'Products from approved businesses across Musuwo, each one showing who is selling it.',
-      }
+  return {
+    title: 'Shop across Musuwo',
+    description: 'Products from approved businesses across Musuwo, each one showing who is selling it.',
+  }
 }
 
 export default async function ShopPage({
@@ -51,9 +44,11 @@ export default async function ShopPage({
 }) {
   const { q } = await searchParams
 
-  if (isMuroora) return <MurooraShop query={q ?? ''} />
-
-  const marketplace = await getMarketplaceProducts()
+  const user = await currentUser()
+  const [marketplace, recommended] = await Promise.all([
+    getMarketplaceProducts(),
+    user ? listRecommendedProducts(user.id) : Promise.resolve([]),
+  ])
 
   // Shaped for the Musuwo catalogue component, which was written against its
   // own type. Mapping here keeps that component unaware of the service.
@@ -64,15 +59,22 @@ export default async function ShopPage({
     description: p.description,
     unitSize: p.unitSize,
     price: p.price.decimal,
-    imageUrl: null,
+    imageUrl: p.imageUrl,
     merchant: {
       name: p.merchant.name,
       slug: p.merchant.slug,
       logoUrl: p.merchant.logoPath,
+      whatsappNumber: p.merchant.whatsappNumber,
+      websiteUrl: p.merchant.websiteUrl,
     },
   }))
 
   return (
-    <MusuwoShopCatalogue products={products} initialQuery={q ?? ''} />
+    <MusuwoShopCatalogue
+      products={products}
+      recommendedIds={recommended.map((product) => product.id)}
+      initialQuery={q ?? ''}
+      signedIn={Boolean(user)}
+    />
   )
 }

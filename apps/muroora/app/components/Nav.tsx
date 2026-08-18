@@ -13,7 +13,7 @@ import { brand, isMuroora } from '@/lib/brand'
  */
 const MUSUWO_LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/stores/muroora-mart', label: 'Shop' },
+  { href: '/shop', label: 'Shop' },
   { href: '/marketplace?category=food', label: 'Food' },
   { href: '/marketplace?category=accommodation', label: 'Accommodation' },
   { href: '/marketplace?category=services', label: 'Services' },
@@ -31,7 +31,7 @@ const MUSUWO_LINKS = [
  */
 const MUROORA_LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/shop', label: 'Shop' },
+  { href: '/stores/muroora-mart/shop', label: 'Shop' },
   { href: '/diaspora', label: 'Diaspora' },
   { href: '/contact', label: 'Contact' },
 ]

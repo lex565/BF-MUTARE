@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 
 import { currentUser, isAdmin, isStaff } from '@/lib/auth'
 import { signOut } from '@/app/login/actions'
+import { myBusinesses } from '@/lib/services/marketplace'
 
 export const metadata: Metadata = {
   title: 'Your account',
@@ -30,6 +31,7 @@ export default async function AccountPage({
 
   const { denied } = await searchParams
   const firstName = (user.fullName ?? '').split(' ')[0]
+  const workspaces = await myBusinesses(user.id)
 
   return (
     <main className="mx-auto max-w-[52rem] px-gutter py-16">
@@ -77,6 +79,13 @@ export default async function AccountPage({
             Nothing here yet. Ordering opens once checkout is finished.
           </p>
         </div>
+
+        {workspaces.map((business) => (
+          <Link key={business.businessId} href={`/business/${business.businessId}`} className="border border-support p-6 transition-colors hover:bg-support hover:text-white">
+            <h2 className="font-bold">{business.name}</h2>
+            <p className="mt-2 text-small opacity-80">Business profile, products and Musuwo publishing.</p>
+          </Link>
+        ))}
 
         {isStaff(user) && (
           <Link

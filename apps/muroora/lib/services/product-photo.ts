@@ -82,12 +82,15 @@ export async function addProductPhoto(params: {
   file: File
   alt?: string
   actorId: string
+  /** Business workspaces pass their resolved store. Legacy shop admin calls
+   * keep using the configured founding-store id. */
+  storeId?: string
 }): Promise<{ path: string; url: string }> {
   const [product] = await db
     .select({ id: products.id, name: products.name, sku: products.sku })
     .from(products)
     .where(
-      and(eq(products.id, params.productId), eq(products.storeId, STORE_ID)),
+      and(eq(products.id, params.productId), eq(products.storeId, params.storeId ?? STORE_ID)),
     )
 
   if (!product) throw new ProductPhotoError('NOT_FOUND', 'No such product.')

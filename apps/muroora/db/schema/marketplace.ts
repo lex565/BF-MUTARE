@@ -13,7 +13,7 @@ import {
 } from 'drizzle-orm/pg-core'
 
 import { id, softDelete, timestamps } from './_shared'
-import { stores } from './catalogue'
+import { products, stores } from './catalogue'
 import { users } from './identity'
 
 /**
@@ -101,6 +101,12 @@ export const businesses = pgTable(
 
     city: text('city').notNull().default('Mutare'),
     logoPath: text('logo_path'),
+
+    /** Public links deliberately supplied by the business owner. These are
+     * separate from private application contact details. */
+    websiteUrl: text('website_url'),
+    whatsappNumber: text('whatsapp_number'),
+    faviconPath: text('favicon_path'),
 
     /**
      * NOT PUBLIC. Must be omitted from any public payload until a contact
@@ -296,6 +302,27 @@ export const businessApplicationDocuments = pgTable(
       .defaultNow(),
   },
   (t) => [index('business_application_documents_app_idx').on(t.applicationId)],
+)
+
+/** Signed-in browsing signals used for private, first-party recommendations. */
+export const marketplaceProductViews = pgTable(
+  'marketplace_product_views',
+  {
+    id: id(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    productId: uuid('product_id')
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    viewedAt: timestamp('viewed_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('marketplace_product_views_user_idx').on(t.userId, t.viewedAt),
+    index('marketplace_product_views_product_idx').on(t.productId),
+  ],
 )
 
 export const businessesRelations = relations(businesses, ({ one, many }) => ({
