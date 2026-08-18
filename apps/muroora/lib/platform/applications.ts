@@ -443,7 +443,10 @@ export async function requestInformation(params: {
  *
  * The application is NOT deleted (§25). It stays, rejected, with its history.
  */
-export async function rejectApplication(params: { id: string; reason: string }) {
+export async function rejectApplication(params: {
+  id: string
+  reason: string
+}): Promise<NotifyResult> {
   const admin = await assertPermission('business_applications.reject')
   const reason = params.reason.trim()
   if (reason.length < 10) {
@@ -454,8 +457,17 @@ export async function rejectApplication(params: { id: string; reason: string }) 
   }
 
   const [existing] = await db
-    .select({ status: businessApplications.status })
+    .select({
+      status: businessApplications.status,
+      businessName: businessApplications.businessName,
+      name: users.fullName,
+      email: users.email,
+      applicationPhone: businessApplications.contactPhone,
+      whatsapp: businessApplications.whatsapp,
+      accountPhone: users.phone,
+    })
     .from(businessApplications)
+    .leftJoin(users, eq(users.id, businessApplications.applicantId))
     .where(eq(businessApplications.id, params.id))
 
   if (!existing) throw new ApplicationError('NOT_FOUND', 'No such application.')
@@ -493,6 +505,24 @@ export async function rejectApplication(params: { id: string; reason: string }) 
       reason,
     })
   })
+
+  /**
+   * Tell them, and tell them WHY.
+   *
+   * A rejection that arrives as silence is the worst outcome for somebody who
+   * spent an evening photographing documents. Almost every refusal at this
+   * stage is a fixable paper problem, and the email says so - see notify.ts.
+   */
+  return notifyApplicant({
+    kind: 'REJECTED',
+    businessName: existing.businessName,
+    applicant: {
+      name: existing.name,
+      email: existing.email,
+      phone: existing.whatsapp ?? existing.applicationPhone ?? existing.accountPhone,
+    },
+    message: reason,
+  })
 }
 
 /** A URL-safe slug, uniqueness handled by the caller against the table. */
@@ -528,7 +558,12 @@ export async function approveApplication(params: {
   note?: string
   /** PILOT by default: live, visible, and marked as still being trialled. */
   status?: 'PILOT' | 'ACTIVE'
-}): Promise<{ businessId: string; publicId: string; created: boolean }> {
+}): Promise<{
+  businessId: string
+  publicId: string
+  created: boolean
+  notice: NotifyResult | null
+}> {
   const admin = await assertPermission('business_applications.approve')
 
   const result = await db.transaction(async (tx) => {
@@ -550,7 +585,13 @@ export async function approveApplication(params: {
       .where(eq(businesses.applicationId, params.id))
 
     if (already) {
-      return { businessId: already.id, publicId: already.publicId, created: false }
+      return {
+        businessId: already.id,
+        publicId: already.publicId,
+        created: false,
+        businessName: application.businessName,
+        applicant: { name: null, email: null, phone: null },
+      }
     }
 
     if (application.status === 'REJECTED') {
@@ -559,6 +600,11 @@ export async function approveApplication(params: {
         'This application was rejected. It has to be resubmitted before it can be approved.',
       )
     }
+
+    const [applicantRow] = await tx
+      .select({ fullName: users.fullName, email: users.email, phone: users.phone })
+      .from(users)
+      .where(eq(users.id, application.applicantId))
 
     // A slug nobody else holds. Loops rather than trusting a counter, because
     // two businesses called "Mutare Bakery" is entirely plausible.
@@ -655,14 +701,48 @@ export async function approveApplication(params: {
       },
     })
 
-    return { businessId: business.id, publicId: business.publicId, created: true }
+    return {
+      businessId: business.id,
+      publicId: business.publicId,
+      created: true,
+      businessName: application.businessName,
+      applicant: {
+        name: applicantRow?.fullName ?? null,
+        email: applicantRow?.email ?? null,
+        phone:
+          application.whatsapp ??
+          application.contactPhone ??
+          applicantRow?.phone ??
+          null,
+      },
+    }
   })
 
   // Outside the transaction: a cache drop is not something to roll back, and
   // doing it inside would hold the lock across a network call.
   if (result.created) await invalidatePublicFeeds('all')
 
-  return result
+  /**
+   * Welcome them.
+   *
+   * ONLY on a real approval, never on the idempotent second click - somebody
+   * double-tapping on a slow connection must not receive two welcome emails,
+   * which reads as a system that does not know what it just did.
+   *
+   * Outside the transaction and after the commit: holding a database lock open
+   * across a mail relay would be worse than a missed email, and the business is
+   * live either way.
+   */
+  const notice = result.created
+    ? await notifyApplicant({
+        kind: 'APPROVED',
+        businessName: result.businessName,
+        applicant: result.applicant,
+        message: params.note ?? null,
+      })
+    : null
+
+  return { ...result, notice }
 }
 
 /* ------------------------------------------------------- applicant side */

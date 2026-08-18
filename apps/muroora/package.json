@@ -26,6 +26,7 @@
     "db:clear-checks": "node --env-file=.env.local db/clear-check-data.mjs",
     "db:verify-applications": "tsx --env-file=.env.local db/verify-applications.mts",
     "storage:setup": "node --env-file=.env.local db/setup-storage.mjs",
+    "pilot:walk": "node --env-file=.env.local db/pilot-walkthrough.mjs",
     "mail:preview": "tsx db/preview-emails.mjs",
     "mail:test": "tsx --env-file=.env.local db/send-test-email.mjs",
     "db:verify-notify": "tsx --env-file=.env.local db/verify-notify.mts",

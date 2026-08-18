@@ -132,9 +132,17 @@ export async function rejectAction(
 ): Promise<ReviewState> {
   const id = String(formData.get('id'))
   try {
-    await rejectApplication({ id, reason: String(formData.get('reason') ?? '') })
+    const notice = await rejectApplication({
+      id,
+      reason: String(formData.get('reason') ?? ''),
+    })
     refresh(id)
-    return { message: 'Rejected. The application and its history are kept.' }
+    return {
+      message: notice.emailed
+        ? 'Recorded, and they have been emailed the reason. The application and its history are kept.'
+        : `Recorded, but NOT emailed. ${notice.emailProblem ?? ''}`,
+      whatsappUrl: notice.whatsappUrl,
+    }
   } catch (error) {
     return explain(error)
   }
@@ -152,10 +160,18 @@ export async function approveAction(
       status: formData.get('status') === 'ACTIVE' ? 'ACTIVE' : 'PILOT',
     })
     refresh(id)
+
+    if (!result.created) {
+      return {
+        message: `Already approved — ${result.publicId}. Nothing was created a second time, and no second welcome email was sent.`,
+      }
+    }
+
     return {
-      message: result.created
-        ? `Approved. ${result.publicId} is live and the applicant now owns it.`
-        : `Already approved — ${result.publicId}. Nothing was created a second time.`,
+      message: result.notice?.emailed
+        ? `Approved. ${result.publicId} is live, the applicant owns it, and they have been emailed.`
+        : `Approved. ${result.publicId} is live and the applicant owns it - but they were NOT emailed. ${result.notice?.emailProblem ?? ''}`,
+      whatsappUrl: result.notice?.whatsappUrl,
     }
   } catch (error) {
     return explain(error)
