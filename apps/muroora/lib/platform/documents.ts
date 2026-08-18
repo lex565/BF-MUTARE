@@ -182,44 +182,134 @@ export async function uploadDocument(params: {
 
   if (error) throw new DocumentError('NO_STORAGE', error.message)
 
-  // One document per kind, except photographs, where several is the point.
+  /**
+   * METADATA FIRST, THEN DELETE THE OLD FILE. The order matters and the
+   * previous order was wrong.
+   *
+   * It used to delete the old storage object and the old row, and only then
+   * insert the new row. If that insert failed, the applicant was left with no
+   * document at all, their original evidence already gone from the bucket and
+   * unrecoverable, and the file they had just uploaded orphaned with nothing
+   * pointing at it. Somebody replacing a blurry ID photo could lose the
+   * readable one they already had.
+   *
+   * Now: the row is written in a transaction; if that fails, the file just
+   * uploaded is removed so the bucket does not accumulate untracked identity
+   * documents; and the PREVIOUS file is deleted only once the new metadata has
+   * committed. At every instant there is exactly one row and at least one file.
+   *
+   * A partial unique index on (application_id, kind) - migration 0017 - makes
+   * two simultaneous uploads impossible to resolve into two rows: one of them
+   * loses, and the loser cleans up after itself in the catch below.
+   */
   const single = !['PREMISES_PHOTO', 'PROPERTY_PHOTO'].includes(params.kind)
-  if (single) {
-    const old = await db
-      .select({ id: businessApplicationDocuments.id, path: businessApplicationDocuments.path })
-      .from(businessApplicationDocuments)
-      .where(
-        and(
-          eq(businessApplicationDocuments.applicationId, params.applicationId),
-          eq(businessApplicationDocuments.kind, params.kind),
-        ),
-      )
-    if (old.length) {
-      // Remove the file too, not just the row. A replaced ID photo left in the
-      // bucket is a copy nobody knows about and nobody will ever delete.
-      await supabase.storage.from(BUCKET).remove(old.map((o) => o.path))
-      await db
-        .delete(businessApplicationDocuments)
+  let previousPath: string | null = null
+
+  try {
+    previousPath = await db.transaction(async (tx) => {
+      if (!single) {
+        await tx.insert(businessApplicationDocuments).values({
+          applicationId: params.applicationId,
+          uploadedBy: params.userId,
+          kind: params.kind,
+          path,
+          mimeType: params.file.type,
+          sizeBytes: params.file.size,
+          originalName: null,
+        })
+        return null
+      }
+
+      const [old] = await tx
+        .select({ path: businessApplicationDocuments.path })
+        .from(businessApplicationDocuments)
         .where(
           and(
             eq(businessApplicationDocuments.applicationId, params.applicationId),
             eq(businessApplicationDocuments.kind, params.kind),
           ),
         )
+        .for('update')
+
+      if (old) {
+        await tx
+          .update(businessApplicationDocuments)
+          .set({
+            path,
+            uploadedBy: params.userId,
+            mimeType: params.file.type,
+            sizeBytes: params.file.size,
+            createdAt: new Date(),
+          })
+          .where(
+            and(
+              eq(businessApplicationDocuments.applicationId, params.applicationId),
+              eq(businessApplicationDocuments.kind, params.kind),
+            ),
+          )
+        return old.path
+      }
+
+      // No existing row. A concurrent upload racing us here loses on the
+      // unique index and compensates in its own catch.
+      await tx.insert(businessApplicationDocuments).values({
+        applicationId: params.applicationId,
+        uploadedBy: params.userId,
+        kind: params.kind,
+        path,
+        mimeType: params.file.type,
+        sizeBytes: params.file.size,
+        // The original filename is NOT stored. People name files things like
+        // "my id.jpg" and sometimes worse, and it serves no purpose here.
+        originalName: null,
+      })
+      return null
+    })
+  } catch (dbError) {
+    console.error('[documents] metadata write failed:', (dbError as Error).message)
+    // The metadata did not commit, so nothing points at the file we just put
+    // in the bucket. Remove it rather than leaving an untracked identity
+    // document behind.
+    const { error: rollbackError } = await supabase.storage
+      .from(BUCKET)
+      .remove([path])
+    if (rollbackError) {
+      // Worth shouting about: an unreferenced ID photo is now sitting in the
+      // bucket. `npm run storage:orphans` finds these.
+      console.error(
+        '[documents] ORPHANED FILE - upload succeeded, metadata failed, cleanup failed:',
+        path,
+        rollbackError.message,
+      )
     }
+    throw new DocumentError(
+      'NO_STORAGE',
+      'That did not save. Your previous document is untouched - please try again.',
+    )
   }
 
-  await db.insert(businessApplicationDocuments).values({
-    applicationId: params.applicationId,
-    uploadedBy: params.userId,
-    kind: params.kind,
-    path,
-    mimeType: params.file.type,
-    sizeBytes: params.file.size,
-    // The original filename is NOT stored. People name files things like
-    // "my id.jpg" and sometimes worse, and it serves no purpose here.
-    originalName: null,
-  })
+  /**
+   * Only now is the old file removed, and the result is CHECKED.
+   *
+   * Ignoring it was the other half of the original bug: a failed delete left a
+   * national ID in the bucket after its only database reference was gone - a
+   * document nobody knows exists and nobody will ever remove. A failure here
+   * does not fail the upload, because the new document is safely recorded and
+   * refusing at this point would be worse for the applicant. It is logged
+   * loudly instead, and `npm run storage:orphans` reports it.
+   */
+  if (previousPath && previousPath !== path) {
+    const { error: removeError } = await supabase.storage
+      .from(BUCKET)
+      .remove([previousPath])
+    if (removeError) {
+      console.error(
+        '[documents] ORPHANED FILE - replaced but old object not deleted:',
+        previousPath,
+        removeError.message,
+      )
+    }
+  }
 }
 
 /** What has been uploaded. Metadata only - never a URL. */

@@ -45,14 +45,27 @@ function Feedback({ state }: { state: ReviewState }) {
       </p>
     )
   }
-  if (state.message) {
-    return (
-      <p className="cc-note" role="status">
-        {state.message}
-      </p>
-    )
-  }
-  return null
+  if (!state.message) return null
+
+  return (
+    <div className="cc-note" role="status">
+      <p style={{ margin: 0 }}>{state.message}</p>
+      {/* Opens the reviewer's own WhatsApp with the message already written.
+          The surest way to reach somebody in Zimbabwe, and the only one that
+          costs nothing today. */}
+      {state.whatsappUrl && (
+        <a
+          href={state.whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cc-btn cc-btn-go"
+          style={{ marginTop: '.85rem', display: 'inline-block' }}
+        >
+          Send it on WhatsApp
+        </a>
+      )}
+    </div>
+  )
 }
 
 export function ReviewPanel({

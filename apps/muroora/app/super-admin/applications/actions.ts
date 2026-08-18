@@ -28,7 +28,20 @@ import { PlatformAuthError } from '@/lib/platform/auth'
  * instead of the person meeting an error page and losing what they typed.
  */
 
-export type ReviewState = { error?: string; message?: string }
+export type ReviewState = {
+  error?: string
+  message?: string
+  /**
+   * A wa.me link the reviewer can click to send the same words on WhatsApp.
+   *
+   * Present whenever the applicant gave a usable number. Automated WhatsApp
+   * needs the Meta Business API - paid, weeks to approve, and a verified
+   * number Musuwo does not have - so this opens the reviewer's own WhatsApp
+   * with the message already written. It costs nothing and works today; the
+   * trade is that a person has to press it.
+   */
+  whatsappUrl?: string | null
+}
 
 /** Turn the two error types we raise deliberately into something readable. */
 function explain(error: unknown): ReviewState {
@@ -93,12 +106,21 @@ export async function requestInfoAction(
 ): Promise<ReviewState> {
   const id = String(formData.get('id'))
   try {
-    await requestInformation({
+    const notice = await requestInformation({
       id,
       message: String(formData.get('message') ?? ''),
     })
     refresh(id)
-    return { message: 'The applicant has been asked, and can now edit and resubmit.' }
+
+    // Say plainly whether they were actually told. "Request sent" when no
+    // email went anywhere is how an application sits for three weeks with
+    // everyone assuming the other side is slow.
+    return {
+      message: notice.emailed
+        ? 'Asked. An email is on its way, and they can now edit and resubmit.'
+        : `Recorded, and they can now edit and resubmit - but NOT emailed. ${notice.emailProblem ?? ''}`,
+      whatsappUrl: notice.whatsappUrl,
+    }
   } catch (error) {
     return explain(error)
   }

@@ -13,6 +13,7 @@ import { users } from '@/db/schema/identity'
 import { orders } from '@/db/schema/orders'
 import { platformAuditLog } from '@/db/schema/platform'
 import { assertPermission, type PlatformAdmin } from '@/lib/platform/auth'
+import { notifyApplicant, type NotifyResult } from '@/lib/platform/notify'
 
 /**
  * Drop the cached public feeds so an approved business appears immediately.
@@ -346,7 +347,7 @@ export async function requestInformation(params: {
   id: string
   message: string
   dueAt?: Date | null
-}) {
+}): Promise<NotifyResult> {
   const admin = await assertPermission('business_applications.review')
   const message = params.message.trim()
   if (!message) {
@@ -357,8 +358,19 @@ export async function requestInformation(params: {
   }
 
   const [existing] = await db
-    .select({ status: businessApplications.status })
+    .select({
+      status: businessApplications.status,
+      businessName: businessApplications.businessName,
+      name: users.fullName,
+      email: users.email,
+      // The application's own contact number first: it is the one the business
+      // gave for this purpose. The account phone is the fallback.
+      applicationPhone: businessApplications.contactPhone,
+      whatsapp: businessApplications.whatsapp,
+      accountPhone: users.phone,
+    })
     .from(businessApplications)
+    .leftJoin(users, eq(users.id, businessApplications.applicantId))
     .where(eq(businessApplications.id, params.id))
 
   if (!existing) throw new ApplicationError('NOT_FOUND', 'No such application.')
@@ -367,6 +379,12 @@ export async function requestInformation(params: {
       'WRONG_STATUS',
       'This application has already been decided.',
     )
+  }
+
+  const applicant = {
+    name: existing.name,
+    email: existing.email,
+    phone: existing.whatsapp ?? existing.applicationPhone ?? existing.accountPhone,
   }
 
   await db.transaction(async (tx) => {
@@ -394,6 +412,25 @@ export async function requestInformation(params: {
       entityId: params.id,
       changes: { message },
     })
+  })
+
+  /**
+   * Tell them, OUTSIDE the transaction and after it has committed.
+   *
+   * Inside it, a slow mail API would hold a database lock open across a
+   * network call; and a failed send would roll back a request the reviewer
+   * has already made. The decision is the important half - the notification
+   * is best effort, and `notifyApplicant` never throws.
+   *
+   * Until this existed the message went into the database and nowhere else,
+   * so an application could sit in NEEDS_INFORMATION for weeks with each side
+   * waiting on the other.
+   */
+  return notifyApplicant({
+    kind: 'INFO_REQUESTED',
+    businessName: existing.businessName,
+    applicant,
+    message,
   })
 }
 
