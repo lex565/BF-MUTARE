@@ -1,0 +1,79 @@
+MUSUWO / MUROORA MART — URGENT SUPABASE SECURITY AUDIT AND RLS FIX
+
+Use the complete security-audit specification from my immediately preceding request concerning the Supabase warnings:
+- rls_disabled_in_public
+- sensitive_columns_exposed
+
+This is an EXISTING Musuwo/Muroora Mart project. Do not rebuild, wipe data, create a new Supabase project, weaken authentication, or expose privileged credentials.
+
+FIRST AUDIT, THEN FIX, THEN TEST, THEN RECHECK.
+
+AUDIT
+1. Inspect every public-schema table.
+2. Identify exactly which tables triggered each Supabase Security Advisor warning.
+3. For every table report RLS status, policies, API exposure, intended readers/writers, sensitive columns, and web/mobile dependencies.
+4. Safely test anonymous SELECT/INSERT/UPDATE/DELETE exposure without modifying real user data.
+5. Test whether one authenticated user can access another user's private data.
+6. Audit all Supabase Storage buckets and their policies.
+7. Audit web/mobile/repository/build configuration for accidental service-role credential exposure. Never print secrets.
+
+ACCESS MODEL
+- Anonymous: only intentionally public approved storefront/listing/product/accommodation/pickup-point data.
+- Customer: own profile/orders/messages/complaints and legitimate transaction data only.
+- Merchant: own business/listings/products/orders/application/operational data only.
+- Individual/informal seller: own application, verification status/documents where appropriate, and own approved business only.
+- Super Admin: only according to granular permissions.
+- Platform Owner: highest application authority, still through secure server-side authorization.
+
+SENSITIVE DATA
+National IDs, ID photos, holding-ID photos, proof of address, private addresses, private phone details, verification notes, security reports and similar records must never be publicly queryable. Verification-document storage must be PRIVATE and use authorized/signed access rather than permanent public URLs.
+
+RLS
+Enable RLS where required, but do not blindly enable it everywhere and stop. Create least-privilege policies appropriate to each table. Do not fix legitimate frontend failures by weakening RLS.
+
+SECURITY TESTS
+- Business A cannot access/modify Business B private data, products, orders, applications or verification records.
+- Customer A cannot access Customer B profile, address, private orders, messages or complaints.
+- Anonymous/customer/unrelated business cannot retrieve provider verification documents.
+- Authorized verification reviewer can access only what permissions allow.
+- Normal users cannot promote themselves to Super Admin or Platform Owner.
+- Service-role credentials must never be bundled into browser, React client, React Native/Expo, APK or iOS builds.
+
+SAFE MIGRATIONS
+Create reproducible versioned Supabase migrations. Preserve all existing pilot data. Before destructive or high-risk changes, explain impact first.
+
+REGRESSION TEST
+After fixes verify Musuwo homepage, public businesses/products, Muroora Mart, registration, individual-seller onboarding, document upload, application submission, merchant dashboard, customer accounts, orders, accommodation, delivery, Platform Owner, authorized Super Admin, web app and mobile app.
+
+SECURITY ADVISOR RECHECK
+Re-run/check Supabase Security Advisor. Resolve rls_disabled_in_public and sensitive_columns_exposed where applicable. Explain any intentionally remaining warning precisely.
+
+FINAL REPORT
+Give me plain-English results covering:
+1. Original findings.
+2. Vulnerable tables.
+3. Potentially exposed information.
+4. Whether anonymous reads were possible.
+5. Whether unauthorized writes/deletes were possible.
+6. RLS changes.
+7. Policies created/changed.
+8. Storage buckets checked.
+9. Sensitive-bucket privacy.
+10. Service-role exposure status.
+11. Credential-rotation recommendation.
+12. Cross-user test results.
+13. Cross-business test results.
+14. Verification-document test results.
+15. Privilege-escalation test results.
+16. Web regression status.
+17. Mobile regression status.
+18. Remaining issues.
+19. Recommendations.
+20. Current Security Advisor status.
+
+IMPORTANT
+Real pilot applicants may now submit identity documents, holding-ID photos, addresses and verification records. Treat these as HIGHLY SENSITIVE. Do not delete existing pilot applications. Do not assume RLS is secure merely because it exists: verify and test the policies.
+
+Start with an audit and exact diagnosis of:
+rls_disabled_in_public
+sensitive_columns_exposed
