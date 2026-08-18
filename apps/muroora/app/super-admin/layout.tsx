@@ -51,6 +51,7 @@ const navSections: {
   {
     label: 'Platform',
     items: [
+      { href: '/super-admin/releases', label: 'Mobile app' },
       { href: '/super-admin/audit', label: 'Audit log' },
       { href: '/super-admin/admins', label: 'Administrators', ownerOnly: true },
     ],

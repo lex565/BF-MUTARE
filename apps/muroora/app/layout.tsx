@@ -7,6 +7,7 @@ import { Footer } from '@/app/components/Footer'
 import { StaffBar } from '@/app/components/StaffBar'
 import { IdleGuard } from '@/app/components/IdleGuard'
 import { RecoveryRedirect } from '@/app/components/RecoveryRedirect'
+import { BetaBanner } from '@/app/components/BetaBanner'
 import './globals.css'
 
 /* Figtree rather than the group's Archivo: it is rounder and reads friendlier
@@ -76,6 +77,8 @@ export default function RootLayout({
         <IdleGuard />
         {/* Carries a password-reset fragment to the page that reads it. */}
         <RecoveryRedirect />
+        {/* Renders nothing once dismissed, and nothing on /beta itself. */}
+        <BetaBanner />
         <Nav />
         <div className="flex-1">{children}</div>
         <Footer />

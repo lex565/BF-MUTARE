@@ -69,6 +69,23 @@ export const PLATFORM_PERMISSIONS = {
   /* ------------------------------------------------------------- messaging */
   'business_messages.send': 'Send platform messages to businesses.',
 
+  /* -------------------------------------------------------- mobile beta */
+  /**
+   * Split deliberately. Writing down a build is clerical; publishing one sends
+   * every tester to a download, and blocking one tells everybody running it to
+   * stop. Somebody can be trusted to keep the release notes tidy without being
+   * trusted to push a binary at the whole beta.
+   */
+  'releases.manage': 'Add and edit mobile releases and their notes.',
+  'releases.publish':
+    'Publish, deprecate or block a build. Publishing sends every tester to it.',
+  'beta_feedback.view': 'Read beta feedback from testers.',
+  /**
+   * Separate from ordinary feedback, and it should stay hard to get. An
+   * unfixed security report is a working exploit written down.
+   */
+  'beta_feedback.security': 'Read security reports from testers.',
+
   /* ------------------------------------------------------------- sensitive */
   /**
    * Separate from everything else, and it should stay hard to get. This is
@@ -156,8 +173,17 @@ export const PERMISSION_GROUPS: {
     permissions: ['business_messages.send'],
   },
   {
+    label: 'Mobile beta',
+    note: 'Publishing sends every tester to a download. Grant it sparingly.',
+    permissions: [
+      'releases.manage',
+      'releases.publish',
+      'beta_feedback.view',
+    ],
+  },
+  {
     label: 'Sensitive',
-    note: 'Identity documents belonging to real people. Every view is logged.',
-    permissions: ['sensitive_documents.view'],
+    note: 'Identity documents, and unfixed security reports. Every view is logged.',
+    permissions: ['sensitive_documents.view', 'beta_feedback.security'],
   },
 ]

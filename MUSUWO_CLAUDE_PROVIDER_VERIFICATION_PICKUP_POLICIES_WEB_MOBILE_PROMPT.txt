@@ -1,0 +1,1710 @@
+MUSUWO — CLAUDE FULL-STACK PROVIDER ONBOARDING, VERIFICATION, FOUNDING CIRCLE, PICKUP POINTS, POLICIES, WEB + MOBILE IMPLEMENTATION PROMPT
+
+ROLE
+
+Implement a FULL-STACK extension to the EXISTING Musuwo platform.
+
+This task includes:
+- backend
+- database
+- Supabase / RLS
+- server-side authorization
+- web application
+- mobile application
+- provider/business onboarding
+- identity verification
+- address verification
+- pickup/handover points
+- terms/policy acceptance
+- Founding Circle / early partner recognition
+- incident/accountability controls
+- Super Admin review tools
+- Platform Owner controls
+- testing and audit logging
+
+This is NOT a new project.
+
+DO NOT:
+- rebuild Musuwo from scratch
+- create a new Supabase project
+- duplicate auth, customers, businesses, orders, inventory, chat, delivery, riders or analytics
+- remove Muroora Mart functionality
+- weaken existing security
+- perform destructive migrations without explaining them first
+
+MUSUWO remains the parent platform.
+MUROORA MART remains the Founding Merchant.
+The existing backend remains the source of truth.
+
+============================================================
+1. FIRST ACTION — AUDIT THE EXISTING PROJECT
+============================================================
+
+Before implementation, inspect:
+- web app
+- mobile app
+- Supabase config
+- schema/migrations
+- auth
+- user profiles
+- business applications
+- merchant/business entities
+- business memberships
+- roles
+- Platform Owner
+- Super Admins
+- current onboarding
+- verification systems
+- storage buckets
+- categories
+- products/listings
+- accommodation
+- chat/contact gating
+- delivery/logistics
+- riders
+- merchant/pickup locations
+- audit logs
+- notifications
+- policy/terms acceptance
+- analytics
+- feature flags
+
+Classify each relevant feature as:
+IMPLEMENTED
+PARTIALLY IMPLEMENTED
+NOT IMPLEMENTED
+NEEDS REVIEW
+
+Then explain in plain English:
+- what exists
+- what is missing
+- what will be reused
+- what will change
+- required migrations
+- required RLS/security changes
+- what will remain untouched
+
+Do not perform destructive migrations before this report.
+
+============================================================
+2. CORE PRINCIPLE
+============================================================
+
+LOW BARRIER TO START AN APPLICATION
++
+HIGH ACCOUNTABILITY BEFORE OPERATING
+
+A person does NOT need to own a formally registered company to apply.
+
+However:
+
+AN INFORMAL SELLER MUST NOT BE AN ANONYMOUS SELLER.
+
+Every approved provider must satisfy verification rules associated with their provider type and category.
+
+============================================================
+3. PROVIDER TYPES
+============================================================
+
+At the beginning of onboarding ask:
+
+WHAT BEST DESCRIBES YOU?
+
+1. INDIVIDUAL SELLER / SOLE TRADER
+2. INFORMAL / SMALL BUSINESS
+3. REGISTERED BUSINESS / COMPANY
+4. SERVICE PROVIDER
+5. ACCOMMODATION / BOARDING HOUSE PROVIDER
+
+Provider type must be separate from business category.
+
+Examples:
+
+Provider Type: INDIVIDUAL SELLER
+Category: FOOD
+
+Provider Type: REGISTERED BUSINESS
+Category: BOOKS / RETAIL
+
+============================================================
+4. BUSINESS CATEGORIES
+============================================================
+
+Support/configure:
+- RETAIL / SHOP
+- FOOD / RESTAURANT / TAKEAWAY
+- ACCOMMODATION / BOARDING HOUSE
+- SERVICES
+- EDUCATION / TUTOR
+- BEAUTY / PERSONAL CARE
+- AUTOMOTIVE
+- HOME SERVICES
+- ELECTRONICS
+- BOOKS / STATIONERY
+- OTHER SME
+
+Do not hard-code future growth.
+
+============================================================
+5. REGISTRATION CAN START WITHOUT ALL DOCUMENTS
+============================================================
+
+Allow:
+CREATE ACCOUNT
+→ START APPLICATION
+→ CHOOSE PROVIDER TYPE
+→ SAVE DRAFT
+→ EXPLORE REQUIREMENTS
+→ ENTER INFORMATION
+
+even if the applicant does not yet have every document.
+
+BUT:
+
+SUBMIT FOR REVIEW must remain disabled until all mandatory requirements for that provider type/category are satisfied.
+
+OPERATE PUBLICLY must remain impossible until Musuwo approval.
+
+Therefore:
+
+START APPLICATION = low barrier
+SUBMIT APPLICATION = mandatory requirements complete
+OPERATE = Musuwo approval required
+
+============================================================
+6. “BEFORE YOU START” REQUIREMENTS SCREEN
+============================================================
+
+For an INDIVIDUAL SELLER show something like:
+
+YOU WILL NEED
+
+✓ Government-issued identification
+✓ Clear ID images where applicable
+✓ A photo of yourself holding the same ID
+✓ Verified mobile number
+✓ Address verification evidence
+✓ Operating/fulfilment information
+✓ Approved Musuwo handover point where required
+✓ Product/service information
+✓ Relevant photos
+✓ Acceptance of Musuwo Provider Terms
+✓ Acceptance of Marketplace Standards
+✓ Acceptance of Verification & Identity Policy
+✓ Acceptance of Delivery & Handover Policy where relevant
+✓ Acceptance of Privacy Notice
+✓ Acceptance of Refund/Dispute rules where relevant
+
+[START APPLICATION]
+
+Use plain language.
+
+============================================================
+7. INDIVIDUAL SELLER VERIFICATION — MANDATORY
+============================================================
+
+Before SUBMISSION require:
+
+IDENTITY
+- full legal name
+- government-issued ID type
+- ID number/reference stored securely
+- clear ID image(s)
+- photo/selfie of applicant HOLDING the same ID
+- verified mobile number
+
+ADDRESS
+- declared residential/contact address
+- approved address-verification evidence
+
+OPERATING / HANDOVER
+- declared operating area
+- selected approved Musuwo pickup/handover point where required
+
+OFFERING
+- trading/display name if used
+- category
+- description
+- products/services
+- photos where required
+
+POLICIES
+- all mandatory current versions accepted
+
+Do not allow submission if mandatory identity requirements are missing.
+
+============================================================
+8. INFORMAL / SMALL BUSINESS VERIFICATION
+============================================================
+
+Require:
+- responsible person's verified identity
+- trading/business name
+- verified phone
+- address verification
+- operating location or service area
+- pickup/handover arrangement where required
+- business photos
+- category-specific information
+- policy acceptance
+
+Formal company-registration documents are NOT mandatory if the applicant does not claim to be a registered company.
+
+Do not show “Registered Business Verified” unless registration was actually verified.
+
+Possible valid badges:
+Identity Verified
+Location Verified
+Musuwo Approved
+
+============================================================
+9. REGISTERED BUSINESS VERIFICATION
+============================================================
+
+Require appropriate configurable fields such as:
+- legal/trading name
+- registration number
+- registration evidence where applicable
+- responsible representative
+- representative identity
+- business contact
+- address
+- operating location
+- handover point where required
+- category-specific permits where legally required
+- policies accepted
+
+Do not hard-code unconfirmed legal assumptions.
+
+============================================================
+10. ACCOMMODATION VERIFICATION
+============================================================
+
+Accommodation uses enhanced verification.
+
+Separate:
+OPERATOR
+from
+PROPERTY
+
+One operator may manage multiple properties.
+
+Operator:
+- identity
+- contact
+- address verification
+- relationship to property
+
+Property:
+- property name
+- address
+- map location
+- photos
+- evidence of authority to list/manage where legally appropriate
+- amenities
+- availability
+- category-specific evidence
+
+No public property before approval.
+
+============================================================
+11. ADDRESS VERIFICATION
+============================================================
+
+Use the term:
+ADDRESS VERIFICATION
+
+Do NOT imply home ownership is required.
+
+The applicant may rent, live with family, be in student accommodation, etc.
+
+Create configurable accepted evidence types, potentially including:
+- utility bill
+- municipal bill
+- tenancy/lease agreement
+- bank statement/official bank correspondence showing address
+- official government correspondence
+- employer confirmation
+- student accommodation confirmation
+- landlord/property-owner declaration
+- utility bill in family/landlord name + supporting occupancy evidence
+- Musuwo physical verification
+- other Platform Owner-approved evidence
+
+Platform Owner should be able to enable/disable/add/edit accepted verification methods later.
+
+============================================================
+12. ECOCASH / FINANCIAL DOCUMENTS
+============================================================
+
+Do NOT automatically treat raw EcoCash transaction history as proof of address.
+
+If later accepted as supporting evidence:
+- require it to actually support the verification purpose
+- do not collect unnecessary transaction history
+- allow redaction of irrelevant transaction details where appropriate
+- store privately
+- restrict reviewer access
+
+Use data minimization.
+
+============================================================
+13. DISTINCT VERIFICATION STATES
+============================================================
+
+Support separately:
+
+IDENTITY VERIFIED
+ADDRESS VERIFIED
+OPERATING LOCATION VERIFIED
+HANDOVER POINT VERIFIED
+BUSINESS REGISTRATION VERIFIED
+PROPERTY VERIFIED
+
+Do not collapse everything into one “Verified” boolean.
+
+============================================================
+14. CUSTOMER-FACING VERIFICATION
+============================================================
+
+Customer may see:
+- Identity Verified
+- Location Verified
+- Musuwo Approved
+- Business Registration Verified
+- Property Reviewed
+- Handover Point Verified
+
+Only show badges that reflect checks actually completed.
+
+Never expose:
+- ID number
+- ID photo
+- private residence evidence
+- home address
+- private financial documents
+- internal review notes
+
+============================================================
+15. INDIVIDUAL / INFORMAL ENHANCED REVIEW
+============================================================
+
+Individual/informal applicants should use:
+
+ENHANCED VERIFICATION
+
+Workflow:
+SUBMITTED
+→ IDENTITY REVIEW
+→ ADDRESS REVIEW
+→ HANDOVER POINT REVIEW
+→ CATEGORY REVIEW
+→ DUPLICATE / ACCOUNTABILITY CHECK
+→ SUPER ADMIN REVIEW
+→ APPROVED / NEEDS INFORMATION / REJECTED
+
+Do not impose an arbitrary waiting period.
+
+The UI may explain:
+“Individual and informal sellers require additional verification. Review may take longer because Musuwo must verify the person responsible for the account.”
+
+============================================================
+16. APPROVAL REMAINS HUMAN-CONTROLLED
+============================================================
+
+No automatic merchant approval.
+
+Applications are reviewed by authorized Musuwo Super Admins.
+
+Platform Owner retains ultimate authority.
+
+============================================================
+17. MUSUWO FOUNDING CIRCLE
+============================================================
+
+Create:
+
+MUSUWO FOUNDING CIRCLE
+
+This is permanent historical recognition for the first 10 qualifying EXTERNAL providers approved to operate on Musuwo.
+
+MUROORA MART remains separate:
+FOUNDING MERCHANT
+
+Muroora does not need to consume one of the 10 external places.
+
+Qualifying approved providers may include:
+- individual sellers
+- informal SMEs
+- registered businesses
+- service providers
+- accommodation providers
+
+Eligibility is:
+FIRST 10 QUALIFYING PROVIDERS APPROVED
+
+NOT first 10 who register.
+NOT first 10 who create accounts.
+NOT incomplete applications.
+
+============================================================
+18. FOUNDING CIRCLE NUMBERING
+============================================================
+
+Assign:
+01/10
+02/10
+...
+10/10
+
+Example:
+
+MUTARE BOOK CENTRE
+Musuwo Founding Circle
+02 / 10
+Member Since 2026
+
+Assignment must happen transactionally at approval.
+Prevent duplicate slot usage.
+
+Only Platform Owner may manually correct historical Founding Circle assignments.
+
+Normal Super Admins must not fabricate a slot.
+
+============================================================
+19. FOUNDING CIRCLE BENEFITS
+============================================================
+
+Create configurable benefits such as:
+- extended free pilot
+- 0% commission for a defined period
+- discounted first paid year
+- reduced future platform fees
+- priority support
+- free storefront setup
+- launch promotion
+- early feature access
+
+Store:
+- business/provider
+- benefit type
+- value
+- start date
+- end date
+- reason
+- approved_by
+- status
+
+Do NOT permanently rank Founding Circle businesses higher organically.
+
+============================================================
+20. GENERIC BUSINESS RECOGNITION SYSTEM
+============================================================
+
+Create a data-driven badge/recognition backend.
+
+Historical:
+- FOUNDING MERCHANT
+- FOUNDING CIRCLE
+- CATEGORY LAUNCH PARTNER
+
+Trust:
+- IDENTITY VERIFIED
+- LOCATION VERIFIED
+- REGISTERED BUSINESS VERIFIED
+- TRUSTED PROVIDER
+
+Performance:
+- HIGHLY RESPONSIVE
+- RELIABLE FULFILMENT
+- TOP CATEGORY PARTNER
+
+Milestones:
+- 100 ORDERS
+- 500 ORDERS
+- 1,000 ORDERS
+- 1 YEAR ON MUSUWO
+- 5 YEARS ON MUSUWO
+
+Do not hard-code badges directly into merchant cards.
+
+============================================================
+21. PICKUP / HANDOVER POINT MODEL
+============================================================
+
+Musuwo should NOT automatically offer routine home collection from every home-based/informal seller.
+
+Default low-cost model:
+
+SELLER PREPARES ORDER
+→ SELLER TAKES IT TO APPROVED MUSUWO HANDOVER POINT
+→ MUSUWO CONFIRMS HANDOVER
+→ MUSUWO TAKES DELIVERY CUSTODY
+→ DELIVERY
+→ CUSTOMER
+
+This is required to keep logistics cost manageable.
+
+============================================================
+22. FULFILMENT MODES
+============================================================
+
+Support:
+
+A. MERCHANT LOCATION PICKUP
+For established shops/restaurants/physical businesses.
+
+B. MUSUWO HANDOVER POINT
+For home sellers, individuals and informal SMEs where home collection is uneconomical.
+
+C. PREMIUM MERCHANT COLLECTION — FUTURE
+Possible later for an additional fee or where route economics justify it.
+
+Do NOT enable routine home collection by default.
+
+============================================================
+23. PICKUP POINT BACKEND ENTITY
+============================================================
+
+Create/reuse a real backend entity.
+
+Conceptual fields:
+
+pickup_points
+- id
+- public_id
+- name
+- type
+- address
+- city
+- area/suburb
+- latitude
+- longitude
+- operating_hours
+- contact
+- status
+- verification_status
+- accepts_dropoff
+- accepts_rider_collection
+- capacity_notes
+- instructions
+- partner_business_id if relevant
+- created_at
+- updated_at
+
+Potential types:
+- MUSUWO_HUB
+- PARTNER_BUSINESS
+- MUROORA_MART
+- MERCHANT_LOCATION
+- CAMPUS_AREA_PARTNER
+- OTHER_APPROVED_POINT
+
+============================================================
+24. BUSINESS ↔ PICKUP POINT RELATIONSHIP
+============================================================
+
+Create/reuse relationship such as:
+
+business_pickup_points
+
+Potential fields:
+- business_id
+- pickup_point_id
+- status
+- approved_by
+- approved_at
+- primary
+- notes
+
+One business may eventually have multiple approved points.
+For pilot, prefer one primary point.
+
+============================================================
+25. SELLER PICKUP POINT SELECTION — WEB + MOBILE
+============================================================
+
+During onboarding:
+
+SELECT YOUR HANDOVER POINT
+
+Show nearby approved options with:
+- map where available
+- list
+- approximate distance
+- operating hours
+- instructions
+
+If location permission unavailable:
+allow manual area search.
+
+If no serviceable point exists:
+show:
+
+“Delivery cannot be activated yet because there is no approved Musuwo handover point in your area.”
+
+Possible actions:
+- Join Waitlist
+- Select Another Area
+- Contact Musuwo
+
+Do not expose seller home address to customers.
+
+============================================================
+26. SUPER ADMIN PICKUP POINT MANAGEMENT
+============================================================
+
+Browser Super Admin should include:
+
+PICKUP / HANDOVER POINTS
+
+Authorized admins can:
+- create point
+- approve point
+- verify location
+- pause point
+- deactivate point
+- assign businesses
+- view sellers using point
+- view handover volume
+- review incidents
+
+Platform Owner controls higher-level policy.
+
+============================================================
+27. ORDER HANDOVER
+============================================================
+
+For handover-point sellers:
+
+ORDER PLACED
+→ SELLER ACCEPTS
+→ PREPARES
+→ READY FOR HANDOVER
+→ SELLER DELIVERS TO POINT
+→ HANDOVER CONFIRMED
+→ MUSUWO CUSTODY STARTS
+→ OUT FOR DELIVERY
+→ DELIVERED
+→ CUSTODY CLOSED
+
+Handover confirmation may use:
+- QR
+- short code
+- staff confirmation
+
+Record:
+- order
+- seller/business
+- handover point
+- accepting staff/person
+- timestamp
+- package count
+- condition
+- optional photo
+- previous custody
+- new custody
+
+Before confirmed handover:
+SELLER HAS CUSTODY
+
+After confirmed handover:
+MUSUWO HAS DELIVERY CUSTODY
+
+============================================================
+28. HANDOVER DEADLINES
+============================================================
+
+Prepare support for:
+HANDOVER BY [TIME]
+
+This allows future batching and lower delivery cost.
+
+Do not create unrealistic instant pickup promises.
+
+============================================================
+29. MUSUWO POLICY FRAMEWORK
+============================================================
+
+Create VERSIONED policy records for at least:
+
+1. Musuwo Provider Terms
+2. Musuwo Marketplace Standards
+3. Musuwo Verification & Identity Policy
+4. Musuwo Delivery & Handover Policy
+5. Musuwo Privacy Notice
+6. Musuwo Refunds, Cancellations & Disputes Policy
+7. Musuwo Fees & Payments Policy
+8. Musuwo Accommodation Provider Standards
+9. Musuwo Food Seller Standards
+
+Initial versions must be marked internally:
+
+DRAFT — REQUIRES LEGAL REVIEW BEFORE PRODUCTION ENFORCEMENT
+
+Do not pretend these are lawyer-approved.
+
+============================================================
+30. PROVIDER TERMS — DRAFT CONTENT
+============================================================
+
+Draft plain-language sections covering:
+- eligibility
+- accurate identity
+- account responsibility
+- truthful listing information
+- pricing accuracy
+- availability accuracy
+- prohibited goods/services
+- counterfeit/stolen goods
+- customer treatment
+- fulfilment
+- handover requirements
+- verification rights
+- document accuracy
+- suspension/termination
+- investigation/cooperation
+- disputes
+- fees when introduced
+- privacy references
+- intellectual property
+- policy updates/reacceptance
+- governing-law placeholder for Zimbabwe legal review
+
+============================================================
+31. MARKETPLACE STANDARDS — DRAFT CONTENT
+============================================================
+
+Providers must:
+- use truthful descriptions/photos
+- maintain accurate pricing
+- maintain availability
+- treat customers respectfully
+- prepare orders properly
+- use approved handover procedures
+- cooperate with legitimate disputes
+- follow category rules
+
+Prohibit:
+- fake listings
+- fraud
+- impersonation
+- counterfeit goods
+- stolen goods
+- misleading pricing
+- bait-and-switch
+- harassment
+- fake reviews/orders
+- rating manipulation
+- illegal/prohibited goods
+- misuse of customer data
+
+============================================================
+32. VERIFICATION & IDENTITY POLICY — DRAFT CONTENT
+============================================================
+
+Explain:
+- why Musuwo verifies providers
+- provider verification levels
+- mandatory ID for individual sellers
+- holding-ID photo requirement
+- address verification
+- operating location
+- registration verification
+- property verification
+- re-verification
+- document privacy
+- reviewer access
+- retention principles
+- false information consequences
+
+============================================================
+33. DELIVERY & HANDOVER POLICY — DRAFT CONTENT
+============================================================
+
+Cover:
+- Musuwo logistics role
+- merchant preparation
+- approved pickup/handover points
+- no automatic home collection
+- handover deadlines
+- package condition
+- prohibited/dangerous items
+- custody transfer
+- failed handover
+- seller lateness
+- damaged packaging
+- delivery incidents
+- returns
+- proof of handover
+- proof of delivery
+- merchant-branded customer experience
+- Musuwo logistics attribution
+
+============================================================
+34. REFUNDS / CANCELLATIONS / DISPUTES — DRAFT CONTENT
+============================================================
+
+Cover framework for:
+- customer cancellation
+- merchant cancellation
+- unavailable item
+- damaged item
+- wrong item
+- delivery failure
+- non-delivery claims
+- evidence
+- review
+- merchant response
+- refund authority
+- fraud/abuse
+- appeal where applicable
+
+Do not invent unsupported payment/refund automation.
+
+============================================================
+35. POLICY ACCEPTANCE MUST BE VERSIONED
+============================================================
+
+Do NOT store only:
+accepted_terms = true
+
+Create/reuse:
+
+policy_documents
+- id
+- policy_type
+- version
+- title
+- content/reference
+- effective_date
+- status
+- requires_acceptance
+- created_by
+
+policy_acceptances
+- id
+- user_id
+- business_application_id/business_id
+- policy_id
+- policy_version
+- accepted_at
+- acceptance_method
+- source = web/mobile
+- permitted metadata
+
+============================================================
+36. POLICY ACCEPTANCE UI — WEB + MOBILE
+============================================================
+
+During submission show:
+
+REVIEW AND ACCEPT
+
+[ ] Musuwo Provider Terms
+[ ] Marketplace Standards
+[ ] Verification & Identity Policy
+[ ] Delivery & Handover Policy
+[ ] Privacy Notice
+[ ] Refunds, Cancellations & Disputes Policy
+
+Where relevant:
+[ ] Accommodation Provider Standards
+[ ] Food Seller Standards
+
+Each must be readable/openable.
+
+Do not pre-check boxes.
+
+============================================================
+37. POLICY RE-ACCEPTANCE
+============================================================
+
+If a materially updated policy requires reacceptance:
+
+MUSUWO POLICY UPDATE
+
+“Please review and accept the updated terms before continuing certain business operations.”
+
+Keep historical acceptance records.
+
+============================================================
+38. PLATFORM OWNER POLICY CONTROL
+============================================================
+
+Owner-only:
+POLICIES & TERMS
+
+Allow:
+- Create Draft
+- Preview
+- Publish New Version
+- Set Effective Date
+- Require Re-Acceptance
+
+Ordinary Super Admins must not silently rewrite provider contracts.
+
+============================================================
+39. INCIDENT / ACCOUNTABILITY SYSTEM
+============================================================
+
+Every provider can be reported.
+
+Cases may relate to:
+- provider
+- business
+- order
+- listing
+- product
+- service
+- property
+- chat
+- delivery
+- handover
+- customer
+
+States:
+OPEN
+UNDER_REVIEW
+WAITING_FOR_INFORMATION
+RESOLVED
+DISMISSED
+ACTION_TAKEN
+
+Workflow:
+REPORT
+→ CASE CREATED
+→ RECORDS PRESERVED
+→ ADMIN REVIEW
+→ PROVIDER RESPONSE
+→ CUSTOMER EVIDENCE
+→ ORDER/CHAT/HANDOVER REVIEW
+→ RESOLUTION
+
+Possible outcomes:
+NO ACTION
+GUIDANCE
+WARNING
+TEMPORARY RESTRICTION
+SUSPENSION
+PERMANENT REMOVAL
+
+Do not assume guilt from one report.
+
+============================================================
+40. TEMPORARY RESTRICTION
+============================================================
+
+Authorized admin may temporarily restrict:
+- new orders
+- new listings
+- new leads
+
+for serious cases under review.
+
+Must record:
+- reason
+- actor
+- timestamp
+- scope
+- review state
+
+============================================================
+41. REMOVED / BANNED PROVIDERS
+============================================================
+
+Do not simply erase all history.
+
+Public profile may be removed.
+
+Retain internal records according to policy/legal requirements for:
+- audit
+- disputes
+- fraud prevention
+- enforcement history
+
+============================================================
+42. DUPLICATE / REAPPLICATION REVIEW
+============================================================
+
+If a new application appears to match a previously suspended provider using verified identifiers:
+
+POSSIBLE MATCH
+→ MANUAL REVIEW
+
+Do not automatically ban solely from fuzzy matching.
+
+============================================================
+43. FOUNDING CIRCLE DOES NOT PROVIDE IMMUNITY
+============================================================
+
+Founding Circle is historical recognition.
+
+A Founding Circle provider may still be:
+- restricted
+- suspended
+- permanently removed
+
+for serious violations.
+
+Historical status must not override safety.
+
+============================================================
+44. SUPER ADMIN VERIFICATION REVIEW UI
+============================================================
+
+Show:
+
+IDENTITY
+Verified / Pending / Failed
+
+ADDRESS
+Verified / Pending / Needs Info
+
+OPERATING LOCATION
+Verified / Pending
+
+HANDOVER POINT
+Verified / Pending
+
+BUSINESS REGISTRATION
+Verified / Not Applicable / Pending
+
+CATEGORY REQUIREMENTS
+Complete / Pending
+
+POLICIES
+Accepted / Missing
+
+Sensitive docs only visible to admins with explicit permission.
+
+============================================================
+45. PLATFORM OWNER VERIFICATION SETTINGS
+============================================================
+
+Owner-only configuration:
+- accepted ID types
+- accepted address-verification methods
+- required docs by provider type
+- requirements by category
+- whether handover point is mandatory
+- enhanced review rules
+- policy versions
+- Founding Circle settings
+- max Founding Circle count
+- pickup-point eligibility rules
+
+Simple policy changes should not require code edits.
+
+============================================================
+46. WEB APPLICATION REQUIREMENTS
+============================================================
+
+WEB must support:
+- provider-type selection
+- registration wizard
+- draft save
+- uploads
+- address verification
+- pickup-point selection
+- policy acceptance
+- application review
+- submission
+- status
+- needs-information updates
+- approved business portal
+- verification status
+- handover point
+- order handover
+
+Super Admin + Platform Owner remain browser-only.
+
+============================================================
+47. MOBILE APPLICATION REQUIREMENTS
+============================================================
+
+MOBILE must support:
+
+ACCOUNT
+→ REGISTER A BUSINESS / PROVIDER
+
+Then:
+- provider type
+- category
+- business information
+- camera/photo upload
+- ID upload
+- holding-ID photo
+- address evidence upload
+- map/location selection where available
+- pickup point selection
+- policy reading/acceptance
+- draft save
+- submission
+- application status
+- respond to info requests
+- business management after approval
+- handover instructions
+- order readiness
+- handover status
+
+Use mobile-first forms and large touch targets.
+
+============================================================
+48. CAMERA / UPLOAD UX
+============================================================
+
+For ID:
+TAKE PHOTO
+or
+UPLOAD PHOTO
+
+Guidance:
+“Make sure all details are readable.”
+
+For holding-ID image:
+“Take a clear photo of yourself holding the same ID used in your application.”
+
+Do not implement facial recognition unless separately approved.
+
+============================================================
+49. SENSITIVE DOCUMENT STORAGE
+============================================================
+
+Use PRIVATE storage only.
+
+Implement:
+- private buckets
+- signed/server-authorized access
+- file type validation
+- file size limits
+- ownership checks
+- reviewer permissions
+- audit sensitive document access where appropriate
+
+No public verification URLs.
+
+============================================================
+50. SUPER ADMIN PERMISSIONS
+============================================================
+
+Use existing hierarchy:
+
+PLATFORM OWNER = highest authority
+
+Up to 10 active SUPER ADMINS initially.
+
+Permissions may include:
+- applications.review
+- applications.approve
+- applications.reject
+- verification.identity
+- verification.address
+- verification.documents
+- pickup_points.manage
+- cases.review
+- businesses.pause
+- businesses.suspend
+- founding_circle.view
+
+Only Platform Owner controls:
+- admin creation/removal
+- Founding Circle manual correction
+- high-level verification policy
+- policy publication
+- critical platform settings
+
+============================================================
+51. APPLICATION REVIEW CLAIMING
+============================================================
+
+With multiple Super Admins:
+
+UNASSIGNED APPLICATION
+→ CLAIM REVIEW
+
+Show:
+“Currently being reviewed by [Admin]”
+
+Owner can reassign.
+
+Do not hard-lock forever if reviewer goes offline.
+
+============================================================
+52. FOUNDING CIRCLE ADMIN UI
+============================================================
+
+Platform Owner sees:
+
+MUSUWO FOUNDING CIRCLE
+
+Muroora Mart
+Founding Merchant
+
+External:
+01 / 10 — [Provider]
+02 / 10 — [Provider]
+...
+10 / 10 — [Provider]
+
+Show:
+- provider
+- provider type
+- category
+- approval date
+- current status
+- active benefits
+
+============================================================
+53. PICKUP POINT ANALYTICS
+============================================================
+
+Admin may see:
+- active pickup points
+- businesses assigned
+- handovers today
+- failed handovers
+- incident count
+- capacity issues
+- average handover delay where real data exists
+
+Do not fabricate performance data.
+
+============================================================
+54. ANALYTICS EVENTS
+============================================================
+
+Track real events such as:
+- application_started
+- provider_type_selected
+- application_draft_saved
+- document_uploaded
+- application_submitted
+- verification_requested
+- verification_completed
+- application_needs_information
+- application_approved
+- application_rejected
+- pickup_point_selected
+- handover_ready
+- handover_completed
+- custody_transferred
+- policy_viewed
+- policy_accepted
+- founding_circle_assigned
+- case_created
+- provider_restricted
+- provider_restored
+
+Do not collect unnecessary sensitive analytics.
+
+============================================================
+55. OWNER / SUPER ADMIN DASHBOARD
+============================================================
+
+Add cards:
+
+APPLICATIONS
+- individual sellers
+- informal SMEs
+- registered businesses
+- accommodation
+- services
+
+VERIFICATION
+- identity pending
+- address pending
+- handover point pending
+- needs information
+
+PICKUP POINTS
+- active
+- sellers assigned
+- handovers today
+- issues
+
+FOUNDING CIRCLE
+- X / 10 filled
+
+SAFETY
+- open cases
+- restricted providers
+
+============================================================
+56. LOW-BANDWIDTH DESIGN
+============================================================
+
+Optimize web + mobile:
+- safe image compression
+- upload progress
+- retry failed uploads
+- save drafts
+- lazy loading
+- minimal API calls
+- avoid heavy animation
+
+Do NOT reduce ID images until text becomes unreadable.
+
+============================================================
+57. USER-FRIENDLY LANGUAGE
+============================================================
+
+Avoid unnecessary jargon such as:
+KYC
+Entity Verification
+Risk Engine
+
+Prefer:
+Verify your identity
+Verify your address
+Choose a handover point
+Review your application
+Musuwo is reviewing your application
+
+============================================================
+58. SERVER-SIDE COMPLETENESS VALIDATION
+============================================================
+
+Do not rely only on frontend required fields.
+
+Server/database must validate:
+- provider type
+- mandatory fields
+- mandatory document presence
+- current required policy acceptances
+- pickup point requirement
+- business category
+- application ownership
+- valid state transitions
+- approval permissions
+
+Implement a server-authoritative completeness evaluator.
+
+Example:
+
+Application Completeness: 87%
+
+Missing:
+- Address verification
+- Delivery & Handover Policy acceptance
+
+SUBMIT disabled until complete.
+
+Requirements must be dynamic by provider type/category.
+
+============================================================
+59. DATA ACCESS / RLS
+============================================================
+
+CUSTOMER:
+public approved provider data only
+
+APPLICANT:
+own application, uploads and status
+
+BUSINESS OWNER:
+own business and relevant operational records
+
+SUPER ADMIN:
+records allowed by granular permissions
+
+PLATFORM OWNER:
+highest platform application-level permissions
+
+SENSITIVE DOCUMENTS:
+authorized verification reviewers only
+
+PICKUP POINTS:
+separate public operational data from private admin fields
+
+============================================================
+60. MUSUWO DELIVERY BRANDING — PRESERVE
+============================================================
+
+MUSUWO handles eligible delivery infrastructure.
+
+Customer-facing order remains merchant-branded.
+
+Example:
+
+TARIRO'S KITCHEN
+
+Your order is out for delivery.
+
+Secondary:
+Delivery coordinated by Musuwo
+
+Do not change this rule.
+
+============================================================
+61. PUBLIC RIDER RECRUITMENT
+============================================================
+
+Keep:
+
+BECOME A MUSUWO RIDER
+COMING SOON
+
+Internal delivery/logistics may continue in controlled mode.
+
+Do not open unrestricted public rider signup.
+
+============================================================
+62. TESTING — INDIVIDUAL SELLER
+============================================================
+
+Test:
+1. Individual can start application without documents.
+2. Draft saves.
+3. Cannot submit without ID.
+4. Cannot submit without holding-ID photo.
+5. Cannot submit without address verification.
+6. Cannot submit without required policy acceptance.
+7. Cannot submit without handover point where required.
+8. Submitted seller is not public.
+9. Authorized admin can review identity.
+10. Unauthorized admin cannot view ID.
+11. Applicant cannot self-approve.
+12. Approval activates business.
+13. Private home address never appears publicly.
+14. Handover point appears correctly to approved seller.
+
+============================================================
+63. TESTING — INFORMAL SME
+============================================================
+
+Test:
+- can apply without company-registration docs
+- responsible owner identity mandatory
+- address verification mandatory
+- does not receive Registered Business Verified badge
+- can receive Identity Verified / Location Verified
+- approved business becomes public only after review
+
+============================================================
+64. TESTING — REGISTERED BUSINESS
+============================================================
+
+Test:
+- registration fields appear
+- registration evidence required where configured
+- representative identity required
+- verified registration can produce Business Registration Verified
+- unverified claim cannot produce badge
+
+============================================================
+65. TESTING — PICKUP POINTS
+============================================================
+
+Test:
+1. Home seller cannot enable standard delivery without required handover arrangement.
+2. Seller can select approved point.
+3. Suspended point cannot be selected.
+4. Handover creates custody event.
+5. Seller custody ends only when handover confirmed.
+6. Musuwo custody starts exactly once.
+7. Duplicate handover is idempotent.
+8. Customer cannot access seller home address.
+9. Admin can reassign point.
+10. Handover history is auditable.
+
+============================================================
+66. TESTING — POLICIES
+============================================================
+
+Test:
+- checkboxes not preselected
+- required policies must be accepted
+- acceptance stores version
+- updated required policy can trigger reacceptance
+- old acceptance remains in history
+- applicant cannot fake acceptance client-side
+- unpublished drafts are not enforced
+
+============================================================
+67. TESTING — FOUNDING CIRCLE
+============================================================
+
+Test:
+1. Muroora remains Founding Merchant separately.
+2. First qualifying external approved provider receives 01/10.
+3. Slots assigned only after approval.
+4. Rejected application receives no slot.
+5. Duplicate approval does not consume another slot.
+6. Only 10 slots.
+7. 11th qualifying provider does not receive Founding Circle.
+8. Super Admin cannot manually fabricate slot.
+9. Platform Owner can correct mistaken assignment with audit trail.
+10. Founding Circle status does not automatically alter organic ranking.
+
+============================================================
+68. TESTING — CASES / ACCOUNTABILITY
+============================================================
+
+Test:
+- customer can report provider
+- report does not auto-convict
+- case is created
+- authorized admin can review
+- temporary restriction is logged
+- restoration is logged
+- removed provider public profile is disabled appropriately
+- internal history remains according to policy
+- duplicate/reapplication match triggers manual review, not auto-ban
+
+============================================================
+69. REGRESSION TESTS
+============================================================
+
+Verify:
+- Musuwo web app works
+- Musuwo mobile app works
+- Muroora Mart works
+- existing customers remain
+- existing orders remain
+- inventory remains
+- delivery architecture remains
+- rider backend remains
+- chat/contact gating remains
+- accommodation remains
+- Super Admin system remains
+- Platform Owner controls remain
+- current branding remains
+
+============================================================
+70. IMPLEMENTATION ORDER
+============================================================
+
+PHASE 1 — AUDIT
+
+PHASE 2 — BACKEND VERIFICATION FOUNDATION
+- provider types
+- verification requirements
+- document metadata
+- address evidence
+- policy model
+- completeness rules
+
+PHASE 3 — WEB + MOBILE ONBOARDING
+- provider type
+- forms
+- uploads
+- drafts
+- policies
+- submit
+
+PHASE 4 — ADMIN REVIEW
+- enhanced review
+- verification dashboard
+- permissions
+
+PHASE 5 — PICKUP / HANDOVER NETWORK
+- pickup point backend
+- assignment
+- seller selection
+- handover/custody
+
+PHASE 6 — FOUNDING CIRCLE
+- recognition backend
+- numbering
+- benefits
+- owner controls
+
+PHASE 7 — POLICIES
+- draft policy content
+- versioning
+- acceptance
+- owner publishing
+
+PHASE 8 — CASES / ACCOUNTABILITY
+- reports
+- restrictions
+- investigation
+- reapplication review
+
+PHASE 9 — HARDENING
+- RLS
+- authorization
+- file security
+- tests
+- regression
+- web/mobile parity
+
+============================================================
+71. REQUIRED FIRST RESPONSE FROM CLAUDE
+============================================================
+
+Before implementation, report:
+
+1. Existing business-application architecture.
+2. Existing provider/business-type architecture.
+3. Existing verification structures.
+4. Existing sensitive-storage setup.
+5. Current onboarding requirements.
+6. Current web onboarding.
+7. Current mobile onboarding.
+8. Current Super Admin review flow.
+9. Current Platform Owner permissions.
+10. Current delivery/handover architecture.
+11. Whether pickup points already exist.
+12. Current policy/terms acceptance implementation.
+13. Current incident/case architecture.
+14. Current badges/recognition structure.
+15. Proposed backend tables/changes.
+16. Proposed RLS changes.
+17. Proposed upload/storage changes.
+18. How individual sellers will be verified.
+19. How address verification remains configurable.
+20. How holding-ID evidence will be stored securely.
+21. How seller home address stays private.
+22. How pickup points will work.
+23. How home collection remains unavailable by default.
+24. How Founding Circle numbering is transactionally safe.
+25. How policy versioning works.
+26. How web/mobile share the same backend.
+27. What existing code will be reused.
+28. What remains untouched.
+29. Which changes require Platform Owner approval.
+30. Confirmation that no new paid service is required unless explicitly explained.
+
+Explain technical issues in PLAIN ENGLISH.
+
+============================================================
+72. FINAL NON-NEGOTIABLES
+============================================================
+
+1. FULL STACK: BACKEND + WEB + MOBILE.
+2. ONE SHARED BACKEND.
+3. MUSUWO = PLATFORM.
+4. MUROORA MART = FOUNDING MERCHANT.
+5. INDIVIDUAL/INFORMAL SELLERS MAY APPLY WITHOUT A REGISTERED COMPANY.
+6. INFORMAL DOES NOT MEAN ANONYMOUS.
+7. INDIVIDUAL IDENTITY VERIFICATION IS MANDATORY BEFORE SUBMISSION.
+8. HOLDING-ID PHOTO IS MANDATORY FOR INDIVIDUAL SELLERS.
+9. ADDRESS VERIFICATION IS MANDATORY FOR INDIVIDUAL SELLERS.
+10. STARTING AN APPLICATION DOES NOT REQUIRE ALL DOCUMENTS.
+11. SUBMISSION DOES REQUIRE ALL MANDATORY REQUIREMENTS.
+12. OPERATING REQUIRES MUSUWO APPROVAL.
+13. PRIVATE RESIDENTIAL ADDRESS MUST NEVER BE EXPOSED TO CUSTOMERS.
+14. ECOCASH TRANSACTION HISTORY IS NOT AUTOMATIC PROOF OF ADDRESS.
+15. VERIFICATION METHODS MUST BE CONFIGURABLE.
+16. HOME COLLECTION IS NOT THE DEFAULT LOW-COST FULFILMENT MODEL.
+17. HOME/INFORMAL SELLERS USE APPROVED MUSUWO HANDOVER POINTS WHERE REQUIRED.
+18. CUSTODY TRANSFER MUST BE RECORDED.
+19. FIRST 10 QUALIFYING EXTERNAL APPROVED PROVIDERS MAY JOIN MUSUWO FOUNDING CIRCLE.
+20. FOUNDING CIRCLE STATUS IS HISTORICAL, NOT PERMANENT SEARCH PRIORITY.
+21. POLICIES MUST BE VERSIONED.
+22. POLICY ACCEPTANCE MUST STORE EXACT VERSION + TIME.
+23. NO PRE-CHECKED POLICY BOXES.
+24. INITIAL POLICIES MUST BE CREATED AS DRAFTS REQUIRING LEGAL REVIEW.
+25. INCIDENT REPORTING MUST BE FAIR AND AUDITABLE.
+26. FOUNDING PROVIDERS ARE NOT IMMUNE FROM SUSPENSION.
+27. PLATFORM OWNER CONTROLS CRITICAL POLICIES, FOUNDING CIRCLE AND ADMIN RIGHTS.
+28. SUPER ADMINS REVIEW ACCORDING TO GRANULAR PERMISSIONS.
+29. SENSITIVE DOCUMENTS MUST BE PRIVATE.
+30. RLS + SERVER-SIDE AUTHORIZATION ARE MANDATORY.
+31. PUBLIC RIDER RECRUITMENT REMAINS COMING SOON.
+32. MUSUWO DELIVERY REMAINS PLATFORM-LEVEL WITH MERCHANT-FACING BRANDING.
+33. PRESERVE EXISTING WORK.
+34. DO NOT DUPLICATE SYSTEMS.
+35. DO NOT PERFORM DESTRUCTIVE MIGRATIONS WITHOUT PERMISSION.

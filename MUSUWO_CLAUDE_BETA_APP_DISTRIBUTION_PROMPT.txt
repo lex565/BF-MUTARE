@@ -1,0 +1,110 @@
+MUSUWO — CLAUDE BETA APP DISTRIBUTION PROMPT
+
+Use the complete implementation specification from my immediately preceding message in this conversation titled:
+“MUSUWO — ADD MOBILE APP BETA DISTRIBUTION TO THE EXISTING WEBSITE”.
+
+IMPORTANT: Implement the complete specification, not only the summary below.
+
+CORE REQUIREMENTS
+
+1. Modify the EXISTING Musuwo project. Do not rebuild or create duplicate systems.
+2. Preserve Musuwo branding, Muroora Mart, marketplace, onboarding, Founding Circle, verification, pickup/handover, delivery, accommodation, customer/merchant accounts, Super Admin, Platform Owner, Supabase data, and the existing mobile app.
+3. Create a public /beta page for mobile app testing.
+4. Add a tasteful dismissible website banner/card linking to /beta.
+5. Android should support an active beta download destination controlled from the backend.
+6. iOS should show “Coming Soon” until a real TestFlight URL is configured.
+7. Never invent a TestFlight URL.
+8. Do not hard-code APK/build URLs in UI components.
+9. Create/reuse centralized beta release configuration with platform, version, build number, release date, download URL, release notes, minimum supported version, status, mandatory update, file size, timestamps, etc.
+10. Platform Owner browser control center must include Mobile App → Beta Releases.
+11. Platform Owner can add releases, update URLs, publish/deprecate/block builds, configure minimum supported versions, mandatory updates, iOS/TestFlight later, and enable/disable public beta.
+12. Use granular Super Admin release permissions; not every Super Admin may publish builds.
+13. Create Musuwo-controlled routes such as /beta/android and /beta/ios that redirect to the currently approved distribution destination.
+14. Desktop /beta may show QR codes pointing to Musuwo-controlled routes.
+15. Show current version, release date, release notes and optional known issues. Never fabricate values.
+16. Include safe Android installation instructions and tell users to install only from the official Musuwo beta page.
+17. Add beta feedback/reporting. Security concerns must be private.
+18. Support controlled cybersecurity testing without exposing service-role keys, private env vars, owner credentials, ID-document buckets or admin secrets.
+19. Preserve development, staging/beta and production separation.
+20. Prepare mobile app version checking against trusted backend configuration.
+21. Optional newer release → Update / Later.
+22. Blocked or below-minimum release → Update Required.
+23. Platform Owner must be able to block an unsafe release after a security issue.
+24. Add privacy-conscious beta analytics if compatible with existing analytics.
+25. Design /beta so Android Beta can later become Google Play and iOS TestFlight can later become App Store without redesign.
+26. Do not store APK binaries directly in PostgreSQL.
+27. Keep the page responsive, accessible and consistent with Musuwo.
+
+COST CONTROL — NON-NEGOTIABLE
+
+During pilot/testing:
+- Keep Vercel on the free tier where practical and within limits.
+- Keep Supabase on the free tier where practical and within limits.
+- Namecheap is primarily being used for the musuwo.online domain.
+- Do NOT migrate the entire application to Namecheap hosting merely because the domain is registered there.
+- Domain registration and application hosting are separate concerns.
+- musuwo.online can point to the existing web deployment.
+- Do not introduce unnecessary paid infrastructure.
+- Only recommend a paid upgrade for a concrete reason such as real usage limits, storage, bandwidth, backups, production reliability, security, compliance or performance.
+- BEFORE adding any new paid dependency, STOP and explain its cost, why it is needed, and whether a free alternative exists.
+
+TESTING
+
+Test:
+- /beta desktop/mobile
+- active Android download
+- missing release handling
+- iOS Coming Soon
+- future TestFlight activation
+- QR redirects
+- dismissible beta banner
+- Platform Owner release controls
+- unauthorized publishing blocked
+- deprecated/blocked release behavior
+- optional and mandatory mobile update behavior
+- beta feedback
+- private security reports
+- existing web/mobile functionality
+- Supabase RLS
+- Muroora Mart
+- business onboarding
+- no frontend secrets
+
+FIRST RESPONSE BEFORE IMPLEMENTATION
+
+Before changing code, audit and report:
+1. Existing web deployment.
+2. Existing mobile build system.
+3. Whether Expo/EAS is used.
+4. Existing environment structure.
+5. Existing release/version infrastructure.
+6. Existing feedback/support.
+7. Existing analytics.
+8. Existing admin release permissions.
+9. Existing beta release configuration.
+10. What will be reused.
+11. What backend additions are genuinely required.
+12. Whether any paid service would be required.
+13. How /beta will work.
+14. How Android distribution will work.
+15. How iOS/TestFlight will be added later.
+16. How version blocking will work.
+17. How existing systems will be protected.
+
+FINAL REQUIREMENT
+
+This is not merely a website design task.
+
+Implement:
+BACKEND
++ DATABASE/RLS WHERE REQUIRED
++ PLATFORM OWNER RELEASE MANAGEMENT
++ WEB BETA PAGE
++ MOBILE VERSION CHECKING
++ ANDROID BETA DISTRIBUTION
++ FUTURE IOS/TESTFLIGHT SUPPORT
++ FEEDBACK
++ SECURITY CONTROLS
++ TESTS
+
+Preserve the existing Musuwo architecture and functionality.
