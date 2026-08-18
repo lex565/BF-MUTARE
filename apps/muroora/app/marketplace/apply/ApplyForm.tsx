@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import { useFormStatus } from 'react-dom'
 
 import {
@@ -142,6 +142,61 @@ function Checklist({ readiness }: { readiness: Readiness }) {
 
 /* ------------------------------------------------------------ uploads */
 
+/**
+ * Shrink a photo in the browser before it is sent.
+ *
+ * WHY THIS IS WORTH THIRTY LINES. A photo of an ID off any modern phone is
+ * 2-4 MB. Sending that over mobile data in Mutare is slow, costs the person
+ * money by the megabyte, and fails often enough that they give up - and it was
+ * also being rejected outright by Next's 1 MB server-action limit, which is
+ * the bug that made this form impossible to finish.
+ *
+ * A 1600px JPEG is a few hundred KB and is far more than enough to read an ID
+ * number off. So the upload is usually ten times smaller and ten times more
+ * likely to arrive.
+ *
+ * FALLS BACK TO THE ORIGINAL, deliberately, whenever the browser cannot decode
+ * the file: PDFs, HEIC on most desktops, anything unexpected. Refusing those
+ * would mean an iPhone user simply cannot apply, which is far worse than
+ * sending a larger file. The 12 MB server limit covers that case.
+ */
+async function shrinkImage(file: File): Promise<File> {
+  if (!file.type.startsWith('image/')) return file
+  // Already small enough to not be worth the risk of re-encoding.
+  if (file.size < 600 * 1024) return file
+
+  try {
+    const bitmap = await createImageBitmap(file)
+    const MAX = 1600
+    const scale = Math.min(1, MAX / Math.max(bitmap.width, bitmap.height))
+    if (scale === 1 && file.size < 2 * 1024 * 1024) return file
+
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(bitmap.width * scale)
+    canvas.height = Math.round(bitmap.height * scale)
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return file
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    bitmap.close()
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      // 0.85 keeps an ID number crisply readable. Lower starts to mush the
+      // small print, which is the only part that matters here.
+      canvas.toBlob(resolve, 'image/jpeg', 0.85),
+    )
+    if (!blob || blob.size >= file.size) return file
+
+    return new File([blob], 'upload.jpg', { type: 'image/jpeg' })
+  } catch {
+    // Cannot decode it. Send what they chose.
+    return file
+  }
+}
+
+/** 8MB, matching the server. Checked here so the message arrives instantly. */
+const MAX_UPLOAD = 8 * 1024 * 1024
+
 function Upload({
   applicationId,
   kind,
@@ -156,6 +211,48 @@ function Upload({
   done: boolean
 }) {
   const [state, act] = useActionState<ApplyState, FormData>(uploadAction, {})
+  const [busy, setBusy] = useState(false)
+  const [problem, setProblem] = useState<string | null>(null)
+
+  /**
+   * Intercepted rather than a plain form action, because the file has to be
+   * shrunk before it is sent. Submitting the raw input is what produced a
+   * failed request with no explanation.
+   */
+  const send = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setProblem(null)
+
+    const form = event.currentTarget
+    const input = form.elements.namedItem('file') as HTMLInputElement
+    const chosen = input.files?.[0]
+
+    if (!chosen || chosen.size === 0) {
+      setProblem('Choose a file first.')
+      return
+    }
+
+    setBusy(true)
+    try {
+      const file = await shrinkImage(chosen)
+
+      if (file.size > MAX_UPLOAD) {
+        setProblem(
+          `That file is ${(file.size / 1024 / 1024).toFixed(1)}MB, and the limit is 8MB. Take a photo rather than sending a scan, or send a smaller PDF.`,
+        )
+        return
+      }
+
+      const data = new FormData()
+      data.set('applicationId', applicationId)
+      data.set('kind', kind)
+      data.set('file', file)
+      act(data)
+      form.reset()
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <div className="border border-rule bg-paper p-5">
@@ -164,20 +261,29 @@ function Upload({
         {done && <span className="chip chip-live">Received</span>}
       </div>
       {note && <p className="mt-2 text-small text-ink-soft">{note}</p>}
+
+      {problem && (
+        <p role="alert" className="my-4 border-l-4 border-accent bg-accent-wash px-5 py-4 text-small">
+          {problem}
+        </p>
+      )}
       <Say state={state} />
-      <form action={act} className="mt-4 flex flex-wrap items-center gap-3">
-        <input type="hidden" name="applicationId" value={applicationId} />
-        <input type="hidden" name="kind" value={kind} />
+
+      <form onSubmit={send} className="mt-4 flex flex-wrap items-center gap-3">
         <input
           type="file"
           name="file"
           required
-          // capture lets a phone open the camera directly, which is how most
-          // of these will actually be taken.
           accept="image/*,application/pdf"
           className="max-w-full text-small"
         />
-        <Submit label={done ? 'Replace' : 'Upload'} className="cc-btn bg-support px-6 py-3 font-mono text-micro font-bold uppercase tracking-label text-white transition-colors hover:bg-ink" />
+        <button
+          type="submit"
+          disabled={busy}
+          className="bg-support px-6 py-3 font-mono text-micro font-bold uppercase tracking-label text-white transition-colors hover:bg-ink disabled:opacity-60"
+        >
+          {busy ? 'Preparing…' : done ? 'Replace' : 'Upload'}
+        </button>
       </form>
     </div>
   )

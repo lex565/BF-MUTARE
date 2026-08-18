@@ -25,6 +25,7 @@
     "platform:whoami": "node --env-file=.env.local db/platform-whoami.mjs",
     "db:clear-checks": "node --env-file=.env.local db/clear-check-data.mjs",
     "db:verify-applications": "tsx --env-file=.env.local db/verify-applications.mts",
+    "storage:setup": "node --env-file=.env.local db/setup-storage.mjs",
     "db:verify-registration": "tsx --env-file=.env.local db/verify-registration.mts",
     "db:verify-releases": "tsx --env-file=.env.local db/verify-releases.mts",
     "db:verify-badge": "tsx --env-file=.env.local db/verify-verification.mts",
