@@ -19,8 +19,11 @@
     "db:verify-access": "tsx --env-file=.env.local db/verify-access.mts",
     "db:verify-riders": "tsx --env-file=.env.local db/verify-riders.mts",
     "db:verify-marketplace": "tsx --env-file=.env.local db/verify-marketplace.mts",
+    "db:apply": "node --env-file=.env.local db/apply-migration.mjs",
     "db:grant": "tsx --env-file=.env.local db/grant-role.ts",
     "auth:email": "node --env-file=.env.local db/apply-auth-email.mjs",
+    "platform:whoami": "node --env-file=.env.local db/platform-whoami.mjs",
+    "db:verify-platform": "tsx --env-file=.env.local db/verify-platform.mts",
     "db:verify-email": "tsx db/verify-email-policy.mts"
   },
   "dependencies": {

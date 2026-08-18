@@ -1,0 +1,1598 @@
+MUSUWO — CLAUDE FULL-STACK BUSINESS ONBOARDING + BACKEND + SUPER ADMIN CONTROL CENTER PROMPT
+
+ROLE
+
+You are now responsible for implementing BOTH the BACKEND and the FRONTEND required to complete Musuwo's business-registration, approval, marketplace administration, and owner-level control system.
+
+This is a FULL-STACK implementation task.
+
+You must inspect the EXISTING Musuwo/Muroora codebase first and build ON TOP OF what already exists.
+
+DO NOT rebuild Musuwo from scratch.
+DO NOT create a second Supabase project.
+DO NOT duplicate existing authentication, customers, businesses, orders, inventory, delivery, riders, messaging, listings, analytics, or storage systems.
+DO NOT destroy existing data.
+DO NOT perform destructive migrations without explicitly explaining them first.
+
+The existing Muroora/Musuwo technical foundation must be preserved and evolved.
+
+============================================================
+1. CORE PRODUCT HIERARCHY — DO NOT CHANGE THIS
+============================================================
+
+MUSUWO = THE PARENT PLATFORM
+
+MUROORA MART = FOUNDING MERCHANT / BUSINESS #001 INSIDE MUSUWO
+
+OTHER BUSINESSES = APPROVED BUSINESSES / MERCHANTS / SERVICE PROVIDERS INSIDE MUSUWO
+
+MUSUWO handles:
+- customer marketplace
+- business onboarding
+- approval
+- search
+- discovery
+- platform administration
+- analytics
+- ranking
+- business monitoring
+- lead/contact systems
+- delivery infrastructure
+- future rider network
+- platform trust/safety
+
+Muroora Mart retains:
+- Muroora branding
+- products
+- inventory
+- staff
+- merchant-specific fulfilment
+- merchant-specific customer identity
+
+============================================================
+2. THIS TASK MUST INCLUDE THE BACKEND
+============================================================
+
+Do not stop at UI mockups.
+
+Implement the backend structures, database migrations, server actions/API endpoints, Supabase RLS policies, role checks, storage rules, audit logs, and required business logic.
+
+For every major feature, provide:
+
+FRONTEND
++
+BACKEND
++
+DATABASE
++
+AUTHORIZATION
++
+VALIDATION
++
+AUDIT LOGGING
++
+TESTS
+
+If an equivalent backend structure already exists, reuse and extend it.
+
+============================================================
+3. FIRST ACTION — FULL CODEBASE AUDIT
+============================================================
+
+Before major implementation, inspect:
+
+- repository structure
+- web app
+- mobile app
+- Supabase configuration
+- schema/migrations
+- authentication
+- user profile model
+- roles
+- existing admin architecture
+- Muroora merchant data
+- business/merchant tables
+- business applications
+- products/listings
+- inventory
+- orders
+- delivery
+- riders
+- chat/messages
+- storage buckets
+- RLS policies
+- audit logs
+- analytics/events
+- feature flags
+- demo/seed data
+- current merchant profile preview
+- current business registration screens
+
+Classify each relevant item:
+
+IMPLEMENTED
+PARTIALLY IMPLEMENTED
+NOT IMPLEMENTED
+NEEDS REVIEW
+
+Then explain in PLAIN ENGLISH what you are going to change.
+
+============================================================
+4. ADMIN HIERARCHY — IMPORTANT
+============================================================
+
+Musuwo must have TWO levels of platform administration.
+
+LEVEL A — MUSUWO OWNER / ROOT SUPER ADMIN
+
+This is the highest level.
+
+This role represents the actual owner/controller of Musuwo.
+
+There should initially be only ONE primary owner-level account unless the owner explicitly adds another.
+
+Suggested internal role name:
+
+platform_owner
+
+or:
+
+root_super_admin
+
+This account has ultimate platform authority.
+
+LEVEL B — MUSUWO SUPER ADMINS
+
+Allow up to 10 active Super Admin / Reviewer accounts initially.
+
+Suggested role:
+
+super_admin
+
+These people may help review businesses, moderate listings, inspect reports, monitor platform operations, and perform approved administrative work.
+
+THEY MUST NOT HAVE THE SAME POWER AS THE PLATFORM OWNER.
+
+============================================================
+5. PLATFORM OWNER — UNIQUE POWERS
+============================================================
+
+The PLATFORM OWNER should be able to:
+
+- create/invite Super Admins
+- deactivate/remove Super Admins
+- control Super Admin permissions
+- see all Super Admin activity
+- manage platform-wide settings
+- manage ranking/search configuration
+- manage business-approval policies
+- manage plans/commission configuration
+- manage security-sensitive platform settings
+- manage owner-level feature flags
+- manage high-risk suspensions/restorations
+- manage platform roles
+- access full audit logs
+- inspect system health
+- manage sensitive verification access
+- perform emergency platform actions
+- revoke admin sessions if infrastructure supports it
+- control who may approve businesses
+- control who may see sensitive documents
+
+The owner should be the only role allowed to grant or revoke SUPER ADMIN status.
+
+============================================================
+6. SUPER ADMIN — LIMITED BUT POWERFUL
+============================================================
+
+Super Admins may be allowed to:
+
+- review business applications
+- approve businesses if granted approval permission
+- request more information
+- reject applications if granted permission
+- review merchant profiles
+- review accommodation/property applications
+- review business verification
+- inspect reports
+- moderate listings
+- review safety cases
+- monitor business performance
+- monitor search quality
+- view marketplace analytics
+- communicate with businesses
+- pause suspicious listings where authorized
+
+Super Admins MUST NOT automatically be allowed to:
+
+- create another Super Admin
+- grant themselves permissions
+- remove the Platform Owner
+- change owner role
+- access secrets/service-role keys
+- modify production environment secrets
+- alter billing/payment credentials
+- erase audit logs
+- disable owner access
+- bypass all RLS
+- silently change ranking to favor arbitrary merchants
+- access sensitive verification documents unless explicitly granted
+
+============================================================
+7. SUPER ADMIN LIMIT
+============================================================
+
+Initially enforce:
+
+MAX_ACTIVE_SUPER_ADMINS = 10
+
+The Platform Owner should be able to change this later through secure configuration if needed.
+
+When trying to add an 11th active Super Admin:
+
+- block creation/activation
+- explain the limit
+- allow owner to deactivate an existing Super Admin first
+
+Do not hard-code this everywhere.
+
+Keep it as a central platform setting/configuration.
+
+============================================================
+8. GRANULAR SUPER ADMIN PERMISSIONS
+============================================================
+
+Do not make every Super Admin identical.
+
+Prepare permissions such as:
+
+business_applications.review
+business_applications.approve
+business_applications.reject
+
+businesses.view
+businesses.pause
+businesses.suspend
+
+accommodation.review
+accommodation.verify
+
+listings.moderate
+
+reports.review
+cases.manage
+
+analytics.view
+search_monitor.view
+
+business_messages.send
+
+sensitive_documents.view
+
+delivery_monitor.view
+
+ranking_monitor.view
+
+Only the Platform Owner may assign/remove these permissions initially.
+
+Use existing permission architecture if available.
+
+============================================================
+9. ADMIN ACCOUNT CREATION
+============================================================
+
+There must NOT be a public:
+
+REGISTER AS SUPER ADMIN
+
+flow.
+
+Correct flow:
+
+PLATFORM OWNER
+→ SUPER ADMIN MANAGEMENT
+→ INVITE ADMIN
+→ enter email/account
+→ select permissions
+→ send invitation / link account
+→ account accepts
+→ admin becomes active
+
+If email invitation infrastructure is not appropriate yet:
+
+allow the Platform Owner to securely promote an existing verified Musuwo account.
+
+Still record:
+
+- who granted role
+- when
+- permissions
+- account
+- activation state
+
+============================================================
+10. ADMIN STATUS
+============================================================
+
+Support:
+
+INVITED
+ACTIVE
+SUSPENDED
+DEACTIVATED
+
+The Platform Owner should be able to deactivate access immediately.
+
+Do not delete historical admin activity when deactivating an admin.
+
+============================================================
+11. UNIQUE SUPER ADMIN WEB PORTAL
+============================================================
+
+The full administration system is WEB/BROWSER ONLY.
+
+Do NOT expose the full Platform Owner or Super Admin portal inside the customer mobile app.
+
+Possible routes:
+
+/super-admin
+
+and for owner-specific controls:
+
+/super-admin/platform
+
+or:
+
+/super-admin/owner
+
+Use the existing routing architecture.
+
+Unauthorized users must receive Access Denied / redirect.
+
+============================================================
+12. COOL SUPER ADMIN DESIGN
+============================================================
+
+The Super Admin interface should look premium and purpose-built for Musuwo.
+
+Do NOT create a generic Bootstrap-looking dashboard.
+
+Design direction:
+
+MUSUWO CONTROL CENTER
+
+Visual identity:
+- Musuwo branding
+- dark charcoal / near-black navigation
+- warm cream/light workspace backgrounds
+- Musuwo green/earth tones where appropriate
+- subtle gold/orange accent where consistent with current branding
+- clean modern typography
+- generous spacing
+- responsive cards
+- clear visual hierarchy
+- elegant charts where charts are genuinely useful
+- subtle rounded corners
+- professional but not corporate-bank boring
+
+Think:
+modern marketplace command center
++
+Zimbabwe-born technology platform
++
+premium operational dashboard
+
+Do not overuse gradients.
+Do not use excessive glassmorphism.
+Do not use giant decorative elements that reduce usability.
+
+============================================================
+13. SUPER ADMIN LAYOUT
+============================================================
+
+Desktop layout recommendation:
+
+LEFT SIDEBAR
+
+MUSUWO logo
+
+Overview
+
+Business Applications
+Businesses
+Accommodation
+Listings
+Orders
+Delivery
+Customers
+
+Search & Discovery
+Algorithms / Ranking
+Analytics
+
+Reports & Safety
+Early Partners
+Plans / Benefits
+Business Messages
+
+Admins
+Audit Logs
+Settings
+
+The "Admins" section should only be visible to Platform Owner.
+
+TOP BAR:
+
+- global search
+- notifications
+- admin identity
+- current role
+- quick actions
+- secure logout
+
+MAIN CONTENT:
+
+Operational dashboard.
+
+============================================================
+14. OWNER VISUAL DISTINCTION
+============================================================
+
+When logged in as PLATFORM OWNER, display a subtle:
+
+PLATFORM OWNER
+
+badge.
+
+Do not call it "Super Super Admin" in production UI.
+
+Use professional terminology:
+
+Platform Owner
+
+Root Administrator
+
+Founder / Platform Owner
+
+Recommended user-facing title:
+
+PLATFORM OWNER
+
+Internal role may be:
+
+root_super_admin
+
+============================================================
+15. SUPER ADMIN OVERVIEW DASHBOARD
+============================================================
+
+Create a useful overview.
+
+TOP CARDS:
+
+BUSINESS APPLICATIONS
+Pending Review: X
+
+ACTIVE BUSINESSES
+X
+
+ORDERS TODAY
+X
+
+DELIVERIES TODAY
+X
+
+OPEN SAFETY CASES
+X
+
+ZERO-RESULT SEARCHES
+X
+
+SECONDARY:
+
+Marketplace activity trend
+
+New businesses
+
+Top categories
+
+Search demand
+
+Merchant health warnings
+
+Accommodation enquiries
+
+Delivery issues
+
+Recent admin activity
+
+Do not fabricate metrics.
+
+Use real database queries.
+
+If no data exists:
+show zero/empty states honestly.
+
+============================================================
+16. BUSINESS APPLICATION REGISTRATION — WEB + MOBILE
+============================================================
+
+Fix business registration so it is accessible from BOTH:
+
+WEB
+MOBILE
+
+Customer/account entry:
+
+REGISTER A BUSINESS
+
+Business application flow:
+
+1. BUSINESS TYPE
+2. BUSINESS INFORMATION
+3. LOCATION
+4. BRANDING
+5. VERIFICATION
+6. REVIEW
+7. SUBMIT
+
+============================================================
+17. BUSINESS TYPE SELECTION
+============================================================
+
+Options:
+
+RETAIL / SHOP
+
+FOOD / RESTAURANT / TAKEAWAY
+
+ACCOMMODATION / BOARDING HOUSE
+
+SERVICES
+
+EDUCATION / TUTOR
+
+BEAUTY / PERSONAL CARE
+
+AUTOMOTIVE
+
+HOME SERVICES
+
+OTHER SME
+
+The selected type determines subsequent form sections.
+
+============================================================
+18. BUSINESS APPLICATION BACKEND
+============================================================
+
+Implement backend structures required to support:
+
+DRAFT
+SUBMITTED
+UNDER_REVIEW
+NEEDS_INFORMATION
+APPROVED
+REJECTED
+
+Application must store:
+
+- applicant user
+- category/type
+- form data
+- location
+- uploads
+- verification metadata
+- submission timestamp
+- current status
+- reviewer
+- review notes
+- history
+
+Do not treat application as live merchant.
+
+============================================================
+19. PRIVATE APPLICATION PREVIEW
+============================================================
+
+Remove the incorrect public merchant preview.
+
+If preview remains:
+
+PREVIEW — NOT PUBLIC
+
+Only applicant and authorized admins can access it.
+
+Do not include it in:
+
+- Musuwo search
+- home feed
+- categories
+- recommendations
+- public business URLs
+- leads
+- commerce
+
+============================================================
+20. APPLICATION STATUS — WEB + MOBILE
+============================================================
+
+Applicant sees:
+
+DRAFT
+
+UNDER REVIEW
+
+NEEDS INFORMATION
+
+APPROVED
+
+REJECTED
+
+For NEEDS INFORMATION:
+display message from reviewer.
+
+Allow applicant to edit only requested/permitted application fields.
+
+============================================================
+21. SUPER ADMIN APPLICATION REVIEW
+============================================================
+
+Application queue:
+
+NEW
+UNDER REVIEW
+NEEDS INFORMATION
+APPROVED
+REJECTED
+
+Review screen:
+
+Applicant
+Business information
+Category
+Location
+Media
+Verification
+History
+Internal notes
+
+Actions according to permissions:
+
+APPROVE
+REQUEST INFORMATION
+REJECT
+
+============================================================
+22. REVIEW CLAIM / ASSIGNMENT
+============================================================
+
+With multiple Super Admins, prevent chaotic duplicate review.
+
+Allow an application to be:
+
+UNASSIGNED
+
+or assigned to:
+
+SUPER ADMIN A
+
+When an admin opens a case, optionally:
+
+CLAIM REVIEW
+
+Other admins can still view if permitted but should see:
+
+Currently being reviewed by [Admin]
+
+Owner can reassign.
+
+Do not create hard locks that permanently trap an application if an admin goes offline.
+
+============================================================
+23. APPROVAL WORKFLOW
+============================================================
+
+Approval must be server-side and transactional.
+
+APPROVE:
+
+1. Verify reviewer permission.
+2. Verify application is approvable.
+3. Create/activate business entity.
+4. Create business owner membership.
+5. Assign public business ID.
+6. Set PILOT/ACTIVE status.
+7. Record verification state.
+8. Create audit event.
+9. Update application to APPROVED.
+10. Notify applicant.
+11. Avoid duplicates if triggered twice.
+
+============================================================
+24. REQUEST MORE INFORMATION
+============================================================
+
+Reviewer selects:
+
+REQUEST INFORMATION
+
+Adds:
+- message
+- requested field/document
+- optional deadline
+
+Applicant receives:
+NEEDS INFORMATION
+
+After resubmission:
+SUBMITTED / UNDER REVIEW
+
+Record complete history.
+
+============================================================
+25. REJECTION
+============================================================
+
+Require:
+- reason
+- reviewer
+- timestamp
+
+Do not delete application.
+
+Do not activate merchant.
+
+Allow future reapplication according to policy.
+
+============================================================
+26. BUSINESS ACTIVATION
+============================================================
+
+Approved application creates/activates business.
+
+Business receives:
+
+MUR-BIZ-XXXX / MUS-BIZ-XXXX according to current naming convention.
+
+If public ID convention is being rebranded, explain before changing existing IDs.
+
+Owner receives:
+
+merchant_admin / business_owner membership.
+
+============================================================
+27. BUSINESS PORTAL
+============================================================
+
+Approved business owner receives:
+
+HOME
+ORDERS / ENQUIRIES
+PRODUCTS / LISTINGS
+MESSAGES
+AVAILABILITY
+DELIVERY / FULFILMENT
+PERFORMANCE
+BUSINESS PROFILE
+SETTINGS
+
+Show only category-relevant tools.
+
+============================================================
+28. SUPER ADMIN — BUSINESS DIRECTORY
+============================================================
+
+Create platform-wide business management.
+
+Filters:
+
+category
+city
+status
+verification
+pilot/paid
+early partner
+health
+join date
+
+Business detail:
+
+- owner
+- staff
+- profile
+- listings
+- orders
+- enquiries
+- fulfilment
+- customer feedback
+- delivery
+- incidents
+- reports
+- performance
+- plan
+- early partner status
+- audit history
+
+============================================================
+29. BUSINESS HEALTH
+============================================================
+
+Compute real operational health indicators.
+
+Possible dimensions:
+
+Profile completeness
+Listing completeness
+Availability accuracy
+Response time
+Fulfilment rate
+Cancellation rate
+Customer feedback
+Verification
+Unresolved incidents
+Musuwo tenure
+
+Do not use one opaque number as an automatic punishment.
+
+============================================================
+30. ALGORITHMS / RANKING CONTROL CENTER
+============================================================
+
+Create a sophisticated but honest browser-based area.
+
+Title:
+
+SEARCH & DISCOVERY LAB
+
+or:
+
+RANKING & DISCOVERY
+
+Show:
+
+Top search queries
+
+Zero-result searches
+
+Trending terms
+
+Category demand
+
+Merchant impressions
+
+Listing impressions
+
+Click-through rates
+
+Product views
+
+Add-to-cart
+
+Order conversion
+
+Enquiry conversion
+
+Contact-release conversion
+
+Ranking version
+
+Search-quality alerts
+
+New-business cold-start performance
+
+Unavailability impact
+
+Geographic/serviceability impact
+
+============================================================
+31. QUERY EXPLAINABILITY
+============================================================
+
+Allow admin to enter a query:
+
+"books"
+
+Show actual ranked results and internal signal explanation.
+
+Example:
+
+1. Mutare Book Centre
+
+Relevance: HIGH
+Category match: EXACT
+Available matching items: 47
+Verified: YES
+Fulfilment reliability: GOOD
+Customer feedback: GOOD
+Location: SERVICEABLE
+
+Do not expose this exact internal detail to merchants/customers.
+
+============================================================
+32. RANKING VERSIONING
+============================================================
+
+Every major ranking logic update should have a version.
+
+Examples:
+
+RULES_V1
+RULES_V2
+
+If later ML is truly introduced:
+
+ML_V1
+
+Do not call rule-based ranking AI.
+
+Store:
+- version
+- activation date
+- changed by
+- description
+- configuration snapshot where practical
+
+============================================================
+33. OWNER-ONLY RANKING CONFIGURATION
+============================================================
+
+Super Admins may MONITOR ranking if permitted.
+
+Only Platform Owner or explicitly authorized senior admin may MODIFY ranking configuration.
+
+Any modification must:
+
+- require reason
+- be audited
+- preserve previous config
+- be reversible where possible
+
+Do not provide:
+"Put Merchant X at #1 forever."
+
+If temporary merchandising/promotions exist:
+label them separately from organic ranking.
+
+============================================================
+34. ANALYTICS
+============================================================
+
+Use actual database/event data.
+
+Admin analytics should support:
+
+Customers
+Businesses
+Orders
+GMV where valid
+Enquiries
+Contact releases
+Delivery
+Categories
+Search
+Conversion
+Retention where valid
+
+Do not invent revenue/profit values.
+
+============================================================
+35. BUSINESS INSIGHTS
+============================================================
+
+Use Musuwo marketplace data to provide SMEs useful feedback.
+
+Examples:
+
+BOOKSTORE:
+"Customers searched A-Level Geography 47 times this week."
+
+BOARDING HOUSE:
+"Your property had 83 views and 4 contact requests."
+
+FOOD BUSINESS:
+"Your highest demand period is 12:00–14:00."
+
+RETAIL:
+"These products are frequently searched but often unavailable."
+
+Initially rule-based and data-driven.
+
+No paid AI requirement.
+
+============================================================
+36. ACCOMMODATION
+============================================================
+
+Accommodation uses stronger onboarding.
+
+Separate:
+
+OPERATOR
+PROPERTY
+
+One operator may own/manage multiple properties.
+
+Application includes:
+
+operator info
+property details
+location
+photos
+verification
+authorization to list where appropriate
+
+No public listing before approval.
+
+============================================================
+37. ACCOMMODATION SUPER ADMIN REVIEW
+============================================================
+
+Super Admin review should include:
+
+Operator verification
+Property review
+Location review
+Submitted documents
+Photos
+Property status
+Trial eligibility
+Safety reports
+
+Only authorized admins can see sensitive docs.
+
+============================================================
+38. EARLY PARTNERS
+============================================================
+
+Platform Owner/Super Admin according to permission may manage:
+
+FOUNDING MERCHANT
+CATEGORY LAUNCH PARTNER
+FOUNDING ACCOMMODATION PARTNER
+EARLY PARTNER
+
+Benefits:
+
+free pilot
+discounted plans
+reduced commission
+free setup
+badge
+launch support
+
+Never permanently distort organic ranking.
+
+============================================================
+39. PLAN / PILOT MANAGEMENT
+============================================================
+
+Business plan states:
+
+FREE
+PILOT
+FOUNDING_PARTNER
+PAID
+PAUSED
+EXPIRED
+
+Accommodation:
+
+FREE ACADEMIC PILOT
+→ PERFORMANCE SUMMARY
+→ PAID ANNUAL RENEWAL
+
+Do not auto-charge at trial expiry.
+
+============================================================
+40. MUSUWO DELIVERY — PRESERVE CURRENT MODEL
+============================================================
+
+MUSUWO handles eligible marketplace delivery.
+
+Merchant brand remains customer-facing.
+
+Example:
+
+MUROORA MART
+
+Your order is out for delivery.
+
+Secondary:
+Delivery coordinated by Musuwo
+
+Do not change this architecture.
+
+============================================================
+41. PUBLIC RIDER RECRUITMENT
+============================================================
+
+Keep:
+
+BECOME A MUSUWO RIDER
+COMING SOON
+
+Public rider recruitment remains closed.
+
+Underlying rider/logistics backend may remain available for controlled/internal testing.
+
+============================================================
+42. DELIVERY MONITORING — ADMIN
+============================================================
+
+Super Admin can monitor:
+
+deliveries
+merchant handover
+active deliveries
+failed deliveries
+incidents
+delivery times
+vehicle types where relevant
+custody events
+
+Sensitive rider verification access should require specific permission.
+
+============================================================
+43. REPORTS & SAFETY
+============================================================
+
+Admin dashboard should include case management.
+
+Cases may relate to:
+
+business
+customer
+property
+listing
+delivery
+chat
+lead
+rider
+
+Statuses:
+
+OPEN
+UNDER_REVIEW
+WAITING_FOR_INFORMATION
+RESOLVED
+DISMISSED
+ACTION_TAKEN
+
+All admin action must be audited.
+
+============================================================
+44. PLATFORM MESSAGES
+============================================================
+
+Allow authorized admins to message businesses.
+
+Examples:
+
+"Your application needs more information."
+
+"Your cancellation rate has increased."
+
+"Your trial ends in 14 days."
+
+"Please update your opening hours."
+
+"Congratulations on 100 completed orders."
+
+Do not spam merchants.
+
+============================================================
+45. ADMIN NOTIFICATIONS
+============================================================
+
+Super Admin notifications:
+
+new application
+application resubmitted
+high-priority report
+suspended merchant event
+verification issue
+delivery incident
+search-quality alert
+system issue where supported
+
+Owner notifications:
+
+new Super Admin invitation accepted
+admin permission changed
+high-risk platform action
+ranking configuration changed
+security-sensitive action
+
+============================================================
+46. AUDIT LOGS
+============================================================
+
+Log:
+
+admin login
+application review
+application claim
+approval
+rejection
+request information
+business pause/suspension
+verification change
+sensitive document view where appropriate
+early-partner change
+plan change
+ranking configuration change
+admin creation
+admin permission change
+admin deactivation
+owner-level settings changes
+
+Audit events must not be editable by normal admins.
+
+============================================================
+47. OWNER ADMIN MANAGEMENT SCREEN
+============================================================
+
+OWNER ONLY:
+
+SUPER ADMINS
+
+Show:
+
+Name
+Email
+Role
+Status
+Permissions
+Last activity
+Added by
+Added date
+
+Actions:
+
+INVITE SUPER ADMIN
+EDIT PERMISSIONS
+SUSPEND
+DEACTIVATE
+REACTIVATE
+
+Display:
+
+Active Super Admins:
+X / 10
+
+============================================================
+48. ADMIN ACTIVITY MONITOR
+============================================================
+
+Platform Owner should be able to inspect:
+
+recent admin actions
+applications approved
+businesses suspended
+permissions changed
+sensitive records accessed where logged
+ranking changes
+plan changes
+
+Do not turn this into invasive keystroke monitoring.
+
+Focus on platform administrative actions.
+
+============================================================
+49. STORAGE / VERIFICATION SECURITY
+============================================================
+
+Business verification docs must be private.
+
+Use:
+
+private Supabase buckets
+signed access/server-authorized access
+file type validation
+size validation
+ownership
+reviewer permissions
+
+Do not publish verification documents through public URLs.
+
+============================================================
+50. RLS / AUTHORIZATION
+============================================================
+
+Review and implement proper policies.
+
+CUSTOMER:
+own user data
+public marketplace data
+own orders/leads/messages
+
+APPLICANT:
+own applications
+
+BUSINESS OWNER/STAFF:
+only businesses they belong to
+
+SUPER ADMIN:
+platform access according to permission
+
+PLATFORM OWNER:
+highest application-level permission
+
+Even Platform Owner application logic should remain server-authorized.
+
+Never expose Supabase service-role key client-side.
+
+============================================================
+51. SUPER ADMIN PERMISSION CHECKS MUST BE SERVER-SIDE
+============================================================
+
+Never rely only on:
+
+if (user.role === "super_admin") show button
+
+Every sensitive action must validate authorization on the server/database layer.
+
+============================================================
+52. WEB + MOBILE FEATURE MATRIX
+============================================================
+
+CUSTOMER MARKETPLACE:
+WEB = YES
+MOBILE = YES
+
+BUSINESS REGISTRATION:
+WEB = YES
+MOBILE = YES
+
+APPLICATION STATUS:
+WEB = YES
+MOBILE = YES
+
+BUSINESS OWNER PORTAL:
+WEB = YES
+MOBILE = useful operational functionality
+
+MUSUWO SUPER ADMIN:
+WEB ONLY
+
+PLATFORM OWNER CONTROLS:
+WEB ONLY
+
+============================================================
+53. REMOVE DEMO / FAKE MERCHANT PREVIEW
+============================================================
+
+Do not show fake merchant profiles to ordinary users.
+
+Demo merchants belong only in:
+
+development seed data
+tests
+Storybook
+staging/demo environment
+
+Production/customer preview shows approved businesses only.
+
+============================================================
+54. RESPONSIVENESS
+============================================================
+
+Super Admin is browser-only but should work well on:
+
+desktop
+laptop
+tablet
+
+Optimize primarily for laptop/desktop.
+
+============================================================
+55. TESTING — BUSINESS REGISTRATION
+============================================================
+
+Test:
+
+1. User can register a business on web.
+2. User can register a business on mobile.
+3. Business types appear.
+4. User can save draft.
+5. User can submit.
+6. Unapproved application is not public.
+7. Private preview cannot be accessed publicly.
+8. Applicant cannot self-approve.
+9. Applicant cannot change status through API tampering.
+10. Admin can request information.
+11. Applicant can resubmit.
+12. Authorized admin can approve.
+13. Approval is idempotent.
+14. Approval creates owner membership.
+15. Rejected business does not go public.
+16. Suspended business becomes unavailable appropriately.
+
+============================================================
+56. TESTING — ADMIN HIERARCHY
+============================================================
+
+Test:
+
+1. Customer cannot access Super Admin.
+2. Merchant cannot access Super Admin.
+3. Super Admin cannot promote another Super Admin.
+4. Platform Owner can add Super Admin.
+5. 10 active Super Admin limit is enforced.
+6. Deactivated Super Admin loses access.
+7. Super Admin permissions are enforced.
+8. Super Admin without approval permission cannot approve.
+9. Owner can change Super Admin permissions.
+10. Super Admin cannot change owner role.
+11. Super Admin cannot delete audit logs.
+12. Owner-only navigation is hidden AND server-protected.
+13. Admin actions produce audit events.
+
+============================================================
+57. TESTING — ALGORITHMS / ANALYTICS
+============================================================
+
+Test:
+
+1. Search dashboard uses real events/data.
+2. Zero-result searches are tracked correctly if analytics supports it.
+3. Ranking explainability uses actual signals.
+4. No fake ML/AI scores are displayed.
+5. Ranking changes are owner-authorized.
+6. Ranking config changes are audited.
+7. Merchant-facing users cannot access ranking internals.
+
+============================================================
+58. TESTING — CROSS-BUSINESS ISOLATION
+============================================================
+
+Business A cannot access:
+
+Business B orders
+Business B customers
+Business B messages
+Business B analytics
+Business B documents
+Business B listings management
+
+============================================================
+59. TESTING — REGRESSION
+============================================================
+
+Verify:
+
+Muroora Mart still works
+Musuwo marketplace still works
+Mobile still works
+Web still works
+Current orders remain
+Current customers remain
+Current products remain
+Current delivery remains
+Rider backend is not broken
+Chat/contact gating remains
+Accommodation remains
+Authentication remains
+
+============================================================
+60. IMPLEMENTATION ORDER
+============================================================
+
+PHASE 1 — AUDIT
+
+Inspect current code/backend/schema/RLS/admin/business onboarding.
+
+PHASE 2 — BACKEND FOUNDATION
+
+Implement/fix:
+- business applications
+- application history
+- business memberships
+- platform roles
+- admin permissions
+- audit logs
+- approval transaction
+- RLS
+
+PHASE 3 — BUSINESS APPLICATION UI
+
+WEB + MOBILE.
+
+PHASE 4 — SUPER ADMIN PORTAL
+
+Build premium Musuwo Control Center.
+
+PHASE 5 — PLATFORM OWNER CONTROLS
+
+Super Admin management
+Permissions
+Admin activity
+Owner-only settings
+
+PHASE 6 — BUSINESS MONITORING
+
+Businesses
+Listings
+Accommodation
+Orders
+Delivery
+Safety
+
+PHASE 7 — SEARCH / RANKING / ANALYTICS
+
+Real metrics and explainability.
+
+PHASE 8 — HARDENING
+
+Security
+RLS
+Testing
+Regression
+Low-bandwidth performance
+
+============================================================
+61. REQUIRED FIRST RESPONSE FROM CLAUDE
+============================================================
+
+Before implementation, provide:
+
+1. Current backend architecture.
+2. Current database schema relevant to this task.
+3. Current business-registration flow.
+4. Why business-type selection is currently missing.
+5. Why merchant preview is showing prematurely.
+6. Current admin architecture.
+7. Current user-role architecture.
+8. Current Supabase RLS state.
+9. Current mobile business-registration support.
+10. Current web business-registration support.
+11. Current Muroora merchant representation.
+12. Current delivery/rider dependency.
+13. Proposed backend schema changes.
+14. Proposed migrations.
+15. Proposed new RLS policies.
+16. Proposed Super Admin hierarchy.
+17. Proposed permission model.
+18. How the 10 Super Admin limit will be implemented.
+19. How Platform Owner will be provisioned securely.
+20. How approval becomes transactional/idempotent.
+21. How sensitive files remain private.
+22. How admin audit logging works.
+23. How the premium Super Admin UI will be structured.
+24. What existing code/components will be reused.
+25. What will NOT be changed.
+26. What requires explicit owner permission before destructive modification.
+27. Confirmation no new paid service is required unless explicitly explained.
+
+Explain technical points in plain English.
+
+============================================================
+62. FINAL NON-NEGOTIABLES
+============================================================
+
+1. CLAUDE MUST IMPLEMENT BACKEND + FRONTEND.
+2. MUSUWO REMAINS THE PLATFORM.
+3. MUROORA MART REMAINS FOUNDING MERCHANT.
+4. BUSINESSES REGISTER THROUGH WEB OR MOBILE.
+5. REGISTRATION CREATES AN APPLICATION, NOT A LIVE MERCHANT.
+6. UNAPPROVED BUSINESSES ARE NOT PUBLIC.
+7. SUPER ADMIN CONTROL CENTER IS WEB/BROWSER ONLY.
+8. PLATFORM OWNER IS THE HIGHEST ROLE.
+9. UP TO 10 ACTIVE SUPER ADMINS INITIALLY.
+10. SUPER ADMINS HAVE GRANULAR PERMISSIONS.
+11. ONLY PLATFORM OWNER CAN CREATE/REMOVE SUPER ADMINS INITIALLY.
+12. PLATFORM OWNER CAN MONITOR SUPER ADMIN ACTIONS.
+13. SUPER ADMINS CAN REVIEW BUSINESSES ACCORDING TO THEIR PERMISSIONS.
+14. MERCHANT OWNERS ONLY CONTROL THEIR OWN BUSINESS.
+15. SEARCH/RANKING DASHBOARD MUST SHOW REAL ALGORITHM SIGNALS, NOT FAKE AI.
+16. MUSUWO DELIVERY MODEL REMAINS INTACT.
+17. MERCHANT BRAND REMAINS CUSTOMER-FACING DURING DELIVERY.
+18. PUBLIC RIDER RECRUITMENT REMAINS COMING SOON.
+19. ONE SHARED BACKEND/SUPABASE PROJECT REMAINS SOURCE OF TRUTH.
+20. RLS AND SERVER-SIDE AUTHORIZATION ARE MANDATORY.
+21. SENSITIVE VERIFICATION FILES MUST BE PRIVATE.
+22. ALL HIGH-RISK ADMIN ACTIONS MUST BE AUDITED.
+23. PRESERVE CURRENT WORK.
+24. DO NOT DUPLICATE SYSTEMS.
+25. DO NOT PERFORM DESTRUCTIVE MIGRATIONS WITHOUT EXPLICIT PERMISSION.
