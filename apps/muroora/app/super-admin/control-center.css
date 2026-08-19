@@ -432,3 +432,44 @@
 @media (prefers-reduced-motion: reduce) {
   .cc * { transition: none !important; }
 }
+
+/* Verification documents.
+   The panel is wide and the images are tall, so they are capped by height
+   rather than width: an ID card and a selfie should sit at a comparable size
+   on screen no matter which way round the photograph was taken. */
+.cc-doc-warning {
+  margin: 0 0 1rem;
+  padding: .7rem .85rem;
+  border: 1px solid var(--cc-line);
+  border-left: 3px solid var(--cc-wait);
+  border-radius: 6px;
+  color: var(--cc-ink-soft);
+  font-size: .86rem;
+  line-height: 1.5;
+}
+.cc-docs { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
+.cc-doc {
+  border: 1px solid var(--cc-line);
+  border-radius: 8px;
+  padding: .8rem .9rem;
+}
+.cc-doc-head {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.cc-doc-head strong { display: block; }
+.cc-doc-head .cc-mono { color: var(--cc-ink-soft); }
+.cc-doc-view { margin: .85rem 0 0; }
+.cc-doc-view img {
+  display: block;
+  max-width: 100%;
+  max-height: 32rem;
+  border-radius: 6px;
+  border: 1px solid var(--cc-line);
+  background: var(--cc-ground);
+}
+.cc-doc-view figcaption { margin-top: .45rem; font-size: .82rem; color: var(--cc-ink-soft); }
+.cc-doc-note { margin: .7rem 0 0; font-size: .85rem; color: var(--cc-ink-soft); }

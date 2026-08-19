@@ -5,6 +5,7 @@ import { getApplication, ApplicationError } from '@/lib/platform/applications'
 import { can, requirePermission } from '@/lib/platform/auth'
 import { StatusChip, humanise } from '@/app/super-admin/StatusChip'
 import { ReviewPanel } from '@/app/super-admin/applications/[id]/ReviewPanel'
+import { DocumentViewer } from '@/app/super-admin/applications/[id]/DocumentViewer'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Application' }
@@ -183,32 +184,16 @@ export default async function ApplicationPage({
             <div className="cc-panel-head">
               <h2>Documents</h2>
             </div>
-            {documents.length === 0 ? (
-              <div className="cc-empty">
-                <p>
-                  <strong>Nothing uploaded.</strong>
-                  Verification documents are stored privately and opening one is
-                  logged against your name.
-                </p>
-              </div>
-            ) : (
-              <div className="cc-panel-body">
-                <ul style={{ margin: 0, paddingLeft: '1.1rem' }}>
-                  {documents.map((d) => (
-                    <li key={d.id} style={{ marginBottom: '.4rem' }}>
-                      {humanise(d.kind)} — {d.originalName ?? 'file'}{' '}
-                      {can(admin, 'sensitive_documents.view') ? (
-                        <span className="cc-mono">({d.mimeType})</span>
-                      ) : (
-                        <span className="cc-mono">
-                          — you do not have permission to open this
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <DocumentViewer
+              canView={can(admin, 'sensitive_documents.view')}
+              documents={documents.map((d) => ({
+                id: d.id,
+                kind: d.kind,
+                mimeType: d.mimeType,
+                sizeBytes: d.sizeBytes,
+                createdAt: d.createdAt.toISOString(),
+              }))}
+            />
           </section>
 
           <section className="cc-panel">

@@ -12,6 +12,7 @@ import {
   ApplicationError,
 } from '@/lib/platform/applications'
 import { PlatformAuthError } from '@/lib/platform/auth'
+import { DocumentError, openDocument } from '@/lib/platform/documents'
 
 /**
  * What a reviewer can do to an application.
@@ -175,5 +176,36 @@ export async function approveAction(
     }
   } catch (error) {
     return explain(error)
+  }
+}
+
+/**
+ * Open one verification document.
+ *
+ * Separate from the ReviewState actions above because it returns a URL rather
+ * than a message, and because it is the only action here that is gated on
+ * `sensitive_documents.view` instead of `business_applications.review`. A
+ * reviewer who may decide an application is NOT automatically a person who may
+ * look at the applicant's national ID.
+ *
+ * `openDocument` does the real work: it checks the permission, writes the
+ * audit row BEFORE minting anything, and returns a link that dies in 60
+ * seconds. Nothing is cached and nothing is revalidated - a signed URL must
+ * never end up in a Next cache entry that outlives its own expiry.
+ */
+export async function openDocumentAction(
+  documentId: string,
+): Promise<{ url?: string; error?: string }> {
+  try {
+    return { url: await openDocument(documentId) }
+  } catch (error) {
+    if (
+      error instanceof PlatformAuthError ||
+      error instanceof DocumentError ||
+      error instanceof ApplicationError
+    ) {
+      return { error: error.message }
+    }
+    throw error
   }
 }
