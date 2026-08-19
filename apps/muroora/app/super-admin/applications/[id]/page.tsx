@@ -34,8 +34,15 @@ export default async function ApplicationPage({
     throw error
   }
 
-  const { application, applicant, history, documents, createdBusiness, assignedToName } =
-    data
+  const {
+    application,
+    applicant,
+    history,
+    documents,
+    createdBusiness,
+    assignedToName,
+    whatsapp,
+  } = data
 
   const details = (application.details ?? {}) as Record<string, unknown>
 
@@ -176,7 +183,44 @@ export default async function ApplicationPage({
                   <dt>Phone on account</dt>
                   <dd>{applicant?.phone ?? 'Not given'}</dd>
                 </div>
+                {/* The number the application itself carries. Shown separately
+                    because it is usually the only one there is - the account
+                    phone is optional and is normally blank, so a panel that
+                    listed only that said "Not given" about somebody who had in
+                    fact written their number down. */}
+                <div>
+                  <dt>Phone on the application</dt>
+                  <dd>
+                    {application.whatsapp ?? application.contactPhone ?? 'Not given'}
+                  </dd>
+                </div>
               </dl>
+
+              {/* Derived from the application's current state, so unlike the
+                  one on the confirmation panel it is still here tomorrow. */}
+              {whatsapp ? (
+                <a
+                  href={whatsapp.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cc-btn cc-btn-go"
+                  style={{ marginTop: '1rem', display: 'inline-block' }}
+                >
+                  {whatsapp.prewritten
+                    ? 'Message on WhatsApp'
+                    : 'Open WhatsApp chat'}
+                </a>
+              ) : (
+                <p className="cc-doc-note">
+                  No usable phone number, so there is no WhatsApp link.
+                </p>
+              )}
+              {whatsapp?.prewritten && (
+                <p className="cc-doc-note">
+                  Opens your own WhatsApp with the {humanise(application.status)}{' '}
+                  message already written. Nothing is sent until you press send.
+                </p>
+              )}
             </div>
           </section>
 

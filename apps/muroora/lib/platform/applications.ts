@@ -13,7 +13,12 @@ import { users } from '@/db/schema/identity'
 import { orders } from '@/db/schema/orders'
 import { platformAuditLog } from '@/db/schema/platform'
 import { assertPermission, type PlatformAdmin } from '@/lib/platform/auth'
-import { notifyApplicant, type NotifyResult } from '@/lib/platform/notify'
+import {
+  composeMessage,
+  notifyApplicant,
+  waNumber,
+  type NotifyResult,
+} from '@/lib/platform/notify'
 
 /**
  * Drop the cached public feeds so an approved business appears immediately.
@@ -164,6 +169,57 @@ export async function countOpenApplications(): Promise<number> {
   return row.n
 }
 
+/**
+ * Send a notice, and WRITE DOWN WHETHER IT ACTUALLY WENT.
+ *
+ * `notifyApplicant` returns whether the email left the building, and until
+ * this existed that answer was shown on the reviewer's screen once and then
+ * discarded. Reload the page and there was no way to tell whether an applicant
+ * had ever been told anything - which matters most in exactly the case it was
+ * needed: tarniah23 was asked for information before the mail relay worked,
+ * never received it, and nothing in the system recorded that.
+ *
+ * The row is INTERNAL. "We emailed you" is reviewer bookkeeping and has no
+ * place in the applicant's own timeline.
+ *
+ * It never throws. The decision is committed and the mail has already gone or
+ * already failed; losing the bookkeeping is not a reason to fail the request
+ * on top of it. A failure here is logged loudly instead, because a silent gap
+ * in the record is the thing this function exists to prevent.
+ */
+async function notifyAndRecord(
+  applicationId: string,
+  params: Parameters<typeof notifyApplicant>[0],
+): Promise<NotifyResult> {
+  const notice = await notifyApplicant(params)
+
+  try {
+    await db.insert(businessApplicationEvents).values({
+      applicationId,
+      event: notice.emailed ? 'EMAILED' : 'EMAIL_FAILED',
+      message: notice.emailed
+        ? `${humanKind(params.kind)} emailed to ${params.applicant.email}.`
+        : `${humanKind(params.kind)} NOT emailed. ${notice.emailProblem ?? 'No reason given.'}`,
+      internal: true,
+    })
+  } catch (error) {
+    console.error(
+      '[applications] could not record the notification outcome:',
+      (error as Error).message,
+    )
+  }
+
+  return notice
+}
+
+function humanKind(kind: 'INFO_REQUESTED' | 'APPROVED' | 'REJECTED'): string {
+  return kind === 'INFO_REQUESTED'
+    ? 'Request for information'
+    : kind === 'APPROVED'
+      ? 'Approval'
+      : 'Rejection'
+}
+
 /** One application, with its history and its documents. Reviewer view. */
 export async function getApplication(id: string) {
   const [application] = await db
@@ -217,7 +273,73 @@ export async function getApplication(id: string) {
     assignedToName = a?.name ?? null
   }
 
-  return { application, applicant, history, documents, createdBusiness, assignedToName }
+  /**
+   * A WhatsApp link that is still here after a reload.
+   *
+   * The one on the confirmation panel is built from the result of the action
+   * that just ran, so it exists for exactly as long as that panel does. Press
+   * Approve, glance away, refresh, and the only way to reach the applicant on
+   * the surest channel in Zimbabwe is gone until somebody re-runs a decision
+   * they have already made. This one is derived from stored state instead, so
+   * it can be pressed tomorrow.
+   *
+   * The text matches WHERE THE APPLICATION ACTUALLY IS, not where it has been.
+   * Sending an approved merchant the "we need more documents" message because
+   * that was the last thing composed would be worse than sending nothing.
+   * Before any decision there is no message to pre-write, so the link opens an
+   * empty chat rather than putting words in the reviewer's mouth.
+   */
+  const phone =
+    application.whatsapp ?? application.contactPhone ?? applicant?.phone ?? null
+
+  const composed =
+    application.status === 'APPROVED'
+      ? composeMessage({
+          kind: 'APPROVED',
+          businessName: application.businessName ?? 'Your business',
+          applicantName: applicant?.name ?? null,
+          message: null,
+        })
+      : application.status === 'REJECTED'
+        ? composeMessage({
+            kind: 'REJECTED',
+            businessName: application.businessName ?? 'Your business',
+            applicantName: applicant?.name ?? null,
+            // The reason as it was actually given, read back from the event
+            // rather than re-invented, so the message and the record agree.
+            message: history.find((h) => h.event === 'REJECTED')?.message ?? null,
+          })
+        : application.status === 'NEEDS_INFORMATION'
+          ? composeMessage({
+              kind: 'INFO_REQUESTED',
+              businessName: application.businessName ?? 'Your business',
+              applicantName: applicant?.name ?? null,
+              message: application.infoRequested,
+            })
+          : null
+
+  const number = waNumber(phone)
+  const whatsapp = number
+    ? {
+        number,
+        // Built from `number`, which is already known good, rather than from
+        // whatsappLink - that re-derives it and so is typed as nullable.
+        url: composed
+          ? `https://wa.me/${number}?text=${encodeURIComponent(composed.body)}`
+          : `https://wa.me/${number}`,
+        prewritten: composed !== null,
+      }
+    : null
+
+  return {
+    application,
+    applicant,
+    history,
+    documents,
+    createdBusiness,
+    assignedToName,
+    whatsapp,
+  }
 }
 
 /** Write one history row. Every state change goes through this. */
@@ -426,7 +548,7 @@ export async function requestInformation(params: {
    * so an application could sit in NEEDS_INFORMATION for weeks with each side
    * waiting on the other.
    */
-  return notifyApplicant({
+  return notifyAndRecord(params.id, {
     kind: 'INFO_REQUESTED',
     businessName: existing.businessName,
     applicant,
@@ -513,7 +635,7 @@ export async function rejectApplication(params: {
    * spent an evening photographing documents. Almost every refusal at this
    * stage is a fixable paper problem, and the email says so - see notify.ts.
    */
-  return notifyApplicant({
+  return notifyAndRecord(params.id, {
     kind: 'REJECTED',
     businessName: existing.businessName,
     applicant: {
@@ -734,7 +856,7 @@ export async function approveApplication(params: {
    * live either way.
    */
   const notice = result.created
-    ? await notifyApplicant({
+    ? await notifyAndRecord(params.id, {
         kind: 'APPROVED',
         businessName: result.businessName,
         applicant: result.applicant,

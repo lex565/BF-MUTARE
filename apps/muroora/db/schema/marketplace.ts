@@ -329,7 +329,7 @@ export const businessApplicationEvents = pgTable(
       .references(() => businessApplications.id, { onDelete: 'cascade' }),
     actorId: uuid('actor_id').references(() => users.id),
     /** SUBMITTED, CLAIMED, RELEASED, INFO_REQUESTED, RESUBMITTED, APPROVED,
-     *  REJECTED, NOTE. */
+     *  REJECTED, NOTE, EMAILED, EMAIL_FAILED. */
     event: text('event').notNull(),
     fromStatus: businessStatusEnum('from_status'),
     toStatus: businessStatusEnum('to_status'),
