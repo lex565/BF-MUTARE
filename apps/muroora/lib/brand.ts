@@ -73,7 +73,7 @@ export const BRAND: Record<SiteBrand, BrandCopy> = {
     description:
       'Discover local businesses, products, food, accommodation and services through Musuwo. Muroora Mart is the founding merchant.',
     home: '/',
-    url: 'https://musuwo.vercel.app',
+    url: 'https://musuwo.online',
     icon: '/icons/musuwo-icon.png',
     appleIcon: '/icons/musuwo-apple-icon.png',
   },
@@ -83,7 +83,7 @@ export const BRAND: Record<SiteBrand, BrandCopy> = {
     description:
       'Groceries and household goods in Mutare, with same-day delivery and a diaspora shopping service for families abroad.',
     home: '/',
-    url: 'https://muroora-mart.vercel.app',
+    url: 'https://muroora.online',
     icon: '/icons/muroora-icon.png',
     appleIcon: '/icons/muroora-apple-icon.png',
   },
