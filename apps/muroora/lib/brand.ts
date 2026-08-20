@@ -64,6 +64,19 @@ interface BrandCopy {
    */
   icon: string
   appleIcon: string
+  /**
+   * Where a person writes to, and what each address is for.
+   *
+   * ONE MAILBOX, THREE ALIASES. All three land in the same Zoho mailbox; the
+   * split is so somebody asking about a late delivery and somebody proposing a
+   * partnership are not competing for the same attention, and so the address
+   * can be moved to a real support desk later without changing what is printed
+   * on the website.
+   *
+   * `purpose` is displayed. An address list with no explanation makes a person
+   * guess which one to use, and they guess wrong, and the answer is slower.
+   */
+  contacts: { address: string; label: string; purpose: string }[]
 }
 
 export const BRAND: Record<SiteBrand, BrandCopy> = {
@@ -76,6 +89,23 @@ export const BRAND: Record<SiteBrand, BrandCopy> = {
     url: 'https://musuwo.online',
     icon: '/icons/musuwo-icon.png',
     appleIcon: '/icons/musuwo-apple-icon.png',
+    contacts: [
+      {
+        address: 'hello@musuwo.online',
+        label: 'General',
+        purpose: 'Anything about Musuwo, or if you are not sure who to ask.',
+      },
+      {
+        address: 'support@musuwo.online',
+        label: 'Orders and help',
+        purpose: 'An order, a delivery, an account, or something going wrong.',
+      },
+      {
+        address: 'marketing@musuwo.online',
+        label: 'Business and press',
+        purpose: 'Selling on Musuwo, partnerships, and press enquiries.',
+      },
+    ],
   },
   muroora: {
     name: 'Muroora Mart',
@@ -86,6 +116,13 @@ export const BRAND: Record<SiteBrand, BrandCopy> = {
     url: 'https://muroora.online',
     icon: '/icons/muroora-icon.png',
     appleIcon: '/icons/muroora-apple-icon.png',
+    /**
+     * Muroora Mart's own contact details live in app/data/site.ts, which is
+     * where the shop's phone, WhatsApp and address already are. Listing
+     * Musuwo's platform addresses on the grocer's site would send a customer
+     * asking about their vegetables to the marketplace's support desk.
+     */
+    contacts: [],
   },
 }
 

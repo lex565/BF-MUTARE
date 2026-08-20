@@ -175,9 +175,20 @@ export async function MusuwoHome({ kind }: { kind?: string }) {
               height={36}
               className="size-9 object-contain"
             />
-            <p className="text-small text-ink-faint">
-              Musuwo · Zimbabwe&rsquo;s local business gateway
-            </p>
+            <div>
+              <p className="text-small text-ink-faint">
+                Musuwo · Zimbabwe&rsquo;s local business gateway
+              </p>
+              {/* One address in the footer rather than all three. A footer is
+                  glanced at, not read; the full list with what each is for is
+                  on /contact. */}
+              <a
+                href="mailto:hello@musuwo.online"
+                className="text-small text-support hover:text-accent"
+              >
+                hello@musuwo.online
+              </a>
+            </div>
           </div>
           <div className="flex flex-wrap gap-6">
             <Link
@@ -191,6 +202,12 @@ export async function MusuwoHome({ kind }: { kind?: string }) {
               className="font-mono text-[0.62rem] uppercase tracking-label text-ink-faint hover:text-support"
             >
               Deliver with Musuwo
+            </Link>
+            <Link
+              href="/contact"
+              className="font-mono text-[0.62rem] uppercase tracking-label text-ink-faint hover:text-support"
+            >
+              Contact us
             </Link>
           </div>
         </div>
