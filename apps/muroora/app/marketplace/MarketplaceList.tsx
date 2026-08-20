@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useMemo, useState } from 'react'
 
 import type { PublicBusiness, MarketplaceProduct } from '@/lib/services/marketplace'
+import { ProductPhoto } from '@/app/components/marketplace/ProductPhoto'
 
 /**
  * The Musuwo directory: every approved business, and what they are selling.
@@ -111,9 +112,25 @@ function BusinessCard({ business }: { business: PublicBusiness }) {
 function ProductCard({ product }: { product: MarketplaceProduct }) {
   return (
     <Link
-      href={`/product/${product.slug}`}
-      className="group flex flex-col border border-rule bg-paper p-5 transition-colors hover:border-support"
+      /**
+       * INTO THE MERCHANT'S SHOP, NOT A GENERIC PRODUCT PAGE.
+       *
+       * This was `/product/{slug}`, which is Muroora Mart's own shop route and
+       * knows only Muroora's catalogue. For every other merchant it answered
+       * "Product not found", drawn in Muroora Mart's branding, on the Musuwo
+       * domain. The first real product any outside merchant published - Cotton
+       * pants from The Pant and Perfume Shop - was unreachable from the
+       * marketplace that was listing it.
+       *
+       * The route below already existed and already worked. Nothing linked to
+       * it. It also carries the merchant slug, so the customer arrives knowing
+       * whose shop they are in, which is the point of section 5.
+       */
+      href={`/marketplace/product/${product.merchant.slug}/${product.slug}`}
+      className="group flex flex-col border border-rule bg-paper transition-colors hover:border-support"
     >
+      <ProductPhoto src={product.imageUrl} alt={product.name} />
+      <div className="flex flex-1 flex-col p-5">
       <h3 className="text-body font-bold group-hover:text-support">
         {product.name}
       </h3>
@@ -131,6 +148,7 @@ function ProductCard({ product }: { product: MarketplaceProduct }) {
       <p className="mt-4 text-h3 text-support">
         ${product.price.decimal}
       </p>
+      </div>
     </Link>
   )
 }

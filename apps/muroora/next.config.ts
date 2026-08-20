@@ -47,6 +47,45 @@ const nextConfig: NextConfig = {
      */
     qualities: [75, 90],
     formats: ['image/avif', 'image/webp'],
+
+    /**
+     * EVERY PRODUCT PHOTO ON THE SITE WAS A BROKEN IMAGE UNTIL THIS EXISTED.
+     *
+     * Product photos live in the public `product-photos` bucket on Supabase,
+     * so their src is an absolute URL on another host. `next/image` will only
+     * optimise a remote host that is listed here, and with nothing listed it
+     * refuses every one of them.
+     *
+     * The failure is quiet in exactly the wrong way. The page renders 200, the
+     * `<img>` tag is emitted with the right alt text and the right dimensions,
+     * and the browser then requests
+     *
+     *   /_next/image?url=https%3A%2F%2F<project>.supabase.co%2F...&w=640&q=75
+     *
+     * which answers `400 INVALID_IMAGE_OPTIMIZE_REQUEST`. So the markup looks
+     * correct in the HTML, the server logs look clean, and the customer sees a
+     * blank box. Verified against production on 2026-08-20 with the one real
+     * product on the marketplace.
+     *
+     * Scoped to the bucket path rather than the whole host: this project's
+     * Supabase domain also serves `business-verification`, which holds
+     * photographs of people's national IDs. Those are fetched through 60-second
+     * signed links by a reviewer, and they must never be reachable through an
+     * image proxy that caches what it fetches. A pathname of `/**` here would
+     * have made the optimiser willing to fetch and cache one.
+     */
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'dparkquflsqimuvufeyk.supabase.co',
+        pathname: '/storage/v1/object/public/product-photos/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dparkquflsqimuvufeyk.supabase.co',
+        pathname: '/storage/v1/object/public/business-logos/**',
+      },
+    ],
   },
 }
 

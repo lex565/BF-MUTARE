@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+
+import { ProductPhoto } from '@/app/components/marketplace/ProductPhoto'
 
 import { currentUser } from '@/lib/auth'
 import { getMarketplaceProduct, recordMarketplaceProductView } from '@/lib/services/marketplace'
@@ -26,7 +27,10 @@ export default async function MarketplaceProductPage({ params }: { params: Promi
   return <main className="mx-auto max-w-[72rem] px-gutter py-12">
     <Link href="/shop" className="font-bold text-support">← Back to Musuwo</Link>
     <div className="mt-8 grid gap-10 md:grid-cols-2">
-      <div className="min-h-80 bg-paper-sunk">{product.imageUrl && <Image src={product.imageUrl} alt={product.name} width={800} height={800} className="h-full w-full object-cover" />}</div>
+      {/* The one image on the page somebody is deliberately looking at, so it
+          loads with priority. `contain` for the same reason as everywhere
+          else: a garment cropped by the frame is not a product photograph. */}
+      <ProductPhoto src={product.imageUrl} alt={product.name} priority />
       <div><p className="font-mono text-micro uppercase tracking-label text-accent">{product.merchant.name}</p><h1 className="mt-3 text-h1">{product.name}</h1>{product.unitSize && <p className="mt-3 text-ink-soft">{product.unitSize}</p>}<p className="mt-5 text-h2 text-support">${product.price.decimal}</p>{product.description && <p className="mt-6 text-lead text-ink-soft">{product.description}</p>}
         <div className="mt-8 flex flex-wrap gap-3">{contact && <a href={`https://wa.me/${contact}?text=${shareText}`} target="_blank" rel="noreferrer" className="rounded-full bg-[#128c7e] px-6 py-3 font-bold text-white">Contact on WhatsApp</a>}<a href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer" className="rounded-full border border-support px-6 py-3 font-bold text-support">Share on WhatsApp</a>{product.merchant.websiteUrl && <a href={product.merchant.websiteUrl} target="_blank" rel="noreferrer" className="rounded-full border border-rule px-6 py-3 font-bold">Business website</a>}</div>
       </div>

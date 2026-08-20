@@ -1,0 +1,1793 @@
+MUSUWO — MASTER FULL-STACK FOR YOU FEED, STOREFRONTS, PRODUCT ANALYTICS, PROMOTIONS, MERCHANT STUDIO, MOBILE FIXES AND SECURITY AUDIT
+
+ROLE
+
+You are modifying the EXISTING Musuwo platform.
+
+This is NOT a new project.
+
+You must work with the existing:
+
+- web application
+- mobile application
+- Supabase backend
+- database schema
+- authentication
+- merchant/business onboarding
+- business verification
+- products
+- orders
+- customers
+- delivery architecture
+- Muroora Mart
+- business profiles
+- Super Admin
+- Platform Owner
+- storage
+- analytics if already present
+- RLS/security policies
+
+DO NOT:
+
+- rebuild Musuwo from scratch
+- create a new Supabase project
+- duplicate existing tables unnecessarily
+- delete existing merchants
+- delete existing products
+- delete existing users
+- wipe existing pilot data
+- break Muroora Mart
+- weaken RLS to make frontend code work
+- expose service-role credentials
+- expose private verification documents
+- create fake analytics data
+- create fake orders
+- change production data destructively without explaining the change first
+
+This implementation must cover:
+
+BACKEND
++
+DATABASE
++
+SUPABASE
++
+RLS
++
+WEB APPLICATION
++
+MOBILE APPLICATION
++
+FOR YOU ALGORITHM
++
+MERCHANT STOREFRONTS
++
+PRODUCT ANALYTICS
++
+MERCHANT ANALYTICS
++
+PROMOTED PRODUCTS
++
+MERCHANT STUDIO
++
+MOBILE STORE MANAGEMENT FIXES
++
+SECURITY TESTING
+
+==================================================
+1. FIRST ACTION — AUDIT EVERYTHING
+==================================================
+
+Before changing code, inspect the existing project.
+
+Report:
+
+IMPLEMENTED
+PARTIALLY IMPLEMENTED
+NOT IMPLEMENTED
+BROKEN
+NEEDS SECURITY REVIEW
+
+for:
+
+- homepage
+- For You feed
+- product cards
+- product details
+- business cards
+- merchant storefronts
+- merchant cover images
+- merchant logos
+- product categories
+- search
+- product analytics
+- merchant analytics
+- product impressions
+- product views
+- cart events
+- orders
+- promotions
+- sponsored products
+- web merchant dashboard
+- mobile merchant dashboard
+- mobile store-management buttons
+- routing
+- scroll restoration
+- business registration
+- verification
+- authentication
+- RLS
+- storage policies
+- role permissions
+- Super Admin
+- Platform Owner
+
+Explain in PLAIN ENGLISH:
+
+1. What already exists.
+2. What is broken.
+3. What will be reused.
+4. What must change.
+5. What database migrations are required.
+6. What RLS changes are required.
+7. Whether any current RLS/security configuration is leaking data.
+8. Whether any public tables or storage buckets are unintentionally accessible.
+9. What you will NOT touch.
+
+Do not perform destructive migrations before giving this report.
+
+==================================================
+2. CORE CUSTOMER EXPERIENCE CHANGE
+==================================================
+
+Musuwo's DEFAULT shopping/home experience must become:
+
+FOR YOU
+
+The primary marketplace discovery experience should focus on PRODUCTS rather than large business cards.
+
+Businesses must NOT disappear from Musuwo.
+
+Instead:
+
+PRODUCTS are the primary discovery object.
+
+BUSINESSES remain real merchant storefronts behind those products.
+
+The user should primarily discover:
+
+products
+offers
+items
+services where appropriate
+
+and then naturally discover the businesses that sell them.
+
+==================================================
+3. FOR YOU — DEFAULT HOME SHOPPING EXPERIENCE
+==================================================
+
+For You should become the default commerce/home feed.
+
+Conceptually:
+
+MUSUWO
+
+[ Search Musuwo ]
+
+For You
+Categories
+other relevant navigation
+
+--------------------------------
+
+Product A
+Product B
+Product C
+Product D
+...
+
+The feed should mix products from multiple approved businesses.
+
+Do NOT simply group the homepage by merchant.
+
+Do NOT show giant merchant cards as the main discovery experience.
+
+Category shortcuts may remain near the top.
+
+Examples:
+
+Food
+Groceries
+Fashion
+Beauty
+Books
+Electronics
+Services
+Stay
+
+But For You remains the primary commerce discovery engine.
+
+==================================================
+4. PRODUCT CARD DESIGN
+==================================================
+
+Each product card should show, where relevant:
+
+- product image
+- product name
+- price
+- sale price if applicable
+- merchant logo
+- merchant name
+- verification badge if applicable
+- delivery/serviceability status where appropriate
+- Sponsored label where applicable
+
+Do not overcrowd the card.
+
+==================================================
+5. PRODUCT CLICK BEHAVIOUR
+==================================================
+
+THIS IS IMPORTANT.
+
+When a customer clicks:
+
+PRODUCT IMAGE
+or
+PRODUCT NAME
+
+they should NOT go to a generic isolated product page.
+
+Instead:
+
+FOR YOU
+↓
+PRODUCT CLICK
+↓
+MERCHANT STOREFRONT
+↓
+THAT EXACT PRODUCT
+
+Example:
+
+For You
+↓
+Cooking Oil
+↓
+Muroora Mart storefront
+↓
+Cooking Oil product highlighted/opened
+
+The customer should immediately understand:
+
+"I am now inside Muroora Mart."
+
+==================================================
+6. MERCHANT NAME / LOGO CLICK
+==================================================
+
+When the customer clicks:
+
+merchant logo
+or
+merchant name
+
+open:
+
+MERCHANT STOREFRONT HOME
+
+Example route conceptually:
+
+/store/muroora-mart
+
+When clicking the product:
+
+/store/muroora-mart/product/cooking-oil-2l
+
+Use the existing routing architecture where possible.
+
+==================================================
+7. MERCHANT STOREFRONT IDENTITY
+==================================================
+
+Every approved merchant should have a proper branded storefront.
+
+At the top show:
+
+- merchant cover image
+- merchant logo
+- merchant name
+- verification badge
+- short description/tagline
+- location
+- delivery/collection information where useful
+
+Example:
+
+[ MUROORA MART COVER IMAGE ]
+
+[logo]
+Muroora Mart
+Musuwo Approved
+Quality goods, great value
+
+The customer must visually understand that they have entered that merchant's shop.
+
+==================================================
+8. STOREFRONT SECTIONS
+==================================================
+
+Desktop/browser:
+
+Create a store-specific side navigation.
+
+Example:
+
+STORE HOME
+ALL PRODUCTS
+
+CATEGORIES
+Groceries
+Drinks
+Snacks
+Household
+Beauty
+etc.
+
+OTHER
+Popular
+New Arrivals
+Offers
+
+INFORMATION
+About Store
+Reviews
+Delivery Information
+
+Use the merchant's real categories.
+
+Do not hard-code Muroora-specific categories globally.
+
+==================================================
+9. MOBILE STOREFRONT NAVIGATION
+==================================================
+
+Do not force a permanent desktop sidebar onto mobile.
+
+Use a mobile drawer or equivalent:
+
+[ Store Menu ]
+
+→ Store Home
+→ All Products
+→ Categories
+→ Popular
+→ Offers
+→ Reviews
+→ About
+→ Delivery
+
+The mobile experience should remain clean and touch-friendly.
+
+==================================================
+10. RETURN TO FOR YOU STATE
+==================================================
+
+This is a high-priority UX requirement.
+
+If a customer scrolls far down the For You feed and opens a product:
+
+For You
+↓
+Product
+↓
+Merchant Storefront
+
+When they press BACK:
+
+RETURN TO THE SAME FOR YOU POSITION.
+
+Do NOT reset them to the top.
+
+Preserve where practical:
+
+- scroll position
+- loaded products
+- pagination state
+- filters
+- recommendation session
+- feed state
+
+This should work on both:
+
+WEB
+and
+MOBILE
+
+==================================================
+11. STORE SLUGS
+==================================================
+
+Every merchant should have a unique reusable store slug.
+
+Example:
+
+musuwo.online/store/muroora-mart
+
+Product:
+
+musuwo.online/store/muroora-mart/product/cooking-oil-2l
+
+Use collision-safe slug generation.
+
+Do not silently change old slugs in ways that break shared links.
+
+==================================================
+12. FOR YOU RECOMMENDATION ENGINE — V1
+==================================================
+
+Do NOT start with machine learning.
+
+We do not yet have enough real user behaviour.
+
+Build a transparent, configurable scoring/ranking system.
+
+Conceptually:
+
+PRODUCT SCORE =
+
+relevance
++
+customer interest
++
+product performance
++
+geographic/serviceability relevance
++
+merchant reliability
++
+freshness
++
+exploration bonus
++
+promotion weighting when applicable
+
+Do not hard-code random magic numbers everywhere.
+
+Create configuration that can be tuned later.
+
+==================================================
+13. SIGNALS FOR THE ALGORITHM
+==================================================
+
+Potential signals include:
+
+- category relevance
+- search relevance
+- previous product interactions
+- product impressions
+- product views
+- add-to-cart rate
+- conversion rate
+- product purchases
+- product shares
+- store visits generated
+- merchant order-completion performance
+- product availability
+- freshness
+- new-product exploration
+- location/serviceability where already available
+
+DO NOT incorporate advanced GIS if it is not already implemented.
+
+Prepare the architecture for location relevance later.
+
+==================================================
+14. IMPRESSION VS VIEW
+==================================================
+
+These MUST be separate.
+
+IMPRESSION:
+
+Product was meaningfully visible in the customer's feed.
+
+VIEW:
+
+Customer intentionally opened the product.
+
+Do NOT call impressions "views."
+
+Do not count:
+
+- hidden products
+- below-fold cards never shown
+- React rerenders
+- admin previews
+- merchant self-refresh spam
+
+as genuine customer views.
+
+==================================================
+15. PRODUCT EVENTS
+==================================================
+
+Create/reuse an event system capable of recording:
+
+PRODUCT_IMPRESSION
+PRODUCT_VIEW
+STORE_VISIT
+ADD_TO_CART
+REMOVE_FROM_CART
+CHECKOUT_STARTED
+ORDER_COMPLETED
+PRODUCT_SHARED
+SEARCH_RESULT_CLICKED
+
+Do not collect unnecessary personally identifiable information.
+
+==================================================
+16. ANALYTICS EVENT QUALITY
+==================================================
+
+Prevent garbage analytics.
+
+Implement reasonable protection against:
+
+- repeated refresh inflation
+- duplicate event firing
+- component rerender impressions
+- bot-like repeated requests
+- merchant repeatedly viewing their own product
+- admin previews
+- duplicate transaction events
+
+Use session/user/event deduplication where appropriate.
+
+==================================================
+17. PRODUCT ANALYTICS
+==================================================
+
+Every merchant should be able to see analytics for their own products.
+
+For example:
+
+PRODUCT PERFORMANCE
+
+Crochet Bucket Hat
+
+Impressions
+Unique viewers
+Product views
+Add to cart
+Orders
+Conversion rate
+Revenue
+
+Also track:
+
+Store entries generated by this product
+
+Example:
+
+184 users entered the merchant store through this product.
+
+==================================================
+18. DISCOVERY PRODUCT METRIC
+==================================================
+
+Create the concept:
+
+STORE DISCOVERY GENERATED
+
+A product may perform as a gateway into a merchant's shop.
+
+Example:
+
+Customer sees Cooking Oil
+↓
+opens product
+↓
+enters Muroora
+↓
+browses rice
+↓
+buys rice
+
+The Cooking Oil product still generated meaningful store discovery.
+
+Track this.
+
+==================================================
+19. STORE ANALYTICS
+==================================================
+
+Merchant analytics should include:
+
+- store visits
+- unique store visitors
+- product impressions
+- product views
+- orders
+- conversion
+- revenue
+- top products
+- top entry products
+- top categories
+- customer discovery sources where available
+
+Traffic-source examples:
+
+For You
+Search
+Shared link
+Direct store link
+Other
+
+==================================================
+20. MERCHANT RECOMMENDATION ENGINE
+==================================================
+
+Build a RULES-BASED merchant recommendation system initially.
+
+Do NOT require AI/LLM calls for every suggestion.
+
+Examples:
+
+HIGH IMPRESSIONS
++
+LOW PRODUCT VIEWS
+
+→ Suggest improving:
+image
+title
+price presentation
+
+HIGH PRODUCT VIEWS
++
+LOW ADD-TO-CART
+
+→ Suggest reviewing:
+price
+description
+availability
+delivery conditions
+
+HIGH ADD-TO-CART
++
+LOW PURCHASE
+
+→ Suggest reviewing:
+checkout friction
+delivery cost
+stock
+payment options
+
+LOW IMPRESSIONS
++
+HIGH CONVERSION
+
+→ Suggest:
+"This product performs strongly when shown to customers. Increasing exposure may generate additional sales."
+
+HIGH STORE DISCOVERY GENERATED
+
+→ Suggest:
+"This product is bringing customers into your store. Keep it well stocked and consider increasing its exposure."
+
+==================================================
+21. PRODUCT PROMOTION / BOOST SYSTEM
+==================================================
+
+Build the promotion infrastructure now, but do NOT automatically activate paid production billing.
+
+Initial model:
+
+BOOST PRODUCT
+$0.30
+24 HOURS
+
+The exact price must be configurable by Platform Owner.
+
+Do not hard-code USD 0.30 permanently.
+
+The feature should support:
+
+PROMOTION_DISABLED
+TEST_MODE
+LIVE
+
+Start with:
+
+TEST_MODE or DISABLED
+
+unless existing payment infrastructure already supports safe live billing.
+
+==================================================
+22. BOOST DOES NOT MEAN #1
+==================================================
+
+Paying for promotion must NOT guarantee first place.
+
+Boost means:
+
+ADDITIONAL ELIGIBLE DISTRIBUTION
+
+The recommendation engine must still consider:
+
+- relevance
+- category
+- availability
+- serviceability
+- merchant approval
+- product status
+
+A Chinhoyi accommodation advertisement should not randomly appear to a Mutare grocery shopper simply because someone paid.
+
+==================================================
+23. SPONSORED LABEL
+==================================================
+
+Every promoted product must clearly display:
+
+Sponsored
+or
+Promoted
+
+Do not disguise ads as organic recommendations.
+
+==================================================
+24. SPONSORED DENSITY
+==================================================
+
+Do not flood For You with advertising.
+
+Prepare a configurable sponsored density.
+
+Recommended initial concept:
+
+approximately one promoted item per 8 organic items
+
+but make this configurable.
+
+Do not hard-code exact placement if existing feed architecture suggests a better implementation.
+
+==================================================
+25. MERCHANT DIVERSITY
+==================================================
+
+Do not allow one merchant to dominate the entire For You feed.
+
+Introduce merchant diversity controls.
+
+Example:
+
+Maximum consecutive products from same merchant:
+1 or 2
+
+Promotion should not let a single merchant buy the entire feed.
+
+==================================================
+26. NEW MERCHANT / PRODUCT EXPLORATION
+==================================================
+
+Prevent the rich-get-richer feedback loop.
+
+If ranking depends only on:
+
+views
+orders
+conversion
+
+then existing winners will receive all future exposure.
+
+Create a controlled exploration bonus for:
+
+- new approved merchants
+- new active products
+- relevant products with limited data
+
+Exploration must not overpower quality/relevance.
+
+==================================================
+27. MERCHANT MOBILE DASHBOARD
+==================================================
+
+The mobile merchant experience should provide useful summary analytics.
+
+Example:
+
+TODAY
+
+Impressions
+Product views
+Store visits
+Orders
+Revenue
+
+TOP PRODUCT
+
+[product]
+views
+orders
+
+[VIEW ANALYTICS]
+
+Do NOT try to reproduce the entire browser analytics studio inside the mobile app.
+
+==================================================
+28. BROWSER MERCHANT STUDIO
+==================================================
+
+Create/improve a proper web merchant-management environment.
+
+Conceptually:
+
+MUSUWO MERCHANT STUDIO
+
+Overview
+Products
+Orders
+Inventory
+Analytics
+Promotions
+Storefront
+Settings
+
+Analytics:
+
+Overview
+Discovery
+Products
+Conversion
+Store Traffic
+Search
+Promotions
+Revenue
+
+Use real data only.
+
+==================================================
+29. BROWSER = FULL ANALYTICS EXPERIENCE
+==================================================
+
+The mobile app should inform merchants:
+
+"For full analytics and advanced store management, open Musuwo Merchant Studio on the web."
+
+But:
+
+DO NOT make the mobile app useless.
+
+Mobile must still provide:
+
+- basic analytics
+- order management
+- product management
+- stock management
+- store status
+- essential settings
+
+==================================================
+30. FIX MOBILE STORE MANAGEMENT
+==================================================
+
+Currently some Store Management sections/buttons in the mobile application are visible but cannot be clicked.
+
+AUDIT ALL OF THEM.
+
+Examples may include:
+
+Products
+Orders
+Inventory
+Analytics
+Promotions
+Store Profile
+Business Information
+Delivery
+Payment Settings
+Settings
+
+For every visible action:
+
+A. Make it work
+
+OR
+
+B. Clearly mark it Coming Soon.
+
+DO NOT leave buttons/cards that appear interactive but do nothing.
+
+==================================================
+31. MOBILE ROUTING
+==================================================
+
+Ensure every merchant-management screen routes correctly on mobile.
+
+Audit:
+
+- tap handlers
+- navigation stacks
+- deep links
+- route params
+- merchant IDs
+- store IDs
+- product IDs
+- permissions
+
+Fix broken navigation properly.
+
+Do not simply wrap everything in empty onPress handlers.
+
+==================================================
+32. PLATFORM OWNER ANALYTICS
+==================================================
+
+Platform Owner should receive marketplace-level analytics.
+
+Examples:
+
+Active products
+Active merchants
+Product impressions
+Product views
+Store visits
+Orders
+GMV where available
+Musuwo revenue where implemented
+
+TOP CATEGORIES
+TRENDING PRODUCTS
+TOP MERCHANTS
+NEW MERCHANTS
+SEARCHES WITH LOW SUPPLY
+
+Example:
+
+"school shoes"
+147 searches
+3 relevant active products
+
+This should eventually help Musuwo identify market gaps.
+
+==================================================
+33. DO NOT SHOW MERCHANT PRIVATE ANALYTICS TO OTHER MERCHANTS
+==================================================
+
+Merchant A must NOT be able to access:
+
+Merchant B:
+- impressions
+- product views
+- conversion
+- revenue
+- private performance
+- promotions
+- customer analytics
+- internal recommendations
+
+This must be enforced at:
+
+DATABASE/RLS
+and
+SERVER/API
+
+Not merely hidden in UI.
+
+==================================================
+34. SECURITY — RLS AUDIT IS MANDATORY
+==================================================
+
+I previously received Supabase warnings involving:
+
+rls_disabled_in_public
+
+and
+
+sensitive_columns_exposed
+
+You MUST verify the CURRENT state of the database.
+
+Do NOT assume previous security fixes remain correct.
+
+Before this feature goes live, explicitly answer:
+
+IS RLS CURRENTLY SECURE?
+
+ARE ANY TABLES LEAKING DATA?
+
+CAN ANONYMOUS USERS ACCESS DATA THEY SHOULD NOT ACCESS?
+
+CAN ONE BUSINESS ACCESS ANOTHER BUSINESS'S PRIVATE DATA?
+
+CAN ONE CUSTOMER ACCESS ANOTHER CUSTOMER'S PRIVATE DATA?
+
+CAN MERCHANTS MANIPULATE ANALYTICS BELONGING TO OTHER MERCHANTS?
+
+CAN USERS MANIPULATE THEIR OWN ANALYTICS TO IMPROVE RANKING?
+
+==================================================
+35. RLS AUDIT — EVERY PUBLIC TABLE
+==================================================
+
+Inspect every table in the public schema.
+
+For each table report:
+
+TABLE
+RLS ENABLED YES/NO
+POLICIES
+ANON ACCESS
+AUTHENTICATED ACCESS
+MERCHANT ACCESS
+ADMIN ACCESS
+SENSITIVE DATA YES/NO
+LEAK RISK
+RECOMMENDED CHANGE
+
+Pay special attention to:
+
+profiles
+businesses
+business_members
+business_applications
+products
+orders
+order_items
+addresses
+verification
+verification_documents
+product_impressions
+product_views
+product_events
+analytics
+merchant_analytics
+promotion_campaigns
+payment records
+customer information
+messages
+support
+security reports
+audit logs
+
+==================================================
+36. ANONYMOUS DATA TEST
+==================================================
+
+Using only the normal public/anon Supabase credentials, safely test whether anonymous users can:
+
+SELECT
+INSERT
+UPDATE
+DELETE
+
+against protected tables.
+
+Do NOT delete or alter real pilot data.
+
+Expected:
+
+Anonymous may read intentionally public approved product/store information.
+
+Anonymous must NOT access:
+
+- private merchant analytics
+- addresses
+- verification data
+- IDs
+- private customer records
+- orders
+- internal revenue information
+- promotion billing records
+- admin data
+
+==================================================
+37. CROSS-MERCHANT SECURITY TEST
+==================================================
+
+Use safe test businesses:
+
+BUSINESS A
+BUSINESS B
+
+Verify BUSINESS A cannot:
+
+- read Business B private analytics
+- read Business B private orders
+- modify Business B products
+- modify Business B promotions
+- manipulate Business B analytics
+- access Business B verification
+- access Business B private settings
+
+And vice versa.
+
+==================================================
+38. CROSS-CUSTOMER SECURITY TEST
+==================================================
+
+Use safe test users:
+
+CUSTOMER A
+CUSTOMER B
+
+Verify CUSTOMER A cannot:
+
+- access Customer B profile
+- read Customer B orders
+- read Customer B addresses
+- access Customer B messages
+- access Customer B private behaviour history
+
+==================================================
+39. ANALYTICS WRITE SECURITY
+==================================================
+
+Analytics are particularly sensitive because they affect recommendation ranking.
+
+Do NOT allow merchants to directly write:
+
+product impressions
+product views
+conversions
+ranking scores
+organic performance
+
+from the client in a trusted way.
+
+Use secure backend/event validation where appropriate.
+
+A merchant must NOT be able to send:
+
+views = 1000000
+
+and become the top product.
+
+==================================================
+40. RECOMMENDATION SCORE SECURITY
+==================================================
+
+The client must NOT control authoritative ranking scores.
+
+Recommendation scoring must be calculated by trusted backend/server/database logic.
+
+The browser/mobile app may receive:
+
+ranked product results
+
+but should not dictate:
+
+organic_rank
+conversion_score
+merchant_quality_score
+promotion_weight
+
+==================================================
+41. PROMOTION SECURITY
+==================================================
+
+A merchant must NOT be able to modify:
+
+promotion price
+promotion duration
+promotion status
+payment status
+promotion weighting
+
+through client-side manipulation.
+
+If promotions are not yet paid/live:
+
+keep payment status controlled in test mode.
+
+==================================================
+42. SUPABASE STORAGE AUDIT
+==================================================
+
+Check storage buckets.
+
+PUBLIC may include:
+
+product images
+merchant logos
+merchant covers
+
+PRIVATE must include:
+
+ID documents
+holding-ID photos
+address verification
+business private documents
+security reports
+other sensitive verification material
+
+Ensure private objects are not accessible with permanent public URLs.
+
+==================================================
+43. SERVICE ROLE KEY AUDIT
+==================================================
+
+Search:
+
+web
+mobile
+repository
+environment files
+build files
+
+for:
+
+SUPABASE_SERVICE_ROLE_KEY
+
+or equivalent privileged credentials.
+
+The service role must NEVER appear in:
+
+browser JS
+client components
+Expo/React Native bundles
+APK
+iOS application
+public repository
+
+If exposed:
+
+STOP.
+
+Tell me immediately.
+
+Recommend rotation where necessary.
+
+Do not print the key.
+
+==================================================
+44. ROLE ESCALATION TEST
+==================================================
+
+Verify a normal user cannot modify:
+
+role
+is_admin
+super_admin
+platform_owner
+permissions
+
+and promote themselves.
+
+Platform Owner / Super Admin authorization must be secure server-side.
+
+==================================================
+45. PUBLIC PRODUCT DATA VS PRIVATE BUSINESS DATA
+==================================================
+
+Create a clear separation.
+
+PUBLIC:
+
+approved merchant name
+merchant logo
+merchant cover
+public description
+approved active products
+public prices
+public categories
+approved reviews
+
+PRIVATE:
+
+revenue
+conversion rates
+internal recommendations
+promotion budget
+private settings
+internal notes
+verification
+documents
+private addresses
+admin decisions
+
+==================================================
+46. SECURITY ADVISOR
+==================================================
+
+After implementation:
+
+Run/check Supabase Security Advisor.
+
+Specifically verify:
+
+rls_disabled_in_public
+
+sensitive_columns_exposed
+
+If either warning remains:
+
+explain exactly:
+
+- affected table
+- why it remains
+- whether it is intentional
+- why it is safe
+
+Do not ignore critical warnings.
+
+==================================================
+47. DATABASE ARCHITECTURE
+==================================================
+
+Reuse existing tables wherever reasonable.
+
+Potential new concepts may include:
+
+product_impressions
+product_events
+product_analytics_daily
+merchant_analytics_daily
+recommendation_sessions
+recommendation_events
+promotion_campaigns
+promotion_events
+
+Do NOT create duplicates if equivalent structures already exist.
+
+==================================================
+48. PERFORMANCE
+==================================================
+
+The For You feed must remain efficient.
+
+Do not calculate enormous analytics/ranking queries for every card render.
+
+Use appropriate:
+
+indexes
+aggregation
+daily summaries
+caching
+pagination
+cursor-based loading
+materialized/precomputed data where justified
+
+Explain performance choices.
+
+==================================================
+49. INDEXES
+==================================================
+
+Review indexes for:
+
+products
+business_id
+category
+status
+created_at
+product events
+product_id
+user/session
+merchant analytics
+promotion status
+feed ranking inputs
+
+Do not create redundant indexes blindly.
+
+==================================================
+50. LOW-BANDWIDTH EXPERIENCE
+==================================================
+
+Many users may have limited or expensive mobile data.
+
+Optimize:
+
+images
+pagination
+lazy loading
+API calls
+feed payload
+storefront payload
+
+Do not download an entire merchant catalogue when only a few products are visible.
+
+==================================================
+51. IMAGE LOADING
+==================================================
+
+Use:
+
+responsive image sizes
+compression
+lazy loading
+placeholders
+
+Do not destroy product-image quality.
+
+==================================================
+52. WEB + MOBILE PARITY
+==================================================
+
+Core customer behaviour should work consistently:
+
+FOR YOU
+product click
+merchant store
+back to feed
+search
+cart
+
+Merchant core behaviour:
+
+products
+orders
+basic analytics
+store profile
+
+Browser gets the richer merchant-management experience.
+
+==================================================
+53. TESTING — CUSTOMER
+==================================================
+
+Test:
+
+1. For You loads.
+2. Multiple merchants appear.
+3. Product click opens correct merchant store/product.
+4. Merchant logo click opens merchant home.
+5. Correct merchant cover/logo shown.
+6. Store categories work.
+7. Back restores feed position.
+8. Sponsored label visible.
+9. Organic/sponsored mix reasonable.
+10. One merchant does not dominate.
+11. New products can receive exploration exposure.
+12. Unapproved products never appear publicly.
+
+==================================================
+54. TESTING — MERCHANT ANALYTICS
+==================================================
+
+Test:
+
+1. impression increments correctly
+2. rerenders do not inflate impressions
+3. product views recorded correctly
+4. merchant self-refresh does not heavily distort analytics
+5. store visits recorded
+6. conversion calculated correctly
+7. top products calculated from real data
+8. recommendations generated from actual metrics
+9. Merchant A cannot see Merchant B data
+
+==================================================
+55. TESTING — PROMOTION
+==================================================
+
+Test:
+
+1. promotion can be configured
+2. promotion disabled/test/live modes work
+3. merchant cannot alter promotion price client-side
+4. sponsored item labeled
+5. boost does not guarantee first position
+6. irrelevant promoted items do not bypass relevance checks
+7. expired promotion stops
+8. one merchant cannot flood feed
+
+==================================================
+56. TESTING — MOBILE STORE MANAGEMENT
+==================================================
+
+Test every visible merchant-management action.
+
+Products
+Orders
+Inventory
+Analytics
+Promotions
+Store Profile
+Delivery
+Payments
+Settings
+
+Every visible card/button must:
+
+work
+OR
+say Coming Soon.
+
+No dead controls.
+
+==================================================
+57. TESTING — SECURITY
+==================================================
+
+Test:
+
+ANON → private merchant analytics
+EXPECTED DENIED
+
+ANON → verification data
+EXPECTED DENIED
+
+MERCHANT A → Merchant B analytics
+EXPECTED DENIED
+
+MERCHANT A → Merchant B products update
+EXPECTED DENIED
+
+CUSTOMER A → Customer B orders
+EXPECTED DENIED
+
+NORMAL USER → admin role escalation
+EXPECTED DENIED
+
+CLIENT → manipulate ranking score
+EXPECTED DENIED
+
+CLIENT → fabricate analytics
+EXPECTED DENIED
+
+CLIENT → fake promotion payment
+EXPECTED DENIED
+
+==================================================
+58. REGRESSION TESTING
+==================================================
+
+Confirm existing features still work:
+
+Musuwo homepage
+Muroora Mart
+business registration
+individual seller registration
+verification
+products
+cart
+orders
+delivery
+accommodation
+services
+customer accounts
+merchant accounts
+Platform Owner
+Super Admin
+web app
+mobile app
+Supabase storage
+
+==================================================
+59. COST CONTROL
+==================================================
+
+Do NOT introduce unnecessary paid services.
+
+During pilot:
+
+Vercel
+→ remain free tier where practical.
+
+Supabase
+→ remain free tier where practical.
+
+Namecheap
+→ domain.
+
+Zoho
+→ existing email system.
+
+Do not add paid analytics/recommendation platforms unnecessarily.
+
+If a paid service becomes necessary:
+
+STOP.
+
+Tell me:
+
+1. cost
+2. why
+3. free alternative
+4. consequence of not using it
+
+before integrating it.
+
+==================================================
+60. IMPLEMENTATION ORDER
+==================================================
+
+PHASE 1
+AUDIT
+
+PHASE 2
+SECURITY + RLS AUDIT
+
+PHASE 3
+DATABASE / ANALYTICS EVENT FOUNDATION
+
+PHASE 4
+FOR YOU DEFAULT EXPERIENCE
+
+PHASE 5
+MERCHANT STOREFRONT ROUTING
+
+PHASE 6
+PRODUCT + STORE ANALYTICS
+
+PHASE 7
+RULES-BASED RECOMMENDATION ENGINE
+
+PHASE 8
+PROMOTION/BOOST INFRASTRUCTURE
+
+PHASE 9
+MERCHANT MOBILE DASHBOARD
+
+PHASE 10
+WEB MERCHANT STUDIO
+
+PHASE 11
+FIX MOBILE STORE MANAGEMENT
+
+PHASE 12
+SECURITY TESTING
+
+PHASE 13
+REGRESSION TESTING
+
+PHASE 14
+FINAL REPORT
+
+==================================================
+61. REQUIRED FIRST RESPONSE FROM CLAUDE
+==================================================
+
+BEFORE IMPLEMENTATION, answer:
+
+1. What currently powers the Musuwo homepage?
+2. Does a For You feed already exist?
+3. How are products currently loaded?
+4. How are businesses currently displayed?
+5. How do merchant storefronts currently work?
+6. Does product → merchant routing already exist?
+7. Are store slugs implemented?
+8. Are merchant cover images implemented?
+9. Does scroll restoration already exist?
+10. What analytics tables/events already exist?
+11. Are impressions currently distinguished from views?
+12. What merchant analytics already exist?
+13. What promotion infrastructure exists?
+14. Which mobile store-management buttons are broken?
+15. What must change in the mobile navigation?
+16. What database changes are required?
+17. What indexes are required?
+18. What recommendation approach will you implement?
+19. How will you prevent new merchants being buried?
+20. How will you prevent one merchant dominating the feed?
+21. How will promotion weighting work?
+22. How will analytics manipulation be prevented?
+23. Is current RLS secure?
+24. Which public tables have RLS disabled?
+25. Are any sensitive columns exposed?
+26. Can anonymous users read private data?
+27. Can one merchant access another merchant's data?
+28. Can one customer access another customer's data?
+29. Are private verification storage buckets secure?
+30. Is the service-role key exposed anywhere client-side?
+31. Does Supabase Security Advisor currently show critical warnings?
+32. What will be changed to secure RLS?
+33. What existing functionality could those security changes affect?
+34. What existing code/tables will be reused?
+35. What will remain untouched?
+36. Will any new paid service be required?
+
+Give the audit first.
+
+Do not implement changes until the architecture and risks are understood.
+
+==================================================
+62. FINAL REPORT AFTER IMPLEMENTATION
+==================================================
+
+After implementation report:
+
+CUSTOMER EXPERIENCE
+- For You status
+- storefront routing status
+- scroll restoration status
+
+ANALYTICS
+- product analytics status
+- store analytics status
+- event tracking status
+
+ALGORITHM
+- ranking signals
+- exploration logic
+- merchant diversity logic
+
+PROMOTIONS
+- boost infrastructure
+- pricing configuration
+- sponsored labeling
+- current mode: disabled/test/live
+
+MOBILE
+- broken buttons fixed
+- remaining Coming Soon areas
+
+WEB
+- Merchant Studio status
+
+SECURITY
+- RLS status
+- leaked tables found
+- leak fixes
+- anonymous test results
+- cross-merchant test results
+- cross-customer test results
+- storage security
+- service-role audit
+- role escalation tests
+- analytics manipulation tests
+- promotion manipulation tests
+- Security Advisor status
+
+REGRESSION
+- web
+- mobile
+- Muroora
+- registration
+- orders
+- existing merchants
+
+REMAINING ISSUES
+
+Do not simply say:
+
+"Everything is secure."
+
+Show evidence from the tests performed.
+
+==================================================
+FINAL NON-NEGOTIABLES
+==================================================
+
+1. FOR YOU becomes the default shopping/home experience.
+2. Products are primary discovery objects.
+3. Businesses remain real merchant storefronts.
+4. Product click opens that product INSIDE its merchant store.
+5. Merchant logo/name opens merchant store home.
+6. Merchant cover/logo makes store identity obvious.
+7. Desktop uses store sidebar.
+8. Mobile uses appropriate drawer/navigation.
+9. Back returns user to previous For You feed position.
+10. Product impressions and product views are different.
+11. Merchants get product analytics.
+12. Merchants get store analytics.
+13. Rules-based recommendations first.
+14. No unnecessary machine learning yet.
+15. Build $0.30/24-hour boost infrastructure as configurable/testable.
+16. Paid boost does not guarantee first position.
+17. Sponsored products are clearly labelled.
+18. Promotion must remain relevant.
+19. One merchant cannot dominate the feed.
+20. New merchants/products receive controlled exploration.
+21. Mobile has useful analytics.
+22. Browser has full Merchant Studio.
+23. Fix all dead mobile Store Management buttons.
+24. Visible buttons either work or clearly say Coming Soon.
+25. Preserve Muroora Mart.
+26. Preserve existing merchants and data.
+27. RLS MUST BE AUDITED.
+28. Explicitly determine whether data is leaking.
+29. Cross-merchant private-data access must be impossible.
+30. Cross-customer private-data access must be impossible.
+31. Sensitive verification records must remain private.
+32. Analytics/ranking cannot be manipulated directly by clients.
+33. Service-role key must never be client-side.
+34. Do not weaken RLS to make the UI work.
+35. Re-run/check Supabase Security Advisor.
+36. Preserve free-tier-first infrastructure during the pilot.
+37. No destructive migration without explanation.
+38. Backend + web + mobile must all be implemented.
