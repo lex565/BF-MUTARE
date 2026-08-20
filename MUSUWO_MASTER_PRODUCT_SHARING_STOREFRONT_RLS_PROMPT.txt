@@ -1,0 +1,598 @@
+MUSUWO MASTER CORRECTION PROMPT Product Routing, Merchant Storefronts,
+Sharing, Deep Links, Authentication, Analytics and RLS
+
+IMPORTANT — AUDIT EXISTING IMPLEMENTATION FIRST
+
+This prompt is an addition/correction to previous Musuwo implementation
+prompts. The project is already under active development.
+
+Before making ANY changes, inspect the current Musuwo codebase and
+compare the existing implementation against every requirement below.
+
+For EACH requirement:
+
+1.  If already implemented correctly: LEAVE IT ALONE. Do not rewrite,
+    refactor, duplicate, or replace it unnecessarily.
+
+2.  If partially implemented: Preserve the working parts and fix ONLY
+    what is missing or incorrect.
+
+3.  If not implemented: Implement it cleanly using the existing Musuwo
+    architecture.
+
+4.  If the existing implementation conflicts with this prompt: Change
+    only the conflicting behaviour and preserve unrelated working
+    functionality.
+
+5.  If an existing technical solution already achieves the same intended
+    behaviour: Keep it rather than replacing it merely to match this
+    prompt’s wording.
+
+DO NOT duplicate routes, components, Supabase tables, migrations, RLS
+policies, database functions, analytics events, storage structures, or
+authentication logic.
+
+Process: AUDIT CURRENT STATE → IDENTIFY GAPS → FIX ONLY GAPS → TEST →
+REPORT.
+
+================================================== PRODUCT CARD AND
+STOREFRONT FLOW ==================================================
+
+Remove WhatsApp as a primary action from For You / marketplace product
+cards.
+
+The primary action should be:
+
+View product →
+
+The product card itself may also be clickable.
+
+Desired shopping journey:
+
+For You → Product → Merchant Storefront → Exact Selected Product → Cart
+→ Checkout → Order
+
+Example:
+
+Cotton pants Merchant: The Pant and Perfume Shop
+
+Clicking View product or the product itself must open:
+
+The Pant and Perfume Shop storefront → Cotton pants
+
+Do NOT send the customer directly to WhatsApp.
+
+Inside the merchant storefront clearly show the merchant’s actual public
+branding/data where available:
+
+-   business logo
+-   banner/cover image
+-   business name
+-   verification status where appropriate
+-   description
+-   public location where appropriate
+-   store categories/navigation
+-   merchant products
+
+Use real merchant-uploaded data. Do not hard-code branding.
+
+The customer must immediately understand that they are inside that
+merchant’s shop on Musuwo.
+
+================================================== MERCHANT CLICK VS
+PRODUCT CLICK ==================================================
+
+These must behave differently.
+
+Merchant logo/name click: → merchant storefront HOME
+
+Product / View Product click: → exact selected PRODUCT inside that
+merchant storefront
+
+Example:
+
+Click “The Pant and Perfume Shop” → The Pant and Perfume Shop storefront
+home.
+
+Click “Cotton pants” → The Pant and Perfume Shop → Cotton pants.
+
+================================================== WHATSAPP BEHAVIOUR
+==================================================
+
+WhatsApp is NOT the normal shopping flow.
+
+Do not place direct merchant WhatsApp contact as a primary CTA on every
+marketplace product card.
+
+WhatsApp should primarily be a SHARE channel:
+
+Share → WhatsApp → sends a Musuwo product URL → recipient returns to
+Musuwo
+
+A secondary “Contact supplier” option may exist where useful for:
+
+-   special product clarification
+-   pre-purchase questions requiring the merchant
+-   fulfilment issues
+-   order issues
+-   supplier-specific problems
+
+It must remain secondary to View Product, Add to Cart and Checkout.
+
+================================================== REAL PUBLIC PRODUCT
+SHARING ==================================================
+
+The current output may resemble:
+
+Cotton pants from The Pant and Perfume Shop on Musuwo:
+/marketplace/product/the-pant-and-perfume-shop/cotton-pants
+
+Do not share only a relative path.
+
+Share a COMPLETE publicly accessible HTTPS Musuwo URL.
+
+Preferred conceptual canonical structure:
+
+https://musuwo.online/store/[merchant-slug]/product/[product-slug]
+
+Example:
+
+https://musuwo.online/store/the-pant-and-perfume-shop/product/cotton-pants
+
+If the existing implementation already has a clean canonical route that
+achieves the same goal, keep it.
+
+The public URL must work: - from WhatsApp - from another browser - from
+another device - logged out - logged in
+
+Avoid multiple competing canonical URLs.
+
+If legacy /marketplace/product/… URLs already exist, do not
+unnecessarily break them. Redirect safely to the canonical route where
+appropriate.
+
+================================================== RICH PRODUCT PREVIEWS
+==================================================
+
+Shared Musuwo products should behave like proper e-commerce links.
+
+Generate dynamic Open Graph/social metadata using the actual product and
+merchant data.
+
+Where supported, the receiving platform should be able to display:
+
+PRODUCT IMAGE Product name Price Merchant name Available on Musuwo
+
+Provide appropriate dynamic metadata including:
+
+-   og:title
+-   og:description
+-   og:image
+-   og:url
+-   appropriate og:type
+-   canonical URL
+-   Twitter/X card metadata where useful
+-   structured product data / JSON-LD where appropriate
+-   price and availability where appropriate
+
+Conceptual example:
+
+og:title: Cotton pants | The Pant and Perfume Shop | Musuwo
+
+og:description: Shop Cotton pants from The Pant and Perfume Shop on
+Musuwo.
+
+og:image: actual public product image
+
+og:url: canonical public product URL
+
+Do NOT hard-code Cotton pants, prices, merchants, or images.
+
+================================================== SHARED PRODUCT
+LANDING EXPERIENCE ==================================================
+
+Desired flow:
+
+WhatsApp / social platform → Musuwo public product URL → Merchant
+storefront → Exact shared product
+
+Show:
+
+-   merchant banner
+-   merchant logo
+-   merchant name
+-   product image/gallery
+-   product name
+-   price
+-   description
+-   availability
+-   variants/options if already supported
+-   Add to Cart or appropriate shopping action
+-   other merchant products
+-   merchant/store navigation
+
+================================================== DO NOT FORCE LOGIN
+BEFORE SHOWING THE PRODUCT
+==================================================
+
+Do NOT immediately block a shared product behind a registration wall.
+
+A logged-out visitor should be able to:
+
+-   open the shared product
+-   view public product information
+-   see the merchant
+-   browse the public merchant storefront
+-   browse other public Musuwo products
+
+Require authentication only when appropriate for
+protected/account-dependent actions such as checkout, placing an order,
+favourites, order history, account management, or protected supplier
+contact.
+
+If a secure guest-cart implementation already exists, preserve it.
+
+A tasteful signup/sign-in prompt may be shown without hiding the
+product.
+
+Example:
+
+New to Musuwo? Discover and shop from local businesses across Zimbabwe.
+[Create account] [Sign in]
+
+================================================== PRESERVE DESTINATION
+THROUGH AUTHENTICATION
+==================================================
+
+If a logged-out visitor:
+
+opens Cotton pants → attempts a protected action → signs up/signs in
+
+DO NOT send them to the generic homepage afterward.
+
+Return them to:
+
+The Pant and Perfume Shop → Cotton pants
+
+Preserve the intended destination securely.
+
+Do not introduce an open-redirect vulnerability.
+
+Authenticated users clicking a shared link should go directly to the
+relevant product without unnecessary signup screens.
+
+================================================== MOBILE APP / DEEP
+LINKING ==================================================
+
+Prepare or preserve proper deep-link architecture where technically
+appropriate.
+
+Desired behaviour:
+
+If Musuwo app is installed: shared Musuwo URL → app → merchant
+storefront → exact product
+
+If app is not installed: shared Musuwo URL → Musuwo web app → merchant
+storefront → exact product
+
+The public web URL must always remain functional.
+
+If full native deep linking requires external configuration that cannot
+yet be completed, implement only the appropriate safe infrastructure and
+report the remaining requirements. Do not fake successful deep linking.
+
+================================================== SHARE MESSAGE AND
+NATIVE SHARING ==================================================
+
+Use clean dynamic share content.
+
+Example:
+
+Cotton pants — $1.00 The Pant and Perfume Shop Available on Musuwo
+
+https://musuwo.online/store/the-pant-and-perfume-shop/product/cotton-pants
+
+Where supported, use native Web Share so the user can choose WhatsApp,
+Messages, Email, other installed apps, etc.
+
+Provide a Copy Link fallback.
+
+The shared object must be the canonical Musuwo product URL, not the
+merchant’s WhatsApp number.
+
+================================================== ANALYTICS
+==================================================
+
+Preserve the analytics architecture from previous Musuwo work.
+
+Support the equivalent of:
+
+PRODUCT_IMPRESSION PRODUCT_VIEW STORE_VISIT ADD_TO_CART CHECKOUT_STARTED
+ORDER_COMPLETED PRODUCT_SHARED CONTACT_SUPPLIER
+
+If equivalent events already exist under different names, use the
+existing architecture rather than duplicating it.
+
+For sharing, where appropriate and privacy-respecting, record:
+
+share_channel = whatsapp
+
+or equivalent.
+
+Do NOT collect private recipient information.
+
+Where practical, preserve privacy-safe shared-link attribution such as:
+
+traffic_source = shared_link
+
+This should eventually support merchant analytics such as:
+
+-   product visits from shared links
+-   store visits from shared products
+-   conversions/orders from shared links
+-   product impressions/views
+-   top-performing products
+
+Never expose another merchant’s private analytics.
+
+================================================== SECURITY / SUPABASE
+RLS AUDIT ==================================================
+
+Audit the relevant Supabase RLS policies, API/server access, storage
+access, and public metadata behaviour.
+
+Explicitly check whether RLS is secure and whether anything is leaking.
+
+Public shared product pages may expose ONLY intentionally public
+information such as:
+
+-   approved merchant public name
+-   public merchant logo/banner
+-   public business description
+-   intentionally public location
+-   approved active products
+-   public product images
+-   public prices
+-   public availability
+-   public categories
+
+DO NOT expose:
+
+-   merchant private analytics
+-   private contact details unless intentionally published
+-   verification documents
+-   IDs/passports
+-   proof of residence
+-   private addresses
+-   internal merchant notes
+-   customer information
+-   customer emails/phone numbers
+-   unrelated order data
+-   merchant revenue
+-   promotion billing
+-   admin-only data
+-   private storage objects
+-   credentials/secrets
+-   service-role keys
+
+Never expose the Supabase service-role key to browser/mobile client
+code.
+
+Do not rely on hidden UI for security. Enforce protected access through
+RLS/server-side authorization.
+
+Do not weaken RLS simply to make public product pages work. If public
+access requires policy changes, make them narrowly scoped to approved
+public merchants/products.
+
+================================================== VISIBILITY RULES
+==================================================
+
+Shared links must NOT bypass Musuwo moderation/status rules.
+
+Test:
+
+Approved merchant + active approved product → public
+
+Deleted/disabled/private/draft product → not publicly
+purchasable/visible according to existing rules
+
+Suspended/unapproved merchant → shared URL must not bypass restrictions
+
+Out-of-stock product → communicate availability and enforce purchasing
+rules according to existing business logic
+
+For unavailable products, show a proper customer-facing experience
+rather than an internal/server error.
+
+Example:
+
+This product is currently unavailable.
+
+Then where appropriate: - Visit store - Similar products - Continue
+shopping
+
+================================================== FOR YOU AND STORE
+NAVIGATION ==================================================
+
+Do NOT undo the For You marketplace architecture.
+
+Products from different approved merchants should appear together in
+Musuwo’s main discovery experience.
+
+Product click: → exact product inside merchant store
+
+Merchant click: → merchant storefront home
+
+Inside a store, provide clear merchant branding and navigation.
+
+Where feasible, preserve sensible marketplace context when returning
+from the store.
+
+Do not break future/current promoted-product architecture. Promoted
+products must still lead through Musuwo into the correct
+merchant/product, not bypass the platform.
+
+================================================== WEB AND MOBILE
+CONSISTENCY ==================================================
+
+Audit browser/web and mobile behaviour.
+
+Do not fix only desktop while leaving mobile with the old WhatsApp-first
+behaviour.
+
+Preserve responsive layouts and existing working store-management
+functionality.
+
+If advanced merchant analytics are intentionally browser-first, preserve
+that design while allowing useful mobile summaries.
+
+================================================== TEST THE COMPLETE
+FLOW ==================================================
+
+Test all applicable scenarios:
+
+A. For You → Cotton pants → View Product → The Pant and Perfume Shop →
+Cotton pants.
+
+B. Click merchant name/logo → merchant storefront home.
+
+C. Product → Share → WhatsApp/native share → complete HTTPS Musuwo
+product URL.
+
+D. Logged-out recipient clicks shared URL → product and merchant
+branding visible.
+
+E. Logged-out recipient attempts protected action → auth → returns to
+exact original product.
+
+F. Authenticated recipient clicks shared URL → direct product
+experience.
+
+G. Verify dynamic metadata: title, description, image, canonical URL,
+structured data where implemented.
+
+H. Unavailable/deleted product → graceful unavailable experience.
+
+I. Suspended/unapproved merchant → shared URL does not bypass
+restrictions.
+
+J. Test responsive/mobile behaviour.
+
+K. Test relevant anonymous access against Supabase RLS and confirm
+protected data cannot be retrieved through modified/direct client
+requests.
+
+L. Confirm analytics are recorded without accidental duplicate counting
+from rerenders/navigation.
+
+M. Confirm sharing analytics do not collect recipient-private data.
+
+Do not claim a test passed if it was not actually performed.
+
+================================================== DO NOT DESTROY
+WORKING FEATURES ==================================================
+
+Do NOT:
+
+-   rebuild the project from scratch
+-   replace working architecture unnecessarily
+-   duplicate Supabase tables/migrations/RLS policies
+-   duplicate analytics systems
+-   create competing product/store routes
+-   break cart functionality
+-   break authentication
+-   break merchant dashboards
+-   break admin approval
+-   break business registration
+-   break merchant uploads
+-   break mobile functionality
+-   hard-code merchant/product data
+-   expose service-role credentials
+-   weaken RLS for convenience
+
+================================================== IMPLEMENTATION ORDER
+==================================================
+
+1.  Inspect repository/current implementation.
+2.  Classify every requirement as already implemented, partial, missing,
+    conflicting, or not applicable.
+3.  Inspect schema, migrations, RLS, routes, product/store components,
+    analytics, auth, and sharing.
+4.  Make the smallest safe changes.
+5.  Run relevant lint/type/build/tests.
+6.  Test product/merchant routing.
+7.  Test public shared URLs and auth return flow.
+8.  Audit RLS/security.
+9.  Test mobile/responsive behaviour.
+10. Report exactly what changed.
+
+================================================== FINAL REPORT REQUIRED
+==================================================
+
+When finished, report using:
+
+ALREADY IMPLEMENTED — NO CHANGE REQUIRED
+
+PARTIALLY IMPLEMENTED — COMPLETED/FIXED
+
+NEWLY IMPLEMENTED
+
+ROUTING State canonical product URL and merchant/product click
+behaviour.
+
+SHARING State share behaviour, native sharing, WhatsApp, Copy Link, and
+rich metadata behaviour.
+
+AUTHENTICATION Explain logged-out shared-link flow and return-to-product
+behaviour.
+
+ANALYTICS State events/attribution used.
+
+SECURITY/RLS CHECKS Explicitly report policies inspected, leaks
+found/not found, changes made, anonymous access boundaries, service-role
+exposure, and remaining concerns.
+
+WEB/MOBILE State what was actually checked.
+
+TESTS PERFORMED List actual commands/tests and results.
+
+REMAINING ISSUES List external configuration or unresolved requirements.
+
+Do not claim anything was tested or secured unless verified.
+
+================================================== END GOAL
+==================================================
+
+Musuwo should behave like:
+
+For You → discover products from many local businesses → click product →
+enter that merchant’s branded storefront → exact product opens →
+browse/add to cart/checkout/order
+
+Sharing should behave like:
+
+Product → Share → WhatsApp/another app → real HTTPS Musuwo product URL →
+rich product preview where supported → recipient clicks → sees product
+immediately inside merchant context → authenticates only when
+appropriate → returns to exact product after authentication → continues
+shopping
+
+WhatsApp: → sharing mechanism → optional secondary supplier-contact
+mechanism → NOT Musuwo’s primary shopping system
+
+Analytics should retain the Musuwo journey:
+
+Impression → Product View → Store Visit → Add to Cart → Checkout → Order
+→ Share
+
+MOST IMPORTANTLY:
+
+IF SOMETHING IS ALREADY IMPLEMENTED CORRECTLY, IGNORE IT AND LEAVE IT
+ALONE.
+
+IF PARTIALLY IMPLEMENTED, FIX ONLY WHAT IS MISSING OR INCORRECT.
+
+IF NOT IMPLEMENTED, IMPLEMENT IT.
+
+AUDIT FIRST. DO NOT DUPLICATE WORK.

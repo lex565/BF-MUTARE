@@ -29,6 +29,25 @@ import {
  * A business id arriving from a client is a REQUEST, never a permission.
  */
 
+/**
+ * Build a public storage URL from a stored bucket path.
+ *
+ * Returns null for a null path rather than a URL ending in "null", which is
+ * what string interpolation would produce and which every consuming component
+ * would then try to load.
+ *
+ * Only ever pointed at PUBLIC buckets. Verification documents live in
+ * `business-verification`, which is private, and are reached exclusively
+ * through the 60-second signed links in lib/platform/documents.ts - never
+ * through this helper. Passing that bucket name here would produce a URL that
+ * looks right and 404s, which is a confusing way to find out you have made a
+ * serious mistake.
+ */
+function publicStorageUrl(bucket: string, path: string | null): string | null {
+  if (!path) return null
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`
+}
+
 /** Statuses a member of the public may see. Everything else is private. */
 const PUBLIC_STATUSES = ['ACTIVE', 'PILOT'] as const
 
@@ -160,6 +179,16 @@ export async function requireMembership(
 /* ---------------------------------------------------------------- public */
 
 export interface PublicBusiness {
+  /**
+   * The internal id.
+   *
+   * Needed because a STORE_VISIT event is attributed to a business, and the
+   * storefront is where that event is raised. It is a UUID, not a secret: it
+   * names a business that is already public by definition, and every write
+   * path resolves membership from the signed-in user rather than from an id a
+   * client supplies.
+   */
+  id: string
   publicId: string
   name: string
   slug: string
@@ -167,6 +196,18 @@ export interface PublicBusiness {
   kind: string
   city: string
   logoPath: string | null
+  /** One line for the storefront banner. See migration 0024. */
+  tagline: string | null
+  /**
+   * Absolute URLs, resolved here from the stored bucket paths.
+   *
+   * The database holds a path and the application builds the URL - see the
+   * note on migration 0024 for why storing a URL is the wrong shape. Doing the
+   * resolution once, here, means no component has to know which bucket a logo
+   * lives in, and a component that forgets cannot render a raw path as a src.
+   */
+  logoUrl: string | null
+  coverImageUrl: string | null
   websiteUrl: string | null
   whatsappNumber: string | null
   faviconPath: string | null
@@ -196,13 +237,16 @@ export interface PublicBusiness {
 export async function listPublicBusinesses(): Promise<PublicBusiness[]> {
   const rows = await db
     .select({
+      id: businesses.id,
       publicId: businesses.publicId,
       name: businesses.name,
       slug: businesses.slug,
       summary: businesses.summary,
+      tagline: businesses.tagline,
       kind: businesses.kind,
       city: businesses.city,
       logoPath: businesses.logoPath,
+      coverImagePath: businesses.coverImagePath,
       websiteUrl: businesses.websiteUrl,
       whatsappNumber: businesses.whatsappNumber,
       faviconPath: businesses.faviconPath,
@@ -220,9 +264,11 @@ export async function listPublicBusinesses(): Promise<PublicBusiness[]> {
     )
     .orderBy(desc(businesses.isFounding), asc(businesses.name))
 
-  return rows.map(({ storeSlug, verifiedAt, ...b }) => ({
+  return rows.map(({ storeSlug, verifiedAt, coverImagePath, ...b }) => ({
     ...b,
     verified: verifiedAt !== null,
+    logoUrl: publicStorageUrl('business-branding', b.logoPath),
+    coverImageUrl: publicStorageUrl('business-branding', coverImagePath),
     storefrontUrl: storeSlug ? `/stores/${storeSlug}` : null,
   }))
 }

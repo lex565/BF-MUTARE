@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { ProductPhoto } from '@/app/components/marketplace/ProductPhoto'
+import { productPath } from '@/lib/musuwo-urls'
 import type { MarketplaceProduct } from '@/lib/services/marketplace'
 
 /**
@@ -218,7 +219,7 @@ export function ForYouFeed({ products, feedKey, surface = 'FOR_YOU' }: Props) {
             <Link
               /* Into the merchant's shop, carrying the product. Section 5:
                  the customer must land understanding whose shop they are in. */
-              href={`/marketplace/product/${product.merchant.slug}/${product.slug}`}
+              href={productPath(product.merchant.slug, product.slug)}
               className="group flex h-full flex-col border border-rule bg-paper transition-colors hover:border-support"
             >
               <ProductPhoto src={product.imageUrl} alt={product.name} />

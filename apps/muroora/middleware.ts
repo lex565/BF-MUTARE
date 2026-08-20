@@ -39,9 +39,44 @@ const MUSUWO_ONLY = ['/marketplace', '/riders']
 const MUSUWO_ORIGIN =
   process.env.NEXT_PUBLIC_MUSUWO_URL ?? 'https://musuwo.vercel.app'
 
+/**
+ * The old product address, moved here for the reason above.
+ *
+ * `/marketplace/product/{merchant}/{product}` is now
+ * `/stores/{merchant}/product/{product}` - see lib/musuwo-urls.ts. The legacy
+ * page calls `permanentRedirect`, and that was verified against production
+ * doing exactly what the note above predicts: HTTP 200, a generic
+ * "Musuwo - local businesses" title, and a NEXT_REDIRECT instruction buried in
+ * the RSC payload for the browser to act on.
+ *
+ * A browser follows it. A WhatsApp link preview, a search crawler and anything
+ * else that reads the document without running React does not - so the exact
+ * audience for a shared product link got a blank generic page. Doing it at the
+ * edge produces a real 308 with a Location header, before any renderer.
+ *
+ * The page-level redirect stays as the backstop, same rule as MUSUWO_ONLY.
+ */
+const LEGACY_PRODUCT = /^\/marketplace\/product\/([^/]+)\/([^/]+)\/?$/
+
 export async function middleware(request: NextRequest) {
   const brandIsMuroora = process.env.NEXT_PUBLIC_SITE_BRAND === 'muroora'
   const pathname = request.nextUrl.pathname
+
+  const legacy = LEGACY_PRODUCT.exec(pathname)
+  if (legacy) {
+    const to = `/stores/${legacy[1]}/product/${legacy[2]}`
+    // On the Muroora deployment this lands on Musuwo, not on Muroora. The old
+    // path lived under /marketplace, which is Musuwo's, and a marketplace
+    // product belongs to the marketplace: resolving it here would put Muroora
+    // Mart's name above another merchant's stock.
+    const url = brandIsMuroora
+      ? new URL(to, MUSUWO_ORIGIN)
+      : Object.assign(request.nextUrl.clone(), { pathname: to })
+    // 308 rather than 307: this move is permanent, and a permanent redirect is
+    // what moves a search engine's index across instead of leaving two entries
+    // for one product.
+    return NextResponse.redirect(url, 308)
+  }
 
   if (
     brandIsMuroora &&

@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react'
 
 import type { PublicBusiness, MarketplaceProduct } from '@/lib/services/marketplace'
 import { ProductPhoto } from '@/app/components/marketplace/ProductPhoto'
+import { productPath } from '@/lib/musuwo-urls'
 
 /**
  * The Musuwo directory: every approved business, and what they are selling.
@@ -70,9 +71,12 @@ function BusinessCard({ business }: { business: PublicBusiness }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex size-14 shrink-0 items-center justify-center bg-paper-sunk">
-          {business.logoPath ? (
+          {/* logoUrl, not logoPath. The column stores a bucket path and this
+              was passing it straight to next/image as a src, which can only
+              ever produce a broken image. */}
+          {business.logoUrl ? (
             <Image
-              src={business.logoPath}
+              src={business.logoUrl}
               alt=""
               width={56}
               height={56}
@@ -126,7 +130,7 @@ function ProductCard({ product }: { product: MarketplaceProduct }) {
        * it. It also carries the merchant slug, so the customer arrives knowing
        * whose shop they are in, which is the point of section 5.
        */
-      href={`/marketplace/product/${product.merchant.slug}/${product.slug}`}
+      href={productPath(product.merchant.slug, product.slug)}
       className="group flex flex-col border border-rule bg-paper transition-colors hover:border-support"
     >
       <ProductPhoto src={product.imageUrl} alt={product.name} />

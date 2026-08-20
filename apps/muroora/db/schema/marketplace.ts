@@ -122,6 +122,18 @@ export const businesses = pgTable(
     city: text('city').notNull().default('Mutare'),
     logoPath: text('logo_path'),
 
+    /**
+     * Storefront branding. Added by migration 0024.
+     *
+     * Both are PATHS within the `business-branding` bucket, never URLs, and a
+     * CHECK enforces it: a column that accepts a URL accepts any URL, and the
+     * site then renders whatever somebody pasted. That is not hypothetical -
+     * `favicon_path` above currently holds a wa.me link on one live merchant.
+     */
+    coverImagePath: text('cover_image_path'),
+    /** One line under the name on the banner. Capped at 120 characters. */
+    tagline: text('tagline'),
+
     /** Public links deliberately supplied by the business owner. These are
      * separate from private application contact details. */
     websiteUrl: text('website_url'),
