@@ -62,6 +62,43 @@ function VerifiedMark() {
   )
 }
 
+/**
+ * The merchant behind a product, on a card.
+ *
+ * Section 3: the business must stay identifiable on every product. The logo is
+ * drawn when the merchant has uploaded one and the initial stands in when they
+ * have not, which today is all of them - so the row never collapses and never
+ * shows a broken image.
+ *
+ * NOT A LINK. It sits inside the product card's own <a>, and nesting an anchor
+ * inside an anchor is invalid HTML that browsers resolve unpredictably. The
+ * merchant's storefront is one tap away from the product page, which is where
+ * the brief's merchant-click behaviour lives.
+ */
+function MerchantLine({ merchant }: { merchant: MarketplaceProduct['merchant'] }) {
+  return (
+    <span className="mt-3 flex items-center gap-2 text-small">
+      <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-paper-sunk">
+        {merchant.logoUrl ? (
+          <Image
+            src={merchant.logoUrl}
+            alt=""
+            width={24}
+            height={24}
+            className="size-6 object-contain"
+          />
+        ) : (
+          <span aria-hidden className="font-mono text-[0.6rem] font-bold text-ink-faint">
+            {merchant.name.charAt(0).toUpperCase()}
+          </span>
+        )}
+      </span>
+      <span className="min-w-0 truncate text-ink-soft">{merchant.name}</span>
+      {merchant.verified && <VerifiedMark />}
+    </span>
+  )
+}
+
 function BusinessCard({ business }: { business: PublicBusiness }) {
   const href = business.storefrontUrl ?? `/stores/${business.slug}`
   return (
@@ -144,10 +181,7 @@ function ProductCard({ product }: { product: MarketplaceProduct }) {
 
       {/* WHO IS SELLING IT. A marketplace listing without a named seller is
           how a customer ends up not knowing who they bought from. */}
-      <p className="mt-3 flex flex-wrap items-center gap-2 text-small">
-        <span className="text-ink-soft">{product.merchant.name}</span>
-        {product.merchant.verified && <VerifiedMark />}
-      </p>
+      <MerchantLine merchant={product.merchant} />
 
       <p className="mt-4 text-h3 text-support">
         ${product.price.decimal}
@@ -204,26 +238,38 @@ export function MarketplaceList({
 
   return (
     <main>
+      {/*
+        PRODUCT-FIRST, NOT A DIRECTORY.
+
+        This page used to open with "Local businesses you can find again",
+        a paragraph about the merchant review process, and then a grid of
+        business cards headed "3 businesses" - with the actual products below
+        the fold under "Products across Musuwo". A customer arriving to shop
+        was shown a register of companies and asked to pick one.
+
+        The hierarchy is now hero, search, filters, products. Businesses have
+        not gone anywhere: every product card names and links to its merchant,
+        the storefronts are unchanged, and searching a merchant's name still
+        surfaces that merchant. What has gone is the permanent block of
+        business cards standing between somebody and the thing they came for.
+      */}
       <section className="border-b border-rule bg-paper-sunk">
-        <div className="mx-auto max-w-[86rem] px-gutter py-14">
-          <p className="font-mono text-micro uppercase tracking-label text-accent">
-            Musuwo directory
-          </p>
-          <h1 className="mt-4 max-w-[16ch] text-mega leading-[.95]">
-            Local businesses you can find again.
+        <div className="mx-auto max-w-[86rem] px-gutter py-12">
+          <h1 className="max-w-[16ch] text-mega leading-[.95]">
+            Everything local, in one place.
           </h1>
-          <p className="mt-6 max-w-2xl text-lead text-ink-soft">
-            Every business here applied and was reviewed by a person before it
-            appeared.
+          <p className="mt-5 max-w-2xl text-lead text-ink-soft">
+            Discover products and services from local businesses across
+            Zimbabwe.
           </p>
 
-          <label className="mt-10 block">
-            <span className="sr-only">Search businesses and products</span>
+          <label className="mt-8 block">
+            <span className="sr-only">Search products, businesses or areas</span>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="min-h-16 w-full border border-rule bg-paper px-6 text-lead focus:border-accent focus:outline-none"
-              placeholder="Search by name, product or area"
+              placeholder="Search products, businesses or areas"
               type="search"
             />
           </label>
@@ -249,13 +295,35 @@ export function MarketplaceList({
       </section>
 
       <section className="mx-auto max-w-[86rem] px-gutter py-section">
-        {businesses.length === 0 ? (
+        {/* Products first, always. */}
+        {shownProducts.length > 0 ? (
+          <>
+            <div className="flex flex-wrap items-baseline justify-between gap-4">
+              <h2 className="text-h2">
+                {term ? 'Matching products' : 'Products across Musuwo'}
+              </h2>
+              <Link
+                href="/marketplace/apply"
+                className="font-mono text-micro uppercase tracking-label text-support transition-colors hover:text-accent"
+              >
+                Sell on Musuwo →
+              </Link>
+            </div>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {shownProducts.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </>
+        ) : (
           <div className="max-w-measure border-l-4 border-accent bg-paper-sunk px-6 py-8">
-            <h2 className="text-h3">No businesses are listed yet.</h2>
+            <h2 className="text-h3">
+              {term ? 'Nothing matches that.' : 'No products are listed yet.'}
+            </h2>
             <p className="mt-3 text-ink-soft">
-              Musuwo is new. Businesses appear here once they have applied and a
-              person has reviewed them, so this page shows nothing rather than
-              showing examples that do not exist.
+              {term
+                ? 'Try a different word, or browse everything.'
+                : 'Musuwo is new. Products appear once an approved business publishes them, so this page shows nothing rather than examples that do not exist.'}
             </p>
             <Link
               href="/marketplace/apply"
@@ -264,58 +332,44 @@ export function MarketplaceList({
               Apply to list your business
             </Link>
           </div>
-        ) : (
-          <>
-            <div className="flex flex-wrap items-baseline justify-between gap-4">
-              <h2 className="text-h2">
-                {shownBusinesses.length}{' '}
-                {shownBusinesses.length === 1 ? 'business' : 'businesses'}
-              </h2>
-              <Link
-                href="/marketplace/apply"
-                className="font-mono text-micro uppercase tracking-label text-support transition-colors hover:text-accent"
-              >
-                Apply to list yours →
-              </Link>
-            </div>
-
-            {shownBusinesses.length === 0 ? (
-              <p className="mt-8 text-ink-soft">
-                Nothing matches that. Try a different word.
-              </p>
-            ) : (
-              <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {shownBusinesses.map((b) => (
-                  <BusinessCard key={b.publicId} business={b} />
-                ))}
-              </div>
-            )}
-
-            {/* What "Verified" means, said once, in words, near the badges. */}
-            <p className="mt-8 max-w-measure text-small text-ink-faint">
-              <strong className="text-ink-soft">Verified</strong> means Musuwo
-              has seen that business&rsquo;s trading licence. It tells you the
-              business is registered and can be traced. It is not a review, and
-              it is not a judgement about how good they are.
-            </p>
-          </>
         )}
 
-        {shownProducts.length > 0 && (
+        {/*
+          MERCHANTS APPEAR WHEN SOMEBODY LOOKS FOR ONE.
+
+          Section 5 of the brief: intentional merchant search should still
+          find a merchant; a permanent directory above the catalogue should
+          not. So this block is rendered only while there is a search term
+          that matches a business. Typing "The Pant and Perfume Shop" finds
+          the shop; opening the page does not present a register of companies.
+        */}
+        {term !== '' && shownBusinesses.length > 0 && (
           <div className="mt-16">
             <h2 className="text-h2">
-              {term ? 'Matching products' : 'Products across Musuwo'}
+              {shownBusinesses.length === 1
+                ? 'Matching business'
+                : 'Matching businesses'}
             </h2>
-            <p className="mt-2 text-ink-soft">
-              Each one shows the business selling it.
-            </p>
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {shownProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {shownBusinesses.map((b) => (
+                <BusinessCard key={b.publicId} business={b} />
               ))}
             </div>
           </div>
         )}
+
+        {/*
+          What "Verified" means, said once, in words - moved off the hero and
+          down here beside the badges it explains. Section 8: the trust idea is
+          worth keeping and must not dominate the shopping experience, and it
+          must never read as Musuwo guaranteeing anybody.
+        */}
+        <p className="mt-16 max-w-measure border-t border-rule pt-6 text-small text-ink-faint">
+          <strong className="text-ink-soft">Verified</strong> means Musuwo has
+          seen that business&rsquo;s trading licence. It tells you the business
+          is registered and can be traced. It is not a review, and it is not a
+          judgement about how good they are.
+        </p>
       </section>
     </main>
   )

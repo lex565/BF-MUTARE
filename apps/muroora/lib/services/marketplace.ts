@@ -297,6 +297,8 @@ export interface MarketplaceProduct {
     /** RETAIL, FOOD, SERVICE and so on. Drives the category filter. */
     kind: string
     logoPath: string | null
+    /** Resolved from logoPath. A path is not a src - see publicStorageUrl. */
+    logoUrl: string | null
     websiteUrl: string | null
     whatsappNumber: string | null
     faviconPath: string | null
@@ -395,6 +397,7 @@ export async function listMarketplaceProducts(): Promise<MarketplaceProduct[]> {
         slug: r.merchantSlug,
         kind: r.merchantKind,
         logoPath: r.merchantLogo,
+        logoUrl: publicStorageUrl('business-branding', r.merchantLogo),
         websiteUrl: r.merchantWebsite,
         whatsappNumber: r.merchantWhatsapp,
         faviconPath: r.merchantFavicon,

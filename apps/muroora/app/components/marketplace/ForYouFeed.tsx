@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -230,17 +231,32 @@ export function ForYouFeed({ products, feedKey, surface = 'FOR_YOU' }: Props) {
                 {product.unitSize && (
                   <p className="mt-1 text-small text-ink-faint">{product.unitSize}</p>
                 )}
-                <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-small text-ink-soft">
-                  <span>{product.merchant.name}</span>
+                <span className="mt-3 flex items-center gap-2 text-small">
+                  <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-paper-sunk">
+                    {product.merchant.logoUrl ? (
+                      <Image
+                        src={product.merchant.logoUrl}
+                        alt=""
+                        width={24}
+                        height={24}
+                        className="size-6 object-contain"
+                      />
+                    ) : (
+                      <span aria-hidden className="font-mono text-[0.6rem] font-bold text-ink-faint">
+                        {product.merchant.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </span>
+                  <span className="min-w-0 truncate text-ink-soft">{product.merchant.name}</span>
                   {product.merchant.verified && (
                     <span
                       title="Musuwo has seen this business's trading licence. It says the business is registered, not that it is good."
-                      className="rounded-pill bg-support/10 px-2 py-0.5 font-mono text-micro font-bold uppercase tracking-label text-support"
+                      className="shrink-0 rounded-pill bg-support/10 px-2 py-0.5 font-mono text-micro font-bold uppercase tracking-label text-support"
                     >
                       Verified
                     </span>
                   )}
-                </p>
+                </span>
                 <p className="mt-auto pt-4 text-h3 text-support">
                   ${product.price.decimal}
                 </p>

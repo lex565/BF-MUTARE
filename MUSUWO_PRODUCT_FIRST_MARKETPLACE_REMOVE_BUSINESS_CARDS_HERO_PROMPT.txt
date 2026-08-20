@@ -1,0 +1,553 @@
+MUSUWO UI CORRECTION PROMPT Product-First Marketplace, Remove Business
+Directory Cards, and Fix Hero Messaging
+
+IMPORTANT — AUDIT EXISTING IMPLEMENTATION FIRST
+
+This is a focused UX correction to the existing Musuwo implementation.
+
+Claude may still be implementing previous Musuwo requirements. Before
+making any changes, inspect the current codebase.
+
+For every requirement below:
+
+1.  If it is already implemented correctly: LEAVE IT ALONE. Do not
+    rewrite, refactor, duplicate, or replace it unnecessarily.
+
+2.  If it is partially implemented: Preserve the working parts and fix
+    ONLY what is missing or incorrect.
+
+3.  If it is not implemented: Implement it cleanly using the existing
+    Musuwo architecture.
+
+4.  If an existing implementation already achieves the same intended UX
+    in a technically better way: Keep it.
+
+Do NOT restart the project. Do NOT duplicate components, routes,
+database structures, analytics, or Supabase policies. Do NOT break
+functionality implemented by previous Musuwo prompts.
+
+================================================== CURRENT PROBLEM
+==================================================
+
+On the current Musuwo marketplace/category page there is a visible
+business-directory section similar to:
+
+3 businesses
+
+[Muroora Mart] [Muradzikwa Tanyaradzwa Ashley] [The Pant and Perfume
+Shop]
+
+This appears before:
+
+Products across Musuwo
+
+The hero also currently uses business-directory-oriented messaging
+similar to:
+
+“Local businesses you can find again.”
+
+and explanatory copy about businesses applying and being reviewed.
+
+This makes the main customer marketplace feel too much like a business
+directory/classified listing page.
+
+That is NOT the intended primary Musuwo customer experience.
+
+Musuwo should be PRODUCT-FIRST.
+
+The intended discovery model is:
+
+Products → customer discovers a merchant through a product → customer
+enters that merchant’s storefront → customer browses more from that
+merchant
+
+================================================== 1. REMOVE THE
+PERMANENT BUSINESS DIRECTORY BLOCK
+==================================================
+
+Remove the large standalone business-card section from the main
+marketplace/category customer browsing page.
+
+This includes the visible block containing merchant cards before the
+product catalogue.
+
+Do NOT delete the businesses.
+
+Do NOT delete merchant records from Supabase.
+
+Do NOT remove merchant profiles.
+
+Do NOT remove merchant storefronts.
+
+Do NOT remove merchant logos.
+
+Do NOT remove merchant names from product cards.
+
+Do NOT remove business search functionality where appropriate.
+
+Do NOT alter merchant approval logic.
+
+This is a CUSTOMER-FACING PRESENTATION/NAVIGATION change only.
+
+The main marketplace/category page should no longer permanently display
+a block such as:
+
+“3 businesses”
+
+followed by merchant cards before products.
+
+================================================== 2. PRODUCTS BECOME
+THE MAIN DISCOVERY EXPERIENCE
+==================================================
+
+After removing the business-card block, move the product catalogue
+upward naturally.
+
+The main page hierarchy should become approximately:
+
+MUSUWO HERO ↓ SEARCH ↓ FILTERS / FOR YOU / EXPLORE / CATEGORIES ↓
+PRODUCTS ↓ PRODUCTS ↓ PRODUCTS
+
+Do not leave a large empty area where the business cards were removed.
+
+The product catalogue/feed should become the visual focus.
+
+================================================== 3. MERCHANT DISCOVERY
+STILL EXISTS THROUGH PRODUCTS
+==================================================
+
+Businesses remain extremely important to Musuwo.
+
+They are simply discovered more naturally through the products they
+sell.
+
+Each product card should continue to identify its merchant using
+appropriate information such as:
+
+-   merchant name
+-   merchant logo where available
+-   product name
+-   product image
+-   price
+-   relevant product information
+
+Example:
+
+[PRODUCT IMAGE]
+
+Cotton pants
+
+$1.00
+
+The Pant and Perfume Shop [merchant logo]
+
+View Product →
+
+================================================== 4. PRODUCT AND
+MERCHANT CLICK BEHAVIOUR
+==================================================
+
+Preserve the routing architecture from the previous Musuwo prompts.
+
+PRODUCT CLICK or VIEW PRODUCT:
+
+For You / Marketplace → Merchant Storefront → Exact Selected Product
+
+Example:
+
+Cotton pants → The Pant and Perfume Shop → Cotton pants
+
+MERCHANT NAME or MERCHANT LOGO CLICK:
+
+For You / Marketplace → Merchant Storefront Home
+
+Do not send the customer directly to WhatsApp.
+
+Do not break the existing storefront architecture.
+
+================================================== 5. BUSINESS SEARCH
+MUST STILL WORK ==================================================
+
+Removing the permanent business-card section does NOT mean businesses
+become impossible to find.
+
+The search experience may still support:
+
+-   product name
+-   merchant/business name
+-   category
+-   location/area where already implemented
+
+If a customer explicitly searches:
+
+“The Pant and Perfume Shop”
+
+it is appropriate to return the merchant/store as a search result.
+
+The distinction is:
+
+DO allow intentional merchant search.
+
+DO NOT permanently place a business directory above the product
+catalogue.
+
+================================================== 6. DEDICATED BUSINESS
+DIRECTORY, IF ONE EXISTS
+==================================================
+
+If Musuwo already has a separate business directory/search page that
+serves a useful purpose, do not delete it automatically.
+
+The main correction applies specifically to the primary
+marketplace/category/product-browsing experience.
+
+If a dedicated business-discovery page exists and does not conflict with
+this architecture, preserve it.
+
+================================================== 7. FIX THE HERO
+MESSAGING ==================================================
+
+The current hero messaging is too business-directory-oriented.
+
+Current-style wording such as:
+
+“Local businesses you can find again.”
+
+and prominent explanatory text about businesses applying and being
+reviewed should NOT dominate the primary shopping experience.
+
+Change the main customer-facing hero to communicate PRODUCT DISCOVERY
+and LOCAL COMMERCE.
+
+Preferred hero headline:
+
+“Everything local, in one place.”
+
+Use this as the default unless an existing implemented headline is
+already clearly better and achieves the same product-first positioning.
+
+Use a short supporting line underneath.
+
+Recommended supporting copy:
+
+“Discover products and services from local businesses across Zimbabwe.”
+
+Keep the copy concise.
+
+Do NOT turn the hero into a long explanation of Musuwo’s merchant
+approval system.
+
+The customer should immediately understand:
+
+Musuwo helps me discover and shop local.
+
+================================================== 8. MERCHANT TRUST /
+REVIEW MESSAGE ==================================================
+
+The current page includes wording similar to:
+
+“Every business here applied and was reviewed by a person before it
+appeared.”
+
+The trust concept is useful, but it should NOT dominate the hero.
+
+If merchant review/verification information is retained, move it to a
+more appropriate secondary location such as:
+
+-   merchant storefront
+-   verification badge tooltip
+-   trust/info section
+-   About Musuwo
+-   merchant information panel
+
+Keep verification language accurate.
+
+Do not imply that Musuwo guarantees merchant quality simply because a
+business was reviewed.
+
+Preserve the distinction between:
+
+VERIFIED/REVIEWED and ENDORSED/GUARANTEED.
+
+Musuwo may confirm that a merchant was reviewed/verified according to
+platform procedures without claiming that Musuwo guarantees the
+merchant’s products or service quality.
+
+================================================== 9. CATEGORY PAGES
+==================================================
+
+Apply the same product-first principle to category views such as:
+
+Food Shop Services Accommodation where appropriate
+
+If the page is fundamentally a product/listing discovery page, do not
+automatically insert a large merchant directory before the actual
+listings.
+
+However, use judgement for categories whose natural unit is not a
+conventional retail product.
+
+For example:
+
+Accommodation may appropriately show accommodation listings/properties.
+
+Services may appropriately show service listings.
+
+Food may show menu items/products and restaurants in context.
+
+Do NOT mechanically force retail product cards onto every Musuwo
+category if the underlying marketplace object is different.
+
+The principle is:
+
+SHOW THE THING THE CUSTOMER CAME TO DISCOVER FIRST.
+
+Merchant identity remains attached to that listing.
+
+================================================== 10. SEARCH AND FILTER
+AREA ==================================================
+
+Preserve the search functionality.
+
+The search bar can continue to support wording such as:
+
+Search products, businesses or areas…
+
+or an improved equivalent.
+
+Filters should remain useful and should not become cluttered.
+
+Do not introduce unnecessary filters merely because the business-card
+block was removed.
+
+================================================== 11. WHATSAPP
+==================================================
+
+Preserve the previous Musuwo requirement:
+
+WhatsApp is NOT the primary product-shopping destination.
+
+Product discovery should remain inside Musuwo.
+
+Product: → View Product → Merchant Storefront → Exact Product
+
+WhatsApp may be used for:
+
+-   sharing a Musuwo product/store URL
+-   secondary Contact Supplier functionality where appropriate
+
+Do not restore direct WhatsApp CTAs as the primary action on marketplace
+product cards.
+
+================================================== 12. SHARING
+==================================================
+
+Do not break the previous product-sharing architecture.
+
+Where already implemented:
+
+Product → Share → WhatsApp/native share → complete public Musuwo HTTPS
+product URL
+
+Shared product links should return users to the exact product inside the
+relevant merchant storefront.
+
+Preserve dynamic rich preview/Open Graph functionality if already
+implemented.
+
+================================================== 13. ANALYTICS
+==================================================
+
+Do not break existing analytics.
+
+Preserve relevant tracking such as:
+
+-   product impressions
+-   product views
+-   merchant/store visits
+-   merchant logo/name clicks
+-   Add to Cart
+-   checkout
+-   orders
+-   shares
+-   search analytics
+-   product-to-store attribution
+
+Removing the permanent merchant-card section should not remove merchant
+analytics elsewhere.
+
+Do not create duplicate analytics systems.
+
+================================================== 14. PROMOTED PRODUCTS
+==================================================
+
+Do not break existing/future promoted-product functionality.
+
+If promoted products are already supported or prepared by previous work,
+they should remain part of the product-first marketplace architecture.
+
+A promoted product should still lead:
+
+Marketplace → Merchant Storefront → Exact Product
+
+Do not create a separate disconnected advertising marketplace.
+
+================================================== 15. MOBILE EXPERIENCE
+==================================================
+
+Apply the same product-first behaviour on mobile.
+
+Do not remove the business directory on desktop while retaining it as a
+permanent block on mobile.
+
+After removing it:
+
+-   products/listings should move upward
+-   no dead whitespace should remain
+-   search/filter controls should remain usable
+-   merchant identity should remain visible
+-   product cards should remain responsive
+-   storefront routing should continue working
+
+================================================== 16. SUPABASE / DATA /
+RLS ==================================================
+
+This is primarily a UI/navigation correction.
+
+Do NOT delete or alter merchant data merely to hide the directory cards.
+
+Do NOT:
+
+-   delete businesses
+-   remove merchant ownership
+-   alter merchant approval status
+-   weaken RLS
+-   expose private merchant data
+-   duplicate database tables
+-   create unnecessary migrations
+
+If no database change is required, do not create one.
+
+Preserve existing secure RLS behaviour.
+
+================================================== 17. TESTING
+==================================================
+
+After implementation, test:
+
+A. Main marketplace page → permanent business-card directory is gone.
+
+B. Category page → permanent business directory is gone where the
+product/listing-first architecture applies.
+
+C. Products/listings move upward → no large empty gap.
+
+D. Product card → merchant identity still visible.
+
+E. Product click → exact product inside merchant storefront.
+
+F. Merchant name/logo click → merchant storefront home.
+
+G. Search for merchant name → merchant can still be found where business
+search is supported.
+
+H. Search for product → product search still works.
+
+I. Mobile/responsive layout → business directory does not reappear
+unexpectedly.
+
+J. Analytics → product/store interaction tracking still works.
+
+K. Hero → product/local-commerce messaging is displayed instead of
+business-directory-first messaging.
+
+L. Existing storefronts → no breakage.
+
+M. Existing sharing → no breakage.
+
+N. RLS/security → no security policies weakened for this UI change.
+
+================================================== 18. FINAL VISUAL
+DIRECTION ==================================================
+
+The main Musuwo marketplace should feel like a modern local-commerce
+marketplace, NOT a static business directory.
+
+The intended customer impression is:
+
+“I can open Musuwo and immediately discover things available from local
+businesses.”
+
+NOT:
+
+“Here is a list of registered businesses. Pick one and then maybe find
+something.”
+
+Preferred hierarchy:
+
+Everything local, in one place.
+
+Discover products and services from local businesses across Zimbabwe.
+
+[SEARCH]
+
+[FILTERS / FOR YOU / EXPLORE]
+
+[PRODUCT] [PRODUCT] [PRODUCT] [PRODUCT]
+
+Each product/listing identifies the business behind it.
+
+Customer clicks a product → enters that merchant’s branded Musuwo
+storefront → sees exact selected product → can continue browsing the
+merchant or return to Musuwo discovery.
+
+================================================== 19. FINAL REPORT
+REQUIRED ==================================================
+
+At completion report:
+
+ALREADY IMPLEMENTED — NO CHANGE REQUIRED
+
+PARTIALLY IMPLEMENTED — FIXED
+
+NEW CHANGES
+
+HERO COPY
+
+MARKETPLACE LAYOUT
+
+MERCHANT DISCOVERY
+
+PRODUCT/STOREFRONT ROUTING
+
+MOBILE
+
+ANALYTICS
+
+SECURITY/RLS
+
+FILES MODIFIED
+
+TESTS PERFORMED
+
+REMAINING ISSUES
+
+Do not claim something was tested if it was not actually tested.
+
+================================================== MOST IMPORTANT
+INSTRUCTION ==================================================
+
+IF SOMETHING IN THIS PROMPT IS ALREADY IMPLEMENTED CORRECTLY BY THE TIME
+YOU READ IT:
+
+IGNORE THAT REQUIREMENT AND LEAVE THE WORKING IMPLEMENTATION ALONE.
+
+IF PARTIALLY IMPLEMENTED:
+
+FIX ONLY THE MISSING OR INCORRECT PART.
+
+IF NOT IMPLEMENTED:
+
+IMPLEMENT IT USING THE EXISTING MUSUWO ARCHITECTURE.
+
+DO NOT REBUILD WORKING FEATURES. DO NOT DUPLICATE WORK. AUDIT FIRST.
