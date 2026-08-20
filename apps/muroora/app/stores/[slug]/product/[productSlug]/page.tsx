@@ -14,6 +14,7 @@ import { discoverySession } from '@/lib/services/discovery-session'
 import { productUrl, storePath, productPath } from '@/lib/musuwo-urls'
 import { ProductPhoto } from '@/app/components/marketplace/ProductPhoto'
 import { ShareProduct } from '@/app/components/marketplace/ShareProduct'
+import { AddToBasket } from '@/app/components/marketplace/AddToBasket'
 import { StoreHeader } from '@/app/components/marketplace/StoreHeader'
 
 /**
@@ -306,12 +307,10 @@ export default async function StoreProductPage({ params }: { params: Params }) {
                 secondary row below, per the brief: WhatsApp is a way to share
                 a Musuwo link, not Musuwo's checkout. */}
             <div className="mt-8">
-              <Link
-                href={`/cart?add=${product.id}`}
-                className="inline-flex min-h-12 items-center rounded-full bg-accent px-8 py-3 font-bold text-white hover:bg-accent-deep"
-              >
-                Add to basket
-              </Link>
+              <AddToBasket
+                productId={product.id}
+                merchantName={product.merchant.name}
+              />
             </div>
 
             <div className="mt-8 border-t border-rule pt-6">

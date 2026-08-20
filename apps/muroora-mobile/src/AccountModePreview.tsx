@@ -1,9 +1,9 @@
 import { useEffect,useState } from 'react';
-import { Pressable,SafeAreaView,ScrollView,StyleSheet,Text,TextInput,View } from 'react-native';
+import { Linking,Pressable,SafeAreaView,ScrollView,StyleSheet,Text,TextInput,View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import type { Session } from '@supabase/supabase-js';
 
-import { mobileApi } from './mobileApi';
+import { API_BASE,mobileApi } from './mobileApi';
 import { supabase,supabaseConfigured } from './supabase';
 
 /**
@@ -36,6 +36,14 @@ type WorkspacePayload={platformRoles:string[];workspaces:Workspace[]};
 type Me={fullName:string|null;email:string|null};
 
 export function AccountModePreview({close,openMuroora,shop}:{close:()=>void;openMuroora:()=>void;shop:()=>void}){
+ /**
+  * Open a page of the website in the phone's browser.
+  *
+  * Deliberately the system browser and not an in-app view: the merchant is
+  * already signed in there, or can be, and an embedded browser with its own
+  * cookie jar would ask them to sign in again for no reason.
+  */
+ const openWeb=(path:string)=>{ void Linking.openURL(`${API_BASE}${path}`); };
  const [session,setSession]=useState<Session|null>(null);
  const [checking,setChecking]=useState(true);
  const [mode,setMode]=useState<Mode>('choose');
@@ -153,9 +161,9 @@ export function AccountModePreview({close,openMuroora,shop}:{close:()=>void;open
   <View style={s.profile}><View style={s.avatar}><Text style={s.avatarText}>○</Text></View><View style={s.grow}><Text style={s.profileTitle}>{me?.fullName||'Individual profile'}</Text><Text style={s.meta}>{me?.email||session.user.email}</Text></View></View>
   <Text style={s.section}>YOUR MUSUWO</Text>
   <Action title="Discover businesses" text="Shopping, food, accommodation and services" onPress={shop}/>
-  <Action title="My orders" text="Purchases made through Musuwo"/>
-  <Action title="Chats and enquiries" text="Private conversations and contact requests"/>
-  <Action title="Saved places and favourites" text="Personal, not visible to business workspaces"/>
+  <Action title="My orders" text="Purchases made through Musuwo" onPress={()=>openWeb('/account')}/>
+  <Action title="Chats and enquiries" soon="Messaging between customers and businesses is not built yet."/>
+  <Action title="Saved places and favourites" soon="Saved addresses and favourites are not built yet."/>
   <View style={s.notice}><Text style={s.noticeTitle}>Buying is personal</Text><Text style={s.noticeText}>A business workspace cannot place personal orders using merchant authority. Purchases always come from your individual account.</Text></View>
  </Shell>;
 
@@ -173,12 +181,25 @@ export function AccountModePreview({close,openMuroora,shop}:{close:()=>void;open
   ))}
 
   <Text style={s.section}>STORE MANAGEMENT</Text>
-  <Action title="Store overview" text="What needs attention right now"/>
-  <Action title="Products and listings" text="Photos, prices and availability"/>
-  <Action title="Orders" text="Prepare and fulfil orders"/>
-  <Action title="Stock" text="Available, reserved, low and damaged"/>
-  <Action title="Staff" text="Business-scoped operational access"/>
-  <Action title="Business profile" text="Logo, description, hours and fulfilment"/>
+  {workspaces.length===0
+   ? <Action title="No business workspace" soon="You are not a member of a business on Musuwo yet."/>
+   : <>
+    {/* These open the Merchant Studio in the phone's browser rather than
+        reproducing it here. That is the brief's own instruction - the browser
+        gets the full management experience - and it means these rows do the
+        real thing today instead of waiting for a native rewrite. The web
+        workspace is responsive and requires the same sign-in. */}
+    <Action title="Products and listings" text="Photos, prices and publishing to Musuwo"
+            onPress={()=>openWeb(`/business/${workspaces[0].businessId}`)}/>
+    <Action title="Business profile" text="Description, links and how customers reach you"
+            onPress={()=>openWeb(`/business/${workspaces[0].businessId}`)}/>
+    <Action title="Your storefront" text="See your shop the way a customer sees it"
+            onPress={()=>openWeb(`/stores/${workspaces[0].slug}`)}/>
+    <Action title="Store overview" soon="Daily figures for your shop are being built."/>
+    <Action title="Orders" soon="Order management on the phone is being built."/>
+    <Action title="Stock" soon="Stock levels on the phone are being built."/>
+    <Action title="Staff" soon="Business-scoped staff access is being built."/>
+   </>}
 
   <View style={s.notice}><Text style={s.noticeTitle}>Delivery through Musuwo</Text><Text style={s.noticeText}>The business prepares the order. Musuwo coordinates the delivery experience. The independent public Musuwo rider network remains Coming Soon.</Text></View>
  </Shell>;
@@ -186,7 +207,40 @@ export function AccountModePreview({close,openMuroora,shop}:{close:()=>void;open
 
 function Shell({title,back,children}:{title:string;back:()=>void;children:React.ReactNode}){return <SafeAreaView style={s.safe}><StatusBar style="dark"/><View style={s.phone}><View style={s.header}><Pressable onPress={back} style={s.back}><Text style={s.backText}>‹</Text></Pressable><Text style={s.headerTitle}>{title}</Text><View style={s.back}/></View><ScrollView contentContainerStyle={s.content}>{children}</ScrollView></View></SafeAreaView>}
 function ModeCard({icon,title,text,action,onPress}:{icon:string;title:string;text:string;action:string;onPress:()=>void}){return <Pressable style={s.modeCard} onPress={onPress}><View style={s.modeIcon}><Text style={s.modeIconText}>{icon}</Text></View><Text style={s.modeTitle}>{title}</Text><Text style={s.modeText}>{text}</Text><Text style={s.modeAction}>{action} →</Text></Pressable>}
-function Action({title,text,onPress}:{title:string;text:string;onPress?:()=>void}){return <Pressable style={s.action} onPress={onPress}><View style={s.grow}><Text style={s.actionTitle}>{title}</Text><Text style={s.meta}>{text}</Text></View><Text style={s.arrow}>›</Text></Pressable>}
+/**
+ * A row in a list of things you can do.
+ *
+ * `onPress` USED TO BE OPTIONAL, AND NINE ROWS WERE RENDERED WITHOUT IT.
+ *
+ * Six of them were the whole of Store Management - overview, products, orders,
+ * stock, staff, business profile - and three were the individual account's
+ * orders, chats and saved places. Every one drew a chevron, took a press, gave
+ * press feedback and did absolutely nothing. There was no message, no "coming
+ * soon", no navigation. A merchant tapped Orders and the screen sat there.
+ *
+ * The type below is what stops that recurring. A row must EITHER do something
+ * or declare itself unfinished; there is no third option, so a dead row is now
+ * a TypeScript error at build time rather than a disappointment on somebody's
+ * phone in Mutare.
+ *
+ * A `soon` row is also drawn differently - dimmed, with a Soon chip and no
+ * chevron - because a control that looks live and is not is the actual problem,
+ * and saying so only after the tap is too late.
+ */
+type ActionProps =
+  { title:string; text:string; onPress:()=>void; soon?:never }
+  /** `soon` carries its own explanation, so `text` would be a second one. */
+  | { title:string; soon:string; text?:never; onPress?:never };
+
+function Action({title,text,onPress,soon}:ActionProps){
+ if(soon){
+  return <View style={[s.action,s.actionSoon]}>
+   <View style={s.grow}><Text style={s.actionTitle}>{title}</Text><Text style={s.meta}>{soon}</Text></View>
+   <View style={s.soonChip}><Text style={s.soonChipText}>SOON</Text></View>
+  </View>;
+ }
+ return <Pressable style={s.action} onPress={onPress}><View style={s.grow}><Text style={s.actionTitle}>{title}</Text><Text style={s.meta}>{text}</Text></View><Text style={s.arrow}>›</Text></Pressable>;
+}
 function Field({label,value,onChange,placeholder,secure,keyboard}:{label:string;value:string;onChange:(v:string)=>void;placeholder?:string;secure?:boolean;keyboard?:'email-address'}){
  return <View style={s.field}>
   <Text style={s.fieldLabel}>{label}</Text>
@@ -194,4 +248,4 @@ function Field({label,value,onChange,placeholder,secure,keyboard}:{label:string;
  </View>;
 }
 
-const s=StyleSheet.create({safe:{flex:1,backgroundColor:C.paper},phone:{flex:1,width:'100%',maxWidth:440,alignSelf:'center',backgroundColor:C.paper},header:{height:68,paddingHorizontal:16,flexDirection:'row',alignItems:'center',borderBottomWidth:1,borderBottomColor:C.rule},back:{width:42,height:42,borderRadius:21,backgroundColor:C.cream,alignItems:'center',justifyContent:'center'},backText:{fontSize:32,color:C.ink,marginTop:-4},headerTitle:{flex:1,textAlign:'center',fontSize:15,fontWeight:'900',color:C.ink},content:{padding:20,paddingBottom:50},eyebrow:{fontSize:9,fontWeight:'900',letterSpacing:1.4,color:C.coral,marginTop:12},title:{fontSize:32,lineHeight:36,fontWeight:'900',color:C.ink,marginTop:6},body:{fontSize:13,lineHeight:20,color:C.muted,marginTop:12,marginBottom:8},modeCard:{padding:22,borderRadius:24,backgroundColor:C.cream,marginTop:16},modeIcon:{width:48,height:48,borderRadius:16,backgroundColor:C.forest,alignItems:'center',justifyContent:'center'},modeIconText:{fontSize:23,fontWeight:'900',color:'#fff'},modeTitle:{fontSize:20,fontWeight:'900',color:C.ink,marginTop:16},modeText:{fontSize:11,lineHeight:17,color:C.muted,marginTop:5},modeAction:{fontSize:11,fontWeight:'900',color:C.coral,marginTop:18},note:{fontSize:9,lineHeight:15,color:C.muted,textAlign:'center',marginTop:20},profile:{padding:17,borderRadius:22,backgroundColor:C.cream,flexDirection:'row',alignItems:'center',gap:12},avatar:{width:50,height:50,borderRadius:17,backgroundColor:C.forest,alignItems:'center',justifyContent:'center'},avatarText:{color:'#fff',fontWeight:'900',fontSize:18},profileTitle:{fontSize:16,fontWeight:'900',color:C.ink},meta:{fontSize:10,lineHeight:15,color:C.muted,marginTop:3},grow:{flex:1},section:{fontSize:9,fontWeight:'900',letterSpacing:1.3,color:C.muted,marginTop:26,marginBottom:5},action:{minHeight:70,borderBottomWidth:1,borderBottomColor:C.rule,flexDirection:'row',alignItems:'center'},actionTitle:{fontSize:13,fontWeight:'900',color:C.ink},arrow:{fontSize:26,color:C.muted},notice:{padding:16,borderRadius:18,backgroundColor:'#F5E6C9',marginTop:20},noticeTitle:{fontSize:12,fontWeight:'900',color:C.ink},noticeText:{fontSize:10,lineHeight:16,color:C.muted,marginTop:4},businessHero:{padding:22,borderRadius:25,backgroundColor:C.forest,marginTop:16},businessKicker:{fontSize:8,fontWeight:'900',letterSpacing:1.3,color:C.gold},businessName:{fontSize:28,fontWeight:'900',color:'#fff',marginTop:5},businessMeta:{fontSize:10,color:'rgba(255,255,255,.65)',marginTop:4},openStore:{height:48,borderRadius:24,backgroundColor:'#fff',alignItems:'center',justifyContent:'center',marginTop:20},openStoreText:{fontSize:12,fontWeight:'900',color:C.forest},field:{marginTop:16},fieldLabel:{fontSize:9,fontWeight:'900',letterSpacing:1.2,color:C.muted,marginBottom:6},fieldInput:{minHeight:52,borderRadius:16,backgroundColor:C.cream,paddingHorizontal:16,fontSize:14,color:C.ink},primary:{height:54,borderRadius:27,backgroundColor:C.forest,alignItems:'center',justifyContent:'center',marginTop:22},primaryText:{fontSize:13,fontWeight:'900',color:'#fff'},dim:{opacity:.6},switch:{fontSize:11,fontWeight:'900',color:C.coral,textAlign:'center',marginTop:18},error:{padding:14,borderRadius:14,backgroundColor:'#F7DDD5',marginTop:16},errorText:{fontSize:11,lineHeight:17,color:'#8C3B22',fontWeight:'700'}});
+const s=StyleSheet.create({safe:{flex:1,backgroundColor:C.paper},phone:{flex:1,width:'100%',maxWidth:440,alignSelf:'center',backgroundColor:C.paper},header:{height:68,paddingHorizontal:16,flexDirection:'row',alignItems:'center',borderBottomWidth:1,borderBottomColor:C.rule},back:{width:42,height:42,borderRadius:21,backgroundColor:C.cream,alignItems:'center',justifyContent:'center'},backText:{fontSize:32,color:C.ink,marginTop:-4},headerTitle:{flex:1,textAlign:'center',fontSize:15,fontWeight:'900',color:C.ink},content:{padding:20,paddingBottom:50},eyebrow:{fontSize:9,fontWeight:'900',letterSpacing:1.4,color:C.coral,marginTop:12},title:{fontSize:32,lineHeight:36,fontWeight:'900',color:C.ink,marginTop:6},body:{fontSize:13,lineHeight:20,color:C.muted,marginTop:12,marginBottom:8},modeCard:{padding:22,borderRadius:24,backgroundColor:C.cream,marginTop:16},modeIcon:{width:48,height:48,borderRadius:16,backgroundColor:C.forest,alignItems:'center',justifyContent:'center'},modeIconText:{fontSize:23,fontWeight:'900',color:'#fff'},modeTitle:{fontSize:20,fontWeight:'900',color:C.ink,marginTop:16},modeText:{fontSize:11,lineHeight:17,color:C.muted,marginTop:5},modeAction:{fontSize:11,fontWeight:'900',color:C.coral,marginTop:18},note:{fontSize:9,lineHeight:15,color:C.muted,textAlign:'center',marginTop:20},profile:{padding:17,borderRadius:22,backgroundColor:C.cream,flexDirection:'row',alignItems:'center',gap:12},avatar:{width:50,height:50,borderRadius:17,backgroundColor:C.forest,alignItems:'center',justifyContent:'center'},avatarText:{color:'#fff',fontWeight:'900',fontSize:18},profileTitle:{fontSize:16,fontWeight:'900',color:C.ink},meta:{fontSize:10,lineHeight:15,color:C.muted,marginTop:3},grow:{flex:1},section:{fontSize:9,fontWeight:'900',letterSpacing:1.3,color:C.muted,marginTop:26,marginBottom:5},action:{minHeight:70,borderBottomWidth:1,borderBottomColor:C.rule,flexDirection:'row',alignItems:'center'},actionSoon:{opacity:.55},soonChip:{paddingHorizontal:8,paddingVertical:3,borderRadius:9,backgroundColor:C.sage},soonChipText:{fontSize:8,fontWeight:'900',letterSpacing:1,color:C.ink},actionTitle:{fontSize:13,fontWeight:'900',color:C.ink},arrow:{fontSize:26,color:C.muted},notice:{padding:16,borderRadius:18,backgroundColor:'#F5E6C9',marginTop:20},noticeTitle:{fontSize:12,fontWeight:'900',color:C.ink},noticeText:{fontSize:10,lineHeight:16,color:C.muted,marginTop:4},businessHero:{padding:22,borderRadius:25,backgroundColor:C.forest,marginTop:16},businessKicker:{fontSize:8,fontWeight:'900',letterSpacing:1.3,color:C.gold},businessName:{fontSize:28,fontWeight:'900',color:'#fff',marginTop:5},businessMeta:{fontSize:10,color:'rgba(255,255,255,.65)',marginTop:4},openStore:{height:48,borderRadius:24,backgroundColor:'#fff',alignItems:'center',justifyContent:'center',marginTop:20},openStoreText:{fontSize:12,fontWeight:'900',color:C.forest},field:{marginTop:16},fieldLabel:{fontSize:9,fontWeight:'900',letterSpacing:1.2,color:C.muted,marginBottom:6},fieldInput:{minHeight:52,borderRadius:16,backgroundColor:C.cream,paddingHorizontal:16,fontSize:14,color:C.ink},primary:{height:54,borderRadius:27,backgroundColor:C.forest,alignItems:'center',justifyContent:'center',marginTop:22},primaryText:{fontSize:13,fontWeight:'900',color:'#fff'},dim:{opacity:.6},switch:{fontSize:11,fontWeight:'900',color:C.coral,textAlign:'center',marginTop:18},error:{padding:14,borderRadius:14,backgroundColor:'#F7DDD5',marginTop:16},errorText:{fontSize:11,lineHeight:17,color:'#8C3B22',fontWeight:'700'}});

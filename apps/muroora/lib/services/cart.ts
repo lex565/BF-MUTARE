@@ -1,9 +1,9 @@
 import { randomBytes } from 'node:crypto'
 
-import { and, eq, isNull, sql } from 'drizzle-orm'
+import { and, eq, isNull, ne, sql } from 'drizzle-orm'
 
 import { db } from '@/db/client'
-import { cartItems, carts, inventory, products } from '@/db/schema'
+import { businesses, cartItems, carts, inventory, products } from '@/db/schema'
 import { add, money, multiply, zero, type Money } from '@/lib/money'
 
 /**
@@ -193,6 +193,88 @@ export async function getCart(owner: CartOwner): Promise<CartView> {
  * increment rather than a second line - see the unique constraint in the
  * schema for why that matters.
  */
+
+/**
+ * Is this product something a customer may actually buy on Musuwo right now?
+ *
+ * THE BUG THIS REPLACED. Both cart paths filtered on
+ * `eq(products.storeId, STORE_ID)` - one hard-coded store, read from
+ * NEXT_PUBLIC_STORE_ID, which is Muroora Mart's. So a customer could browse
+ * The Pant and Perfume Shop, open Cotton pants, press Add to basket, and get
+ * "No such product." Not out of stock, not unavailable: the cart genuinely
+ * could not see any merchant except the founding one. Every marketplace
+ * merchant was browse-only and nothing said so.
+ *
+ * The conditions below are the SAME FOUR the marketplace itself publishes
+ * under - active, not deleted, published to Musuwo, business publicly visible -
+ * plus the merchant's own shop for Muroora, whose products are sold directly
+ * and are not all published to the marketplace. Sharing the predicate is the
+ * point: a product a customer can see is a product a customer can buy, and
+ * suspending a merchant removes both at once.
+ */
+async function purchasable(productId: string) {
+  const [row] = await db
+    .select({
+      id: products.id,
+      storeId: products.storeId,
+      isActive: products.isActive,
+      deletedAt: products.deletedAt,
+      publishToMusuwo: products.publishToMusuwo,
+      businessId: businesses.id,
+      businessName: businesses.name,
+      businessStatus: businesses.status,
+      businessDeletedAt: businesses.deletedAt,
+      stockQuantity: inventory.quantity,
+      stockReserved: inventory.reserved,
+    })
+    .from(products)
+    .leftJoin(inventory, eq(inventory.productId, products.id))
+    .leftJoin(businesses, eq(businesses.storeId, products.storeId))
+    .where(eq(products.id, productId))
+
+  if (!row || row.deletedAt !== null) return null
+
+  const isOwnStore = row.storeId === STORE_ID
+  const businessIsPublic =
+    row.businessStatus !== null &&
+    ['ACTIVE', 'PILOT'].includes(row.businessStatus) &&
+    row.businessDeletedAt === null
+
+  // Muroora's own shop sells its whole active catalogue. Everybody else sells
+  // only what they deliberately published to the marketplace.
+  if (!isOwnStore && !(row.publishToMusuwo && businessIsPublic)) return null
+
+  return row
+}
+
+/**
+ * One merchant per basket.
+ *
+ * Not a limitation invented here - it is what the rest of the platform already
+ * assumes. `carts.store_id`, `orders.store_id` and every delivery zone are
+ * per-store, so a basket holding two merchants' goods cannot become one order
+ * or one delivery without changes running through checkout, orders, zones and
+ * the rider flow. The mobile app's own copy already says "one merchant per
+ * checkout".
+ *
+ * So the rule is enforced here and explained to the customer, rather than
+ * being discovered at checkout when it is too late to do anything about it.
+ */
+async function differentMerchantInCart(
+  cartId: string,
+  storeId: string,
+): Promise<string | null> {
+  const [clash] = await db
+    .select({ name: businesses.name })
+    .from(cartItems)
+    .innerJoin(products, eq(products.id, cartItems.productId))
+    .leftJoin(businesses, eq(businesses.storeId, products.storeId))
+    .where(and(eq(cartItems.cartId, cartId), ne(products.storeId, storeId)))
+    .limit(1)
+
+  return clash ? (clash.name ?? 'another shop') : null
+}
+
 export async function addToCart(
   owner: CartOwner,
   productId: string,
@@ -202,16 +284,7 @@ export async function addToCart(
     throw new CartError('NOT_FOUND', 'Quantity must be a whole number of 1 or more.')
   }
 
-  const [product] = await db
-    .select({
-      id: products.id,
-      isActive: products.isActive,
-      stockQuantity: inventory.quantity,
-      stockReserved: inventory.reserved,
-    })
-    .from(products)
-    .leftJoin(inventory, eq(inventory.productId, products.id))
-    .where(and(eq(products.id, productId), eq(products.storeId, STORE_ID)))
+  const product = await purchasable(productId)
 
   if (!product) throw new CartError('NOT_FOUND', 'No such product.')
   if (!product.isActive) {
@@ -220,6 +293,14 @@ export async function addToCart(
 
   const sellable = (product.stockQuantity ?? 0) - (product.stockReserved ?? 0)
   const cartId = await resolveCart(owner)
+
+  const clash = await differentMerchantInCart(cartId, product.storeId)
+  if (clash) {
+    throw new CartError(
+      'INACTIVE_PRODUCT',
+      `Your basket already has items from ${clash}. Musuwo delivers one shop at a time, so please finish that order first or empty the basket.`,
+    )
+  }
 
   const [alreadyInCart] = await db
     .select({ quantity: cartItems.quantity })
@@ -275,14 +356,9 @@ export async function setCartQuantity(
     return getCart(owner)
   }
 
-  const [product] = await db
-    .select({
-      stockQuantity: inventory.quantity,
-      stockReserved: inventory.reserved,
-    })
-    .from(products)
-    .leftJoin(inventory, eq(inventory.productId, products.id))
-    .where(and(eq(products.id, productId), eq(products.storeId, STORE_ID)))
+  // Same predicate as adding. If these two disagreed, a customer could add an
+  // item and then be unable to change its quantity.
+  const product = await purchasable(productId)
 
   if (!product) throw new CartError('NOT_FOUND', 'No such product.')
 
