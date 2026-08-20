@@ -1,4 +1,4 @@
-import { and, eq, gte, sql } from 'drizzle-orm'
+import { and, eq, gte, inArray, sql } from 'drizzle-orm'
 
 import { db } from '@/db/client'
 import {
@@ -25,6 +25,27 @@ import { money, type Money } from '@/lib/money'
 const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID!
 
 /** Statuses that mean money was actually committed. */
+/**
+ * Order statuses that count as real business.
+ *
+ * WHY THIS IS NOW A `const` TUPLE AND WHY THE QUERY USES `inArray`.
+ *
+ * Both queries below did this:
+ *
+ *   sql`${orders.status}::text = any(${COMMITTED})`
+ *
+ * Drizzle interpolates a JavaScript array into a raw `sql` template as a
+ * comma-separated list of bound parameters wrapped in brackets, so Postgres
+ * received `= any(($3, $4, $5, ...))`. That is a row constructor, not an
+ * array, and Postgres refuses it at planning time:
+ *
+ *   42809  op ANY/ALL (array) requires array on right side
+ *
+ * It therefore failed on EVERY request, with no data required to trigger it -
+ * the whole Reports page answered with a server error for anybody who opened
+ * it. `inArray` builds the `in (...)` list correctly and drops the `::text`
+ * cast, which was only there to make the hand-written comparison type-check.
+ */
 const COMMITTED = [
   'PAYMENT_CONFIRMED',
   'ORDER_RECEIVED',
@@ -39,7 +60,7 @@ const COMMITTED = [
   'OUT_FOR_DELIVERY',
   'RIDER_ARRIVED',
   'DELIVERED',
-]
+] as const
 
 export interface DayPoint {
   day: string
@@ -92,7 +113,7 @@ export async function getReports(days = 30): Promise<Reports> {
           and(
             eq(orders.storeId, STORE_ID),
             gte(orders.placedAt, since),
-            sql`${orders.status}::text = any(${COMMITTED})`,
+            inArray(orders.status, COMMITTED),
           ),
         )
         .groupBy(sql`date_trunc('day', ${orders.placedAt})`)
@@ -120,7 +141,7 @@ export async function getReports(days = 30): Promise<Reports> {
           and(
             eq(orders.storeId, STORE_ID),
             gte(orders.placedAt, since),
-            sql`${orders.status}::text = any(${COMMITTED})`,
+            inArray(orders.status, COMMITTED),
           ),
         )
         .groupBy(orderItems.productName)
@@ -174,7 +195,7 @@ export async function getReports(days = 30): Promise<Reports> {
   }
 
   const committedTotals = totalRows.filter((r) =>
-    COMMITTED.includes(r.status),
+    (COMMITTED as readonly string[]).includes(r.status),
   )
   const orderCount = committedTotals.reduce((n, r) => n + r.n, 0)
   const revenue = committedTotals.reduce((t, r) => t + BigInt(r.amount), 0n)

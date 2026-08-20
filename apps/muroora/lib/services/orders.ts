@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 
-import { and, desc, eq, sql } from 'drizzle-orm'
+import { and, desc, eq, inArray, sql } from 'drizzle-orm'
 
 import { db, type DbOrTx } from '@/db/client'
 import {
@@ -813,7 +813,22 @@ export async function listOrdersForStaff(
       statuses && statuses.length > 0
         ? and(
             eq(orders.storeId, STORE_ID),
-            sql`${orders.status}::text = any(${statuses})`,
+            /**
+             * `inArray`, not `sql\`... = any(${statuses})\``.
+             *
+             * Drizzle interpolates a JS array into a raw sql template as a
+             * bracketed list of bound parameters, so Postgres saw
+             * `= any(($2, $3, ...))` - a row constructor, not an array - and
+             * refused it with `42809 op ANY/ALL (array) requires array on
+             * right side`. This branch only runs when a status filter is
+             * passed, so the unfiltered list worked and filtering by status
+             * always failed. Same bug as lib/services/reports.ts, found while
+             * fixing that one.
+             */
+            inArray(
+              orders.status,
+              statuses as Array<(typeof orders.$inferSelect)['status']>,
+            ),
           )
         : eq(orders.storeId, STORE_ID),
     )
