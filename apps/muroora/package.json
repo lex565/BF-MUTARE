@@ -36,7 +36,9 @@
     "db:verify-releases": "tsx --env-file=.env.local db/verify-releases.mts",
     "db:verify-badge": "tsx --env-file=.env.local db/verify-verification.mts",
     "db:verify-platform": "tsx --env-file=.env.local db/verify-platform.mts",
-    "db:verify-email": "tsx db/verify-email-policy.mts"
+    "db:verify-email": "tsx db/verify-email-policy.mts",
+    "db:verify-discovery": "tsx --env-file=.env.local db/verify-discovery.mts",
+    "analytics:rollup": "tsx --env-file=.env.local db/rollup.mts"
   },
   "dependencies": {
     "@pineberry/ui": "*",

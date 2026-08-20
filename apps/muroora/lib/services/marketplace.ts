@@ -235,10 +235,21 @@ export interface MarketplaceProduct {
   description: string | null
   imageUrl: string | null
   price: { amount: string; currency: string; decimal: string }
+  /**
+   * When the merchant published it to Musuwo, not when the row was created.
+   *
+   * Freshness in the feed means "new to shoppers here", and a product may have
+   * sat in a merchant's own shop for months before they consented to list it.
+   * Serialised as an ISO string because this payload crosses into client
+   * components, where a Date does not survive the boundary intact.
+   */
+  publishedAt: string | null
   merchant: {
     publicId: string
     name: string
     slug: string
+    /** RETAIL, FOOD, SERVICE and so on. Drives the category filter. */
+    kind: string
     logoPath: string | null
     websiteUrl: string | null
     whatsappNumber: string | null
@@ -282,9 +293,11 @@ export async function listMarketplaceProducts(): Promise<MarketplaceProduct[]> {
       priceAmount: products.priceAmount,
       priceCurrency: products.priceCurrency,
       promoPriceAmount: products.promoPriceAmount,
+      publishedToMusuwoAt: products.publishedToMusuwoAt,
       merchantPublicId: businesses.publicId,
       merchantName: businesses.name,
       merchantSlug: businesses.slug,
+      merchantKind: businesses.kind,
       merchantLogo: businesses.logoPath,
       merchantWebsite: businesses.websiteUrl,
       merchantWhatsapp: businesses.whatsappNumber,
@@ -329,10 +342,12 @@ export async function listMarketplaceProducts(): Promise<MarketplaceProduct[]> {
         currency: r.priceCurrency,
         decimal: (Number(amount) / 100).toFixed(2),
       },
+      publishedAt: r.publishedToMusuwoAt?.toISOString() ?? null,
       merchant: {
         publicId: r.merchantPublicId,
         name: r.merchantName,
         slug: r.merchantSlug,
+        kind: r.merchantKind,
         logoPath: r.merchantLogo,
         websiteUrl: r.merchantWebsite,
         whatsappNumber: r.merchantWhatsapp,
