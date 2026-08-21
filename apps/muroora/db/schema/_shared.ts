@@ -19,6 +19,30 @@ import {
 export const currencyEnum = pgEnum('currency', ['USD', 'ZWL'])
 
 /**
+ * Why a delivery could or could not be quoted. Migration 0025.
+ *
+ * Declared HERE rather than beside the delivery tables, for one structural
+ * reason: `orders` carries this on its pricing snapshot and `delivery.ts`
+ * already imports `orders.ts`, so declaring it there and importing it back
+ * would be a cycle. `_shared.ts` imports nothing of ours, which is exactly
+ * what makes it the right home for a type two modules need.
+ *
+ * Mirrors ServiceabilityReason in lib/delivery/tariff.ts. A closed list on
+ * both sides: these codes reach analytics and admin screens, and a spelling
+ * introduced later would split a year of history into two categories that
+ * look like one.
+ */
+export const serviceabilityReasonEnum = pgEnum('serviceability_reason', [
+  'WITHIN_RANGE',
+  'TOO_FAR',
+  'NO_NETWORK_ROUTE',
+  'INVALID_LOCATION',
+  'BUSINESS_NOT_DELIVERING',
+  'OUTSIDE_SERVICE_AREA',
+  'MANUAL_QUOTE_REQUIRED',
+])
+
+/**
  * A monetary column pair: amount in minor units, plus its currency.
  *
  * `bigint` with `mode: 'string'` so values cross the driver boundary without

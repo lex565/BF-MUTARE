@@ -1,5 +1,6 @@
 import { relations, sql } from 'drizzle-orm'
 import {
+  doublePrecision,
   bigint,
   index,
   integer,
@@ -10,7 +11,14 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 
-import { currencyEnum, id, metadata, storeId, timestamps } from './_shared'
+import {
+  currencyEnum,
+  id,
+  metadata,
+  serviceabilityReasonEnum,
+  storeId,
+  timestamps,
+} from './_shared'
 import { products, stores } from './catalogue'
 import { users } from './identity'
 
@@ -124,6 +132,42 @@ export const orders = pgTable(
     customerNote: text('customer_note'),
 
     zoneId: uuid('zone_id'),
+
+    /* ---- The delivery pricing snapshot. Migration 0025. -----------------
+       Frozen at the moment of sale, and nothing recomputes it. Exactly the
+       same principle as `fxRateToUsd` above and the denormalised recipient
+       address: what the customer was charged, and why, has to survive every
+       later change to tariffs, merchant locations and routing data.
+
+       A database CHECK holds `deliveryCustomerFeeCents` equal to
+       `deliveryFeeAmount`, so the snapshot and the money billed cannot drift
+       apart - if they disagree one of them is a lie and there is no way to
+       tell which from the outside. A second CHECK requires the whole snapshot
+       or none of it: half a snapshot cannot be audited or explained. */
+    deliveryPricingVersion: text('delivery_pricing_version'),
+    deliveryQuoteId: uuid('delivery_quote_id'),
+    deliveryServiceabilityReason: serviceabilityReasonEnum(
+      'delivery_serviceability_reason',
+    ),
+    deliveryOriginLatitude: doublePrecision('delivery_origin_latitude'),
+    deliveryOriginLongitude: doublePrecision('delivery_origin_longitude'),
+    deliveryRoadDistanceM: integer('delivery_road_distance_m'),
+    deliveryEstimatedTimeSeconds: integer('delivery_estimated_time_seconds'),
+    deliveryStandardFeeCents: integer('delivery_standard_fee_cents'),
+    deliveryOversizeFeeCents: integer('delivery_oversize_fee_cents'),
+    deliveryPromotionSubsidyCents: integer('delivery_promotion_subsidy_cents'),
+    deliveryCustomerFeeCents: integer('delivery_customer_fee_cents'),
+    deliveryRoutingProvider: text('delivery_routing_provider'),
+    deliveryRoutingDataVersion: text('delivery_routing_data_version'),
+    deliveryQuotedAt: timestamp('delivery_quoted_at', { withTimezone: true }),
+    deliveryQuoteExpiredAt: timestamp('delivery_quote_expired_at', {
+      withTimezone: true,
+    }),
+    /** The ZiG case. Null while everything is USD, which is today - but a rate
+        can never be applied without being recorded beside the amount. */
+    deliveryFxRate: text('delivery_fx_rate'),
+    deliveryFxRateAt: timestamp('delivery_fx_rate_at', { withTimezone: true }),
+
     placedAt: timestamp('placed_at', { withTimezone: true }),
     ...timestamps(),
   },

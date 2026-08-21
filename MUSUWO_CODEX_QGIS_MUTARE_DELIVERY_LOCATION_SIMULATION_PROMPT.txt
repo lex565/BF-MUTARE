@@ -1,0 +1,978 @@
+MUSUWO MUTARE DELIVERY + LOCATION INTELLIGENCE SIMULATION
+QGIS / PyQGIS MASTER BUILD PROMPT
+
+I want you to create a COMPLETE, reproducible QGIS/PyQGIS simulation for the Musuwo pilot in Mutare, Zimbabwe.
+
+This is a GIS simulation and planning project for a local marketplace/delivery platform called Musuwo.
+
+The goal is to simulate:
+- local businesses
+- customer demand
+- road-network delivery
+- travel distance
+- travel time
+- elevation effects
+- population/demand density
+- service areas
+- delivery fees
+- delivery feasibility
+- potential pickup/handover points
+- basic logistics performance
+
+I want ready-to-run code for the QGIS Python Console / PyQGIS.
+
+Do not give me fragments.
+
+Give me a complete working script or a clean modular set of scripts with exact file names and run order.
+
+==================================================
+1. EXISTING DATA
+==================================================
+
+Assume I already have some local GIS datasets.
+
+Potential inputs include:
+- Mutare city boundary shapefile / GeoPackage
+- Mutare administrative areas / suburbs / wards
+- population shapefile or population raster
+- elevation / DEM
+- other demographic or environmental shapefiles
+- business locations where available
+- other local reference data
+
+DO NOT assume exact field names.
+
+The script should allow me to configure input paths and important field names at the top of the script.
+
+If a required field cannot be confidently detected, fail clearly and tell me what field must be supplied.
+
+==================================================
+2. OPENSTREETMAP
+==================================================
+
+The simulation must use OpenStreetMap for the basemap and road/network data.
+
+I want two different OSM uses:
+
+A. VISUAL BASEMAP
+
+Load an OpenStreetMap XYZ basemap automatically into QGIS.
+
+Example:
+OpenStreetMap Standard
+
+Do not use OSM raster tiles as the routing network.
+
+B. VECTOR ROAD NETWORK
+
+Use actual OpenStreetMap vector road data for routing.
+
+Preferred options:
+
+1. If internet access and required QGIS functionality are available:
+   download OSM road data for the Mutare study area.
+
+2. If automatic download is unreliable:
+   allow me to provide a local OSM .pbf, GeoPackage, shapefile, or downloaded road layer.
+
+The code must clearly distinguish:
+OSM basemap tiles
+from
+OSM vector road network.
+
+==================================================
+3. NETWORK DATA PREPARATION
+==================================================
+
+Prepare the OSM road network for routing.
+
+Include relevant highway classes such as:
+motorway
+trunk
+primary
+secondary
+tertiary
+residential
+unclassified
+service
+living_street
+track where appropriate
+
+Allow configuration to include/exclude road types.
+
+Remove obviously unusable road features where appropriate.
+
+Handle:
+- one-way roads where possible
+- disconnected roads
+- invalid geometry
+- multipart features
+- null geometry
+- duplicate roads where appropriate
+
+Create a cleaned road-network layer.
+
+==================================================
+4. CRS
+==================================================
+
+Use an appropriate projected CRS for Mutare distance calculations.
+
+Prefer:
+EPSG:32736
+WGS 84 / UTM Zone 36S
+
+Use WGS84 / EPSG:4326 where necessary for web/OSM compatibility.
+
+Do not calculate delivery distance in geographic degrees.
+
+Transform layers correctly.
+
+==================================================
+5. MUTARE STUDY AREA
+==================================================
+
+Use the supplied Mutare polygon as the master study boundary.
+
+Clip relevant:
+- roads
+- population
+- elevation
+- businesses
+- simulated customers
+
+to the Mutare study area.
+
+Allow an optional buffer around Mutare so road routes near the boundary are not artificially cut off.
+
+Make buffer distance configurable.
+
+==================================================
+6. BUSINESS INPUT
+==================================================
+
+Support two modes:
+
+MODE A — REAL BUSINESSES
+
+If a business point file exists, load it.
+
+Expected conceptual fields may include:
+business_id
+name
+category
+latitude
+longitude
+verified
+delivery_available
+
+Do not hard-code exact field names unless configured.
+
+MODE B — SIMULATED BUSINESSES
+
+If no business file is supplied, generate a configurable number of simulated businesses.
+
+Use:
+NUM_BUSINESSES
+
+Do NOT distribute simulated businesses uniformly if population data is available.
+
+Prefer higher probability of business placement in more populated / urban / accessible areas.
+
+Allow a fallback uniform random method if population data is unavailable.
+
+Include some example categories:
+Groceries
+Fashion
+Food
+Electronics
+Beauty
+Books
+Other
+
+==================================================
+7. CUSTOMER / ORDER DEMAND SIMULATION
+==================================================
+
+Generate simulated customer/order points.
+
+Do NOT place them uniformly by default if population data is available.
+
+Use population as a demand-weighting factor.
+
+The simulation should support:
+NUM_CUSTOMERS
+or
+NUM_ORDERS
+
+For each simulated customer/order, create:
+customer_id
+order_id
+x/y or geometry
+assigned_business_id
+assigned_business_name
+straight_line_distance_km
+road_distance_km
+estimated_travel_time_min
+delivery_fee
+serviceable
+population_zone
+elevation
+slope/terrain metric where possible
+demand_weight
+
+Allow a reproducible RANDOM_SEED.
+
+==================================================
+8. POPULATION WEIGHTED SAMPLING
+==================================================
+
+If population is raster:
+use raster cell values as weights for customer-demand sampling.
+
+If population is polygon/vector:
+use population or population-density field as weights.
+
+If both are available:
+allow configuration of which one to use.
+
+Do not silently assume a population field.
+
+Provide a configuration variable such as:
+POPULATION_FIELD = "population"
+
+or:
+POPULATION_DENSITY_FIELD = "pop_density"
+
+If no valid population field/data exists:
+print a warning and fall back to uniform customer sampling.
+
+==================================================
+9. ELEVATION / DEM
+==================================================
+
+Use the elevation dataset to enrich the simulation.
+
+For each customer and business, where possible extract:
+elevation_m
+
+For each delivery route, derive a useful terrain metric such as:
+- elevation difference
+- approximate cumulative ascent
+- average route slope
+- maximum slope if feasible
+
+Do not make the terrain logic excessively complicated if QGIS lacks a robust route-elevation API.
+
+At minimum:
+business_elevation
+customer_elevation
+absolute_elevation_difference
+
+Optional:
+route_ascent_m
+route_descent_m
+
+==================================================
+10. ROUTING
+==================================================
+
+This is critical.
+
+Do NOT use straight-line distance as the final delivery distance.
+
+Use the road network.
+
+For each simulated customer/order:
+1. identify the selected/nearest eligible business
+2. snap business point to road network
+3. snap customer point to road network
+4. calculate shortest or fastest route
+5. calculate road distance
+6. calculate estimated travel time
+
+Use QGIS network analysis / QgsGraph / Processing algorithms / shortest path functionality as appropriate.
+
+Prefer an implementation that works locally in QGIS without requiring a paid routing API.
+
+If multiple routing approaches are possible:
+choose the most reliable PyQGIS-native approach.
+
+==================================================
+11. ROAD SPEED MODEL
+==================================================
+
+Estimate travel time using configurable speeds by OSM road type.
+
+Use reasonable DEFAULT simulation values but clearly mark them as assumptions.
+
+Example conceptual configuration only:
+motorway = 80 km/h
+trunk = 70
+primary = 60
+secondary = 50
+tertiary = 40
+residential = 30
+service = 20
+track = 15
+
+Do NOT present these values as measured Mutare traffic speeds.
+
+They are simulation assumptions.
+
+Make all speeds configurable at the top of the script.
+
+If maxspeed exists in OSM data, optionally use it where valid.
+
+==================================================
+12. VEHICLE TYPES
+==================================================
+
+Support multiple delivery vehicle modes:
+BICYCLE
+MOTORBIKE
+CAR
+
+Each mode should have:
+- speed multiplier or road speeds
+- maximum delivery radius
+- base fee
+- per-km fee if used
+- terrain/elevation sensitivity where appropriate
+
+Example architecture:
+DELIVERY_MODES = {
+    "bicycle": {...},
+    "motorbike": {...},
+    "car": {...}
+}
+
+Do not hard-code Musuwo's final real pricing.
+
+These are simulation parameters.
+
+==================================================
+13. DELIVERY FEE MODEL
+==================================================
+
+Build a configurable delivery-fee calculator.
+
+Support at least:
+
+OPTION A — distance bands
+0–2 km
+2–5 km
+5–10 km
+10–15 km
+
+OPTION B — base + per-km
+fee = base_fee + road_distance_km * per_km_rate
+
+OPTION C — optional terrain/time surcharge
+
+Allow configuration such as:
+DELIVERY_FEE_MODEL = "distance_band"
+
+Do not make one fee formula impossible to change later.
+
+==================================================
+14. SERVICEABILITY
+==================================================
+
+Determine whether an order is serviceable using configurable rules.
+
+Potential factors:
+- maximum road distance
+- maximum travel time
+- business delivery status
+- vehicle type
+- disconnected road network
+- terrain threshold where appropriate
+- service zone
+
+Return:
+serviceable = TRUE/FALSE
+
+and:
+serviceability_reason
+
+Examples:
+WITHIN_RANGE
+TOO_FAR
+NO_NETWORK_ROUTE
+BUSINESS_NOT_DELIVERING
+OUTSIDE_SERVICE_AREA
+
+==================================================
+15. BUSINESS ASSIGNMENT
+==================================================
+
+Do not always assign a customer to simply the nearest business unless configured.
+
+Support:
+ASSIGNMENT_MODE = "nearest"
+
+and optionally:
+ASSIGNMENT_MODE = "category_then_nearest"
+
+For category-based simulated orders:
+customer wants category
+→ identify businesses in that category
+→ choose nearest/lowest travel-cost eligible business
+
+If no matching business exists:
+record unmet demand.
+
+==================================================
+16. SERVICE ZONES
+==================================================
+
+Create service-zone polygons for businesses.
+
+Support:
+
+A. simple circular buffers
+
+and if practical:
+
+B. network-based service areas / isochrones
+
+Examples:
+5-minute
+10-minute
+15-minute
+or
+2 km
+5 km
+10 km road-network reach
+
+If true network isochrones are impractical with pure PyQGIS in the current environment:
+create distance-based buffers and clearly explain the limitation.
+
+Do not pretend circular buffers are actual road-network isochrones.
+
+==================================================
+17. DELIVERY ROUTE LAYER
+==================================================
+
+Create a route polyline layer.
+
+Each route should include fields such as:
+order_id
+customer_id
+business_id
+business_name
+vehicle_type
+road_distance_km
+travel_time_min
+delivery_fee
+serviceable
+elevation_difference_m
+route_status
+
+Use actual calculated route geometry where available.
+
+Do not draw only straight lines if network routing succeeded.
+
+==================================================
+18. DEMAND HOTSPOTS
+==================================================
+
+Generate demand visualisation.
+
+Create either:
+- heatmap-ready point layer
+- kernel density layer
+- grid/hexbin demand summary
+
+Use simulated order/customer density.
+
+Allow comparison with population density.
+
+Create a layer such as:
+Musuwo_Demand_Hotspots
+
+This should help answer:
+Where are potential Musuwo customers concentrated?
+
+==================================================
+19. PICKUP / HANDOVER POINT SUITABILITY
+==================================================
+
+Create a basic pickup-point suitability simulation.
+
+Potential factors:
+- population/demand density
+- road accessibility
+- proximity to multiple businesses
+- centrality
+- distance to underserved orders
+- slope/elevation penalty if useful
+
+Create candidate pickup points using:
+- grid points
+- demand hotspots
+- business clusters
+or another transparent method.
+
+Score each candidate.
+
+Fields:
+candidate_id
+demand_score
+road_access_score
+business_access_score
+terrain_score
+overall_score
+
+Create:
+Musuwo_Pickup_Candidates
+
+Do not claim these are optimal real-world locations.
+
+They are simulated planning candidates.
+
+==================================================
+20. DELIVERY PERFORMANCE SUMMARY
+==================================================
+
+Calculate summary statistics such as:
+number of businesses
+number of simulated orders
+serviceable orders
+unserviceable orders
+serviceability percentage
+average road distance
+median road distance
+average travel time
+median travel time
+average delivery fee
+total simulated delivery revenue
+orders by business
+orders by category
+orders by distance band
+orders by vehicle mode
+unmet demand by category
+
+If population data exists, also summarize by high/medium/low population zones where practical.
+
+==================================================
+21. BUSINESS PERFORMANCE
+==================================================
+
+Create per-business simulated metrics.
+
+Example:
+business_id
+business_name
+assigned_orders
+serviceable_orders
+average_delivery_distance_km
+average_delivery_time_min
+simulated_sales/orders
+simulated_delivery_revenue
+customer_catchment
+demand_score
+
+Do NOT use the word "profit" unless costs are explicitly modeled.
+
+Revenue is not profit.
+
+==================================================
+22. OPTIONAL RIDER SIMULATION
+==================================================
+
+Design the code so rider simulation can be added later.
+
+Optionally include a simple rider simulation if reasonable.
+
+Potential concepts:
+NUM_RIDERS
+rider start points
+vehicle type
+nearest available rider
+delivery assignment
+rider travel distance
+rider utilisation
+orders per rider
+
+Do not let this make the primary script unstable.
+
+If rider simulation becomes too complex:
+separate it into an optional module.
+
+==================================================
+23. VISUALISATION
+==================================================
+
+Automatically load and organize QGIS layers into groups:
+01_BASEMAP
+02_BOUNDARIES
+03_ROADS
+04_POPULATION
+05_ELEVATION
+06_BUSINESSES
+07_CUSTOMERS_ORDERS
+08_ROUTES
+09_SERVICE_ZONES
+10_DEMAND
+11_PICKUP_CANDIDATES
+
+Add sensible symbology programmatically where practical.
+
+Do not obsess over custom colors if it adds unnecessary complexity.
+
+At minimum:
+businesses = clear point layer
+customers = point layer
+routes = line layer
+service zones = transparent polygon layer
+demand = heatmap/graduated layer
+pickup candidates = graduated symbols
+
+==================================================
+24. OUTPUT FILES
+==================================================
+
+Do not leave everything only as temporary memory layers.
+
+Create an output folder such as:
+MUSUWO_MUTARE_SIMULATION_OUTPUT
+
+Save important outputs as GeoPackage.
+
+Preferred:
+musuwo_mutare_simulation.gpkg
+
+Layers may include:
+mutare_boundary
+osm_roads_clean
+musuwo_businesses
+musuwo_customers
+musuwo_orders
+musuwo_routes
+musuwo_service_zones
+musuwo_demand_hotspots
+musuwo_pickup_candidates
+
+Also create CSV summary outputs where useful.
+
+==================================================
+25. EXPORT SUMMARY
+==================================================
+
+Create:
+simulation_summary.csv
+business_summary.csv
+order_summary.csv
+pickup_candidate_summary.csv
+
+where relevant.
+
+==================================================
+26. PROJECT FILE
+==================================================
+
+Save a QGIS project after successful simulation.
+
+Example:
+Musuwo_Mutare_Delivery_Simulation.qgz
+
+Do not overwrite my existing QGIS project unless explicitly configured.
+
+==================================================
+27. CONFIGURATION SECTION
+==================================================
+
+Put ALL user-editable parameters near the top of the script.
+
+Example structure:
+PROJECT_DIR =
+MUTARE_BOUNDARY_PATH =
+POPULATION_PATH =
+POPULATION_FIELD =
+DEM_PATH =
+BUSINESS_PATH =
+OSM_ROAD_PATH =
+
+NUM_BUSINESSES =
+NUM_ORDERS =
+NUM_RIDERS =
+
+RANDOM_SEED =
+
+METRIC_CRS = "EPSG:32736"
+
+MAX_DELIVERY_DISTANCE_KM =
+
+DELIVERY_FEE_MODEL =
+
+VEHICLE_MODE =
+
+ROAD_SPEEDS = {...}
+
+Do not scatter configuration throughout the code.
+
+==================================================
+28. VALIDATION
+==================================================
+
+Before running the simulation, validate that:
+- files exist
+- layers load
+- geometries are valid enough
+- CRS exists
+- Mutare boundary is polygon
+- population data is readable
+- DEM is readable
+- road network exists or can be retrieved
+
+Print readable warnings/errors.
+
+Do not fail with cryptic Python stack traces where a clear validation message can be given.
+
+==================================================
+29. INTERNET / OSM FAILURE HANDLING
+==================================================
+
+If automatic OSM retrieval fails:
+
+DO NOT let the whole simulation collapse without explanation.
+
+Tell me exactly what road file I need to download and where to place it.
+
+Support running entirely from local files once the OSM road network has been downloaded.
+
+==================================================
+30. PERFORMANCE
+==================================================
+
+The script should be able to simulate:
+100 orders
+500 orders
+1000 orders
+
+without obviously inefficient nested full-layer scans where avoidable.
+
+Use:
+spatial indexes
+nearest-neighbour indexes
+cached features
+network preprocessing
+
+where appropriate.
+
+Explain any performance limitations.
+
+==================================================
+31. REPRODUCIBILITY
+==================================================
+
+Use RANDOM_SEED.
+
+Print all important simulation parameters to the console.
+
+Write them to a metadata text/JSON file in the output directory.
+
+Example:
+simulation_config.json
+
+This must make it possible to reproduce a run.
+
+==================================================
+32. NO FAKE REAL-WORLD CLAIMS
+==================================================
+
+This is a simulation.
+
+Clearly separate:
+
+REAL INPUT DATA:
+Mutare boundary
+OSM roads
+population
+DEM
+real businesses if supplied
+
+SIMULATED DATA:
+customers
+orders
+riders
+delivery demand
+fees if assumptions
+travel speed assumptions
+pickup candidates
+
+Do not present simulated values as measured Musuwo performance.
+
+==================================================
+33. FINAL CODE QUALITY
+==================================================
+
+I want READY-TO-RUN code.
+
+Use:
+- functions
+- clear variable names
+- comments
+- modular structure
+- exception handling
+- progress messages
+
+Avoid pseudocode.
+
+Do not give me "insert your logic here."
+
+If external Python packages are required:
+first prefer packages already bundled with QGIS.
+
+Avoid requiring pip packages unless absolutely necessary.
+
+If a package is required:
+tell me exactly how to install it in the QGIS Python environment.
+
+==================================================
+34. PREFERRED SCRIPT STRUCTURE
+==================================================
+
+You may create something like:
+01_musuwo_config.py
+02_musuwo_data_setup.py
+03_musuwo_osm_network.py
+04_musuwo_simulate_demand.py
+05_musuwo_routing.py
+06_musuwo_delivery_costs.py
+07_musuwo_hotspots_pickup.py
+08_musuwo_export.py
+run_musuwo_simulation.py
+
+OR one master script if that is more robust.
+
+If multiple files are used:
+give the FULL code for EVERY file.
+
+Do not omit code from any module.
+
+==================================================
+35. RUN INSTRUCTIONS
+==================================================
+
+Give exact QGIS instructions:
+1. Where to put the files.
+2. Which paths to edit.
+3. How to open QGIS Python Console.
+4. How to run the script.
+5. Which layers should appear.
+6. Where outputs will be saved.
+7. How to rerun with different parameters.
+8. How to change number of orders.
+9. How to switch vehicle mode.
+10. How to use real businesses later.
+
+==================================================
+36. FINAL OUTPUT I EXPECT
+==================================================
+
+At the end I want to be able to open QGIS and see:
+OpenStreetMap basemap
+Mutare boundary
+Population distribution
+Elevation
+OSM roads
+Business locations
+Simulated customers/orders
+Actual road-network delivery routes
+Serviceable vs unserviceable orders
+Delivery distances
+Travel times
+Delivery fee estimates
+Demand hotspots
+Potential pickup/handover points
+
+and summary outputs explaining how the simulated Musuwo delivery system performs.
+
+==================================================
+37. BUSINESS QUESTIONS THE SIMULATION SHOULD HELP ANSWER
+==================================================
+
+Design outputs so I can eventually evaluate:
+- What Musuwo delivery radius makes sense in Mutare?
+- Which areas have the highest potential customer demand?
+- Which areas are poorly served by current businesses?
+- Which merchants have the largest potential catchment?
+- Where could Musuwo pickup points be useful?
+- How far are customers likely to be from merchants?
+- How much time might deliveries take?
+- How might bicycle vs motorbike vs car change delivery feasibility?
+- How might elevation affect bicycle delivery?
+- What delivery fee structure might be reasonable to test?
+- Which categories show simulated unmet demand?
+- How many simulated orders fall outside serviceable range?
+
+Do NOT answer these questions with invented values.
+
+Build the simulation so the results can answer them.
+
+==================================================
+38. IMPORTANT — AUDIT MY DATA BEFORE CODING ASSUMPTIONS
+==================================================
+
+If you have access to the actual GIS project/datasets, inspect:
+- CRS
+- field names
+- geometry types
+- extents
+- population fields
+- DEM resolution
+- road-network availability
+
+before hard-coding assumptions.
+
+If you do NOT have the datasets:
+build robust configuration and validation so I can supply them.
+
+==================================================
+39. DO NOT OVERCOMPLICATE V1
+==================================================
+
+I want a serious simulation, but I also need it to WORK.
+
+Priority order:
+1. OSM basemap
+2. Mutare boundary
+3. OSM road network
+4. population-weighted demand
+5. businesses
+6. customers/orders
+7. road routing
+8. delivery distance/time
+9. fee/serviceability
+10. DEM/elevation enrichment
+11. demand hotspots
+12. pickup candidates
+13. exports
+14. optional rider simulation
+
+If an advanced feature threatens the stability of the whole build:
+implement the robust core first and make advanced features clearly optional.
+
+==================================================
+40. FINAL RESPONSE FORMAT
+==================================================
+
+Start by giving me:
+
+A. ARCHITECTURE SUMMARY
+B. REQUIRED DATASETS
+C. ASSUMPTIONS
+D. FILE STRUCTURE
+E. COMPLETE CODE
+F. STEP-BY-STEP QGIS RUN INSTRUCTIONS
+G. EXPECTED OUTPUT LAYERS
+H. VALIDATION CHECKLIST
+I. KNOWN LIMITATIONS
+J. HOW TO LATER CONNECT THE SAME LOGIC TO MUSUWO / POSTGIS
+
+Do not give only an explanation.
+
+I need the COMPLETE COPY-PASTE-READY QGIS/PyQGIS CODE.

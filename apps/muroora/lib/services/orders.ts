@@ -45,6 +45,15 @@ import type { CartOwner } from '@/lib/services/cart'
  * exactly the behaviour a server component gets.
  */
 
+import { metresToKmDisplay } from '@/lib/delivery/tariff'
+import {
+  QuoteError,
+  markQuoteConsumed,
+  redeemQuote,
+  type RedeemedQuote,
+} from '@/lib/services/delivery-quote'
+import { businesses } from '@/db/schema/marketplace'
+
 const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID!
 
 /** How long a repeated checkout is treated as the same attempt. */
@@ -82,6 +91,22 @@ export interface PlaceOrderInput {
   customerNote?: string
   /** Set when a signed-in account is placing it. Guests pass nothing. */
   userId?: string
+  /**
+   * A quote id from POST /api/delivery/quote.
+   *
+   * Present: the order is priced by road distance under the approved tariff,
+   * and the whole pricing snapshot is frozen onto it. The fee comes out of our
+   * own quote row - nothing the client posted about the price is read.
+   *
+   * Absent: the older suburb-and-zone path prices it, which is what the
+   * current web checkout still does. Both are supported on purpose. Cutting
+   * the zone path over in the same change that introduces road pricing would
+   * mean no way to sell anything on the day the routing service is
+   * misconfigured, and routing is not configured yet.
+   */
+  deliveryQuoteId?: string
+  /** Marked by staff, never by the customer. Adds the oversize surcharge. */
+  isHeavyOrOversized?: boolean
 }
 
 export interface PlacedOrder {
@@ -112,7 +137,8 @@ export class OrderError extends Error {
       | 'BELOW_MINIMUM'
       | 'INVALID_DETAILS'
       | 'NOT_FOUND'
-      | 'ILLEGAL_TRANSITION',
+      | 'ILLEGAL_TRANSITION'
+      | 'QUOTE_INVALID',
     message: string,
     readonly detail?: unknown,
   ) {
@@ -327,6 +353,45 @@ export async function placeOrder(
 
   /* ---- Delivery, quoted once and then stored ---------------------------- */
 
+  /* ---- Delivery: road distance where a quote was issued ---------------
+
+     Two paths, and which one runs is decided by whether the client obtained a
+     server quote. The road-distance path is the approved tariff; the zone path
+     is what checkout does today. Neither trusts a fee from the client: the
+     first re-reads its own quote row, the second recomputes from the suburb.  */
+
+  let snapshot: RedeemedQuote | null = null
+
+  if (input.deliveryQuoteId) {
+    // Which merchant is this basket from? Derived from the products, not from
+    // anything the client said - the quote is per merchant, and accepting a
+    // client's word for the merchant would let a two-kilometre shop's quote
+    // pay for a fifteen-kilometre one's delivery.
+    const [merchant] = await db
+      .select({ id: businesses.id })
+      .from(businesses)
+      .innerJoin(products, eq(products.storeId, businesses.storeId))
+      .where(eq(products.id, priced[0].productId))
+      .limit(1)
+
+    if (!merchant) {
+      throw new OrderError(
+        'QUOTE_INVALID',
+        'We could not tell which shop this basket belongs to. ' +
+          'Nothing has been ordered.',
+      )
+    }
+
+    try {
+      snapshot = await redeemQuote(input.deliveryQuoteId, merchant.id)
+    } catch (error) {
+      if (error instanceof QuoteError) {
+        throw new OrderError('QUOTE_INVALID', error.message)
+      }
+      throw error
+    }
+  }
+
   let quote
   try {
     quote = await quoteDelivery({
@@ -335,12 +400,17 @@ export async function placeOrder(
     })
   } catch (error) {
     if (error instanceof DeliveryError) {
-      throw new OrderError('NO_DELIVERY', error.message)
+      // A road-distance quote already priced this delivery, so the absence of
+      // a matching zone is not a reason to refuse the order. The zone lookup
+      // is only still consulted for its name and time estimate.
+      if (!snapshot) throw new OrderError('NO_DELIVERY', error.message)
+      quote = null
+    } else {
+      throw error
     }
-    throw error
   }
 
-  if (quote.belowMinimum) {
+  if (quote?.belowMinimum) {
     throw new OrderError(
       'BELOW_MINIMUM',
       `Deliveries to ${quote.zone.name} start at ` +
@@ -351,7 +421,13 @@ export async function placeOrder(
     )
   }
 
-  const total = add(subtotal, quote.fee)
+  /* The fee that will be charged. A redeemed quote wins outright: it is the
+     price the customer was shown and the one the server itself issued. */
+  const deliveryFee = snapshot
+    ? money(BigInt(snapshot.customerFeeCents), 'USD')
+    : quote!.fee
+
+  const total = add(subtotal, deliveryFee)
 
   /* ---- One transaction: order, lines, stock, event, cart --------------- */
 
@@ -384,8 +460,29 @@ export async function placeOrder(
 
         currency: 'USD',
         subtotalAmount: subtotal.amount,
-        deliveryFeeAmount: quote.fee.amount,
+        deliveryFeeAmount: deliveryFee.amount,
         totalAmount: total.amount,
+
+        /* The pricing snapshot, frozen. A database CHECK holds
+           delivery_customer_fee_cents equal to delivery_fee_amount, so these
+           cannot drift apart, and a second CHECK requires all of it or none. */
+        deliveryQuoteId: snapshot?.quoteId ?? null,
+        deliveryPricingVersion: snapshot?.pricingVersion ?? null,
+        deliveryServiceabilityReason: snapshot?.serviceabilityReason ?? null,
+        deliveryOriginLatitude: snapshot?.originLatitude ?? null,
+        deliveryOriginLongitude: snapshot?.originLongitude ?? null,
+        deliveryLatitude: snapshot?.destinationLatitude?.toString() ?? null,
+        deliveryLongitude: snapshot?.destinationLongitude?.toString() ?? null,
+        deliveryRoadDistanceM: snapshot?.roadDistanceM ?? null,
+        deliveryEstimatedTimeSeconds: snapshot?.estimatedTimeSeconds ?? null,
+        deliveryStandardFeeCents: snapshot?.standardFeeCents ?? null,
+        deliveryOversizeFeeCents: snapshot?.oversizeFeeCents ?? null,
+        deliveryPromotionSubsidyCents: snapshot?.promotionSubsidyCents ?? null,
+        deliveryCustomerFeeCents: snapshot?.customerFeeCents ?? null,
+        deliveryRoutingProvider: snapshot?.routingProvider ?? null,
+        deliveryRoutingDataVersion: snapshot?.routingDataVersion ?? null,
+        deliveryQuotedAt: snapshot?.quotedAt ?? null,
+        deliveryQuoteExpiredAt: snapshot?.expiresAt ?? null,
 
         // DRAFT would be wrong: the customer has committed. Payment has not
         // happened, and no provider exists yet, so PENDING_PAYMENT is the
@@ -393,7 +490,7 @@ export async function placeOrder(
         status: 'PENDING_PAYMENT',
         substitutionPreference: input.substitutionPreference ?? 'CONTACT_ME',
         customerNote: input.customerNote?.trim() || null,
-        zoneId: quote.zone.id,
+        zoneId: quote?.zone.id ?? null,
         placedAt: new Date(),
         // orderNumber omitted: the column default calls next_order_number(),
         // which is atomic.
@@ -451,10 +548,26 @@ export async function placeOrder(
       actorId: input.userId ?? null,
       metadata: {
         itemCount: priced.reduce((n, l) => n + l.quantity, 0),
-        zone: quote.zone.name,
+        zone: quote?.zone.name ?? null,
+        /* Which pricing model priced this order. Worth recording on the event
+           rather than inferring later from which columns are null: the two
+           paths coexist during the changeover and "why was this one $3" is
+           a question somebody will ask about a specific order. */
+        pricingBasis: snapshot ? 'ROAD_DISTANCE' : 'ZONE',
+        pricingVersion: snapshot?.pricingVersion ?? null,
+        roadDistanceM: snapshot?.roadDistanceM ?? null,
         guest: input.userId ? false : true,
       },
     })
+
+    /* Spend the quote, inside this transaction.
+       The UPDATE requires consumed_at to still be null and reports whether it
+       matched, so two simultaneous checkouts cannot both use one quote: the
+       loser's whole transaction rolls back rather than producing a second
+       order at a price quoted once. */
+    if (snapshot) {
+      await markQuoteConsumed(tx, snapshot.quoteId, order.id)
+    }
 
     // The cart is marked converted rather than deleted, so the customer's
     // order history can point back at exactly what they had chosen.
@@ -471,15 +584,29 @@ export async function placeOrder(
     orderNumber: placed.orderNumber,
     status: placed.status,
     subtotal,
-    deliveryFee: quote.fee,
+    deliveryFee,
     total,
     currency: 'USD',
     itemCount: priced.reduce((n, l) => n + l.quantity, 0),
     recipientName: placed.recipientName,
     deliverySuburb: placed.deliverySuburb,
-    zoneName: quote.zone.name,
-    estimatedMinutesMin: quote.zone.estimatedMinutesMin,
-    estimatedMinutesMax: quote.zone.estimatedMinutesMax,
+    /* A road-priced delivery has no zone, so it says the thing a customer
+       actually wants to see in its place: how far it is going. The
+       confirmation screen renders "Dangamvura - 7.3 km by road", which reads
+       correctly without the front end needing to know either model exists. */
+    zoneName:
+      quote?.zone.name ??
+      `${metresToKmDisplay(snapshot!.roadDistanceM)} km by road`,
+    estimatedMinutesMin:
+      quote?.zone.estimatedMinutesMin ??
+      (snapshot?.estimatedTimeSeconds
+        ? Math.round(snapshot.estimatedTimeSeconds / 60)
+        : null),
+    estimatedMinutesMax:
+      quote?.zone.estimatedMinutesMax ??
+      (snapshot?.estimatedTimeSeconds
+        ? Math.round(snapshot.estimatedTimeSeconds / 60)
+        : null),
     placedAt: placed.placedAt!,
     replayed: false,
   }

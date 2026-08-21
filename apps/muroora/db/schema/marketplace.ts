@@ -1,5 +1,6 @@
 import { relations, sql } from 'drizzle-orm'
 import {
+  doublePrecision,
   boolean,
   index,
   integer,
@@ -133,6 +134,28 @@ export const businesses = pgTable(
     coverImagePath: text('cover_image_path'),
     /** One line under the name on the banner. Capped at 120 characters. */
     tagline: text('tagline'),
+
+    /**
+     * Where the merchant actually is. Migration 0025.
+     *
+     * The origin of every road-distance delivery quote. Until this exists for
+     * a merchant, no delivery from them can be priced at all - `city` is not a
+     * point you can route from.
+     *
+     * A CHECK refuses a coordinate that is not one, and singles out (0, 0):
+     * that is what an empty form field looks like, and it is a real place in
+     * the Gulf of Guinea, so it would be routed and fail rather than rejected.
+     */
+    latitude: doublePrecision('latitude'),
+    longitude: doublePrecision('longitude'),
+    locationConfirmedAt: timestamp('location_confirmed_at', { withTimezone: true }),
+    locationConfirmedBy: uuid('location_confirmed_by'),
+    /**
+     * False means collection only, which is an ordinary way to trade - and is
+     * the BUSINESS_NOT_DELIVERING reason code. Kept as a column so the answer
+     * costs no routing call.
+     */
+    deliversLocally: boolean('delivers_locally').notNull().default(true),
 
     /** Public links deliberately supplied by the business owner. These are
      * separate from private application contact details. */
