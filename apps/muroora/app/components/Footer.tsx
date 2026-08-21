@@ -13,6 +13,10 @@ import { brand, isMuroora } from '@/lib/brand'
 const MUSUWO_URL = process.env.NEXT_PUBLIC_MUSUWO_URL
 
 export function Footer() {
+  /* Muroora's `contacts` array is empty on purpose - see lib/brand.ts - so
+     this is empty there and the "still to be confirmed" line survives. */
+  const footerContacts = brand.contacts.filter((contact) => contact.inFooter)
+
   return (
     <footer className="border-t border-rule bg-paper-sunk">
       <div className="mx-auto grid max-w-[86rem] gap-12 px-gutter py-16 md:grid-cols-12">
@@ -43,11 +47,32 @@ export function Footer() {
           <p className="mt-4 text-ink-soft">
             Mutare, Zimbabwe
           </p>
-          {/* Contact details are genuinely unknown - the company profile gives
-              the city and nothing more. Saying so beats inventing a number. */}
-          <p className="mt-4 max-w-[30ch] text-small text-ink-faint">
-            Phone and email are still to be confirmed.
-          </p>
+          {/* Muroora Mart's phone and address are real but were never written
+              into this app, so the honest line stays until they are. Musuwo's
+              addresses ARE live mailboxes, so it prints them: a footer telling
+              a visitor there is no way to write to us, on a site that has had
+              working mail for weeks, costs enquiries. */}
+          {footerContacts.length > 0 ? (
+            <ul className="mt-4 space-y-3">
+              {footerContacts.map((contact) => (
+                <li key={contact.address}>
+                  <a
+                    href={`mailto:${contact.address}`}
+                    className="text-ink-soft transition-colors hover:text-accent"
+                  >
+                    {contact.address}
+                  </a>
+                  <p className="mt-1 font-mono text-micro uppercase tracking-label text-ink-faint">
+                    {contact.label}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 max-w-[30ch] text-small text-ink-faint">
+              Phone and email are still to be confirmed.
+            </p>
+          )}
         </div>
 
         {/* Links to the parent only. The sister companies are listed on

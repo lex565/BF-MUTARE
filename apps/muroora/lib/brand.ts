@@ -75,8 +75,19 @@ interface BrandCopy {
    *
    * `purpose` is displayed. An address list with no explanation makes a person
    * guess which one to use, and they guess wrong, and the answer is slower.
+   *
+   * `inFooter` marks the addresses repeated in the footer of every page. The
+   * footer is not the contact page in miniature: it carries the two addresses
+   * a stranger needs before they have decided to look for a contact page, and
+   * the full list with its explanations stays on /contact. Order desks are
+   * reached from an order, not from the bottom of the homepage.
    */
-  contacts: { address: string; label: string; purpose: string }[]
+  contacts: {
+    address: string
+    label: string
+    purpose: string
+    inFooter?: boolean
+  }[]
 }
 
 export const BRAND: Record<SiteBrand, BrandCopy> = {
@@ -94,6 +105,7 @@ export const BRAND: Record<SiteBrand, BrandCopy> = {
         address: 'hello@musuwo.online',
         label: 'General',
         purpose: 'Anything about Musuwo, or if you are not sure who to ask.',
+        inFooter: true,
       },
       {
         address: 'support@musuwo.online',
@@ -104,6 +116,7 @@ export const BRAND: Record<SiteBrand, BrandCopy> = {
         address: 'marketing@musuwo.online',
         label: 'Business and press',
         purpose: 'Selling on Musuwo, partnerships, and press enquiries.',
+        inFooter: true,
       },
     ],
   },

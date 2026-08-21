@@ -64,3 +64,18 @@ yarn-error.log*
 .env*.local
 
 .verify-credentials
+
+# QGIS delivery simulation: the SCRIPTS and README are committed, the DATA is not.
+#
+# 9.5MB of national shapefiles/rasters plus a 2.2MB GeoPackage of simulated
+# output, all of it either downloadable again or reproducible by re-running
+# run_musuwo_simulation.py. This repository has already been through one
+# large-file problem (see Images/ above); adding 12MB of derived geodata that
+# nothing in the build reads would be repeating it on purpose.
+qgis_musuwo/data/
+qgis_musuwo/MUSUWO_MUTARE_SIMULATION_OUTPUT/
+qgis_musuwo/__pycache__/
+qgis_musuwo/qgis_run.log
+ZWE_*.zip
+symbology-style.db
+__pycache__/
